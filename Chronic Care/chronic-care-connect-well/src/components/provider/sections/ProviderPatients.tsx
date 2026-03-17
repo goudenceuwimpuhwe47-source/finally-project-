@@ -15,7 +15,7 @@ import { format } from "date-fns";
 import { Eye, FileText, Search, AlarmClock } from "lucide-react";
 import React, { useState } from "react";
 
-const API_URL = 'http://localhost:5000';
+import { API_URL } from "@/lib/utils";
 
 export const ProviderPatients = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;

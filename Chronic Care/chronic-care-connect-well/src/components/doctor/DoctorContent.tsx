@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { availableMedicines } from '@/lib/medicines';
+import { API_URL } from '@/lib/utils';
 
 export default function DoctorContent({ activeSection, setActiveSection }: { activeSection: string; setActiveSection: (s: string)=>void; }) {
   const { user } = useAuth();
@@ -38,7 +39,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
   const loadAssigned = async () => {
     if (!token) return;
     try {
-      const res = await fetch('http://localhost:5000/orders/doctor/assigned', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/orders/doctor/assigned`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       const arr = Array.isArray(data?.orders) ? data.orders : Array.isArray(data) ? data : [];
       if (arr.length === 0) return; // don't override optimistic UI with empty
@@ -51,7 +52,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
   const loadHistory = async () => {
     if (!token) return;
     try {
-      const res = await fetch('http://localhost:5000/orders/doctor/history', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/orders/doctor/history`, { headers: { Authorization: `Bearer ${token}` } });
       // allow either { orders: [...] } or a raw array
       let data: any = null;
       try { data = await res.json(); } catch { data = []; }
@@ -108,7 +109,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
       return;
     }
     try {
-      await requestJSON(`http://localhost:5000/orders/${current.id}/doctor-status`, {
+      await requestJSON(`${API_URL}/orders/${current.id}/doctor-status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -155,7 +156,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
       return;
     }
     try {
-      await requestJSON(`http://localhost:5000/orders/${current.id}/doctor-status`, {
+      await requestJSON(`${API_URL}/orders/${current.id}/doctor-status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status: 'rejected', reason: rejectReason.trim() }),
@@ -291,7 +292,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                             (() => {
                               const url = viewing?.medical_certificate?.startsWith('http')
                                 ? viewing.medical_certificate!
-                                : `http://localhost:5000/${viewing?.medical_certificate}`;
+                                : `${API_URL}/${viewing?.medical_certificate}`;
                               const isPdf = (viewing?.medical_certificate || '').toLowerCase().endsWith('.pdf');
                               if (isPdf) {
                                 return (
@@ -548,7 +549,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                             (() => {
                               const url = viewing?.medical_certificate?.startsWith('http')
                                 ? viewing.medical_certificate!
-                                : `http://localhost:5000/${viewing?.medical_certificate}`;
+                                : `${API_URL}/${viewing?.medical_certificate}`;
                               const isPdf = (viewing?.medical_certificate || '').toLowerCase().endsWith('.pdf');
                               if (isPdf) {
                                 return (

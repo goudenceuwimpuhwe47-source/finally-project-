@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-const API_URL = "http://localhost:5000";
+import { API_URL } from "@/lib/utils";
 
 export const ProviderAssigned = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;

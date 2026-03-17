@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { MessageSquare, Send, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { API_URL } from "@/lib/utils";
 
 type Msg = { id: number | string; from_role: string; to_role: string; content: string; created_at: string; status?: 'sent'|'delivered'|'read' };
 type ChatUser = { id: number; name?: string; email?: string; username?: string; lastMessage?: string; unreadCount?: number };
@@ -32,7 +33,7 @@ export const ProviderCommunication = () => {
   }, [messages.length]);
   const markRead = async (patientId: number) => {
     try {
-      await fetch('http://localhost:5000/provider/chat/mark-read', {
+      await fetch(`${API_URL}/provider/chat/mark-read`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ patientId })
       });
@@ -40,7 +41,7 @@ export const ProviderCommunication = () => {
   };
   const reloadActiveMessages = async (pid: number) => {
     try {
-      const res = await fetch(`http://localhost:5000/provider/chat/messages/${pid}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/provider/chat/messages/${pid}`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
   const list = Array.isArray(data.messages) ? data.messages : [];
   setMessages(sortByTime(list));
@@ -49,11 +50,11 @@ export const ProviderCommunication = () => {
 
   const loadAdminMessages = async () => {
     try {
-      const res = await fetch('http://localhost:5000/provider/chat/admin/messages', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/provider/chat/admin/messages`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       const list = Array.isArray(data.messages) ? data.messages : [];
       setMessages(sortByTime(list));
-      await fetch('http://localhost:5000/provider/chat/admin/mark-read', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+      await fetch(`${API_URL}/provider/chat/admin/mark-read`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
       setAdminUnread(0);
     } catch {}
   };
@@ -63,7 +64,7 @@ export const ProviderCommunication = () => {
     const load = async () => {
       if (!token) return;
       try {
-        const res = await fetch('http://localhost:5000/provider/chat/users', { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(`${API_URL}/provider/chat/users`, { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         setPatients(Array.isArray(data.users) ? data.users : []);
       } catch {}
@@ -84,7 +85,7 @@ export const ProviderCommunication = () => {
         setClearedAt(Number.isFinite(ts) ? ts : 0);
   const hidden = new Set<string>(JSON.parse(localStorage.getItem(`chatHidden:${key}`) || '[]'));
   setHiddenIds(hidden);
-        const res = await fetch(`http://localhost:5000/provider/chat/messages/${activePatient.id}`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(`${API_URL}/provider/chat/messages/${activePatient.id}`, { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         const list = Array.isArray(data.messages) ? data.messages : [];
         const filtered = list.filter((m:any) => {
@@ -92,7 +93,7 @@ export const ProviderCommunication = () => {
           return (!ts || t>=ts) && !hidden.has(String(m.id));
         });
   setMessages(sortByTime(filtered));
-        await fetch('http://localhost:5000/provider/chat/mark-read', {
+        await fetch(`${API_URL}/provider/chat/mark-read`, {
           method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ patientId: activePatient.id })
         });
@@ -106,7 +107,7 @@ export const ProviderCommunication = () => {
   // socket wiring
   useEffect(() => {
     if (!token) return;
-    const socket = io('http://localhost:5000', { auth: { token } });
+    const socket = io(API_URL, { auth: { token } });
     socketRef.current = socket;
     socket.on('message:new', (m: any) => {
       // Support provider<->patient and admin<->provider threads
@@ -119,7 +120,7 @@ export const ProviderCommunication = () => {
         if (activeAdmin) {
           setMessages(prev => sortByTime([...prev, m]));
           if (m.from_role === 'admin') {
-            fetch('http://localhost:5000/provider/chat/admin/mark-read', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(()=>{});
+            fetch(`${API_URL}/provider/chat/admin/mark-read`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(()=>{});
           }
           setAdminUnread(0);
         } else if (m.from_role === 'admin') {

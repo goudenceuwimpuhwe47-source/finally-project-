@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { Pill, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { API_URL } from '@/lib/utils';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -147,7 +148,7 @@ const Auth = () => {
     const email = formData.get('verifyEmail') as string;
     const code = formData.get('verifyCode') as string;
     try {
-      const res = await fetch('http://localhost:5000/auth/verify', {
+      const res = await fetch(`${API_URL}/auth/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code })

@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { io } from "socket.io-client";
+import { API_URL } from "@/lib/utils";
 
 interface AdminSidebarProps {
   activeSection: string;
@@ -18,7 +19,7 @@ export const AdminSidebar = ({ activeSection, setActiveSection }: AdminSidebarPr
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [loading, setLoading] = useState(true);
   const token = useMemo(()=> (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '', []);
-  const API_URL = 'http://localhost:5000';
+
 
   // Debug: Log state changes
   useEffect(() => {

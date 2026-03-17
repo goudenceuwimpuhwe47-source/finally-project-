@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { io } from "socket.io-client";
 
-const API_URL = 'http://localhost:5000';
+import { API_URL } from '@/lib/utils';
 
 export function PatientAlertsSection() {
   const token = useMemo(() => (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '', []);

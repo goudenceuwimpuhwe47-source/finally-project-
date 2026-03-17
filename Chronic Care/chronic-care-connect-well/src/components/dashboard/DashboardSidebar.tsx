@@ -2,6 +2,7 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, S
 import { Heart, Pill, MessageSquare, User, Bell, LogOut, AlarmClock } from "lucide-react";
 import LogoutConfirm from "./LogoutConfirm";
 import { useEffect, useMemo, useState } from "react";
+import { API_URL } from "@/lib/utils";
 import { io } from "socket.io-client";
 
 interface DashboardSidebarProps {
@@ -29,7 +30,6 @@ export function DashboardSidebar({ activeSection, setActiveSection }: DashboardS
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [unreadAlerts, setUnreadAlerts] = useState(0);
   const token = useMemo(()=> (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '', []);
-  const API_URL = 'http://localhost:5000';
   useEffect(() => {
     const h1 = (e: CustomEvent) => setUnreadAdmin(Number(e?.detail?.unread || 0));
     const h2 = (e: CustomEvent) => setUnreadDoctor(Number(e?.detail?.unread || 0));

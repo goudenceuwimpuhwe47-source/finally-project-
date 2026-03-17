@@ -7,23 +7,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { User, Lock, Mail, Phone } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-const API_FALLBACKS = [
-  typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_API_URL ? String((import.meta as any).env.VITE_API_URL).replace(/\/$/, '') : null,
-  'http://localhost:5000',
-  'http://localhost:5001',
-].filter(Boolean) as string[];
+import { API_URL } from '@/lib/utils';
 
 async function apiFetch(path: string, token: string, init?: RequestInit) {
-  let lastErr: any = null;
-  for (const base of API_FALLBACKS) {
-    try {
-      const res = await fetch(`${base}${path}`, { ...(init||{}), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init?.headers||{}) } });
-      if (res.ok) return await res.json();
-      lastErr = await res.text();
-    } catch (e: any) { lastErr = e?.message || 'Failed'; }
+  try {
+    const res = await fetch(`${API_URL}${path}`, { ...(init||{}), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init?.headers||{}) } });
+    if (res.ok) return await res.json();
+    const errorText = await res.text();
+    throw new Error(errorText || `Request failed with status ${res.status}`);
+  } catch (e: any) {
+    throw new Error(e?.message || 'Request failed');
   }
-  throw new Error(lastErr || 'Request failed');
 }
 
 export function ProfileSection() {

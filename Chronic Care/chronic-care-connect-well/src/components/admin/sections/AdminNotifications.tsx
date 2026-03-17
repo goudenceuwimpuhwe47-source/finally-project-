@@ -9,7 +9,7 @@ import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
-const API_URL = "http://localhost:5000";
+import { API_URL } from "@/lib/utils";
 
 export const AdminNotifications = () => {
   const { user } = useAuth();
@@ -32,7 +32,7 @@ export const AdminNotifications = () => {
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) return;
-    const socket = io('http://localhost:5000', { auth: { token } });
+    const socket = io(API_URL, { auth: { token } });
     
     // Listen for payment notifications
     socket.on('order:payment_received', (p: any) => {

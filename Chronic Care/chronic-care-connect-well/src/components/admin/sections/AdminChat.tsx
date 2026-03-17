@@ -10,6 +10,7 @@ import { PatientListItem } from "./chat/PatientListItem";
 import { EmptyChat } from "./chat/EmptyChat";
 import { io, Socket } from "socket.io-client";
 import { Input } from "@/components/ui/input";
+import { API_URL } from "@/lib/utils";
 
 export interface ChatMessage {
   id: number | string;
@@ -48,7 +49,7 @@ export const AdminChat = () => {
   useEffect(() => {
     const loadUsers = async () => {
       try {
-        const res = await fetch('http://localhost:5000/admin/chat/users', {
+        const res = await fetch(`${API_URL}/admin/chat/users`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
@@ -74,7 +75,7 @@ export const AdminChat = () => {
     const loadMessages = async () => {
       if (!selectedPatient) return;
       try {
-        const res = await fetch(`http://localhost:5000/admin/chat/messages/${selectedPatient.id}?page=${page}&pageSize=${pageSize}` ,{
+        const res = await fetch(`${API_URL}/admin/chat/messages/${selectedPatient.id}?page=${page}&pageSize=${pageSize}` ,{
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
@@ -89,7 +90,7 @@ export const AdminChat = () => {
           }));
           setMessages(msgs);
           // mark read
-          await fetch('http://localhost:5000/admin/chat/mark-read', {
+          await fetch(`${API_URL}/admin/chat/mark-read`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ patientId: selectedPatient.id })
@@ -103,7 +104,7 @@ export const AdminChat = () => {
   // Socket setup
   useEffect(() => {
     if (!token) return;
-    const socket = io('http://localhost:5000', { auth: { token } });
+    const socket = io(API_URL, { auth: { token } });
     socketRef.current = socket;
     socket.on('connect', () => {});
     socket.on('presence:snapshot', (snap: any) => {
@@ -132,7 +133,7 @@ export const AdminChat = () => {
           // If incoming from patient while open, mark read immediately
           if (m.from_role === 'patient') {
             try {
-              await fetch('http://localhost:5000/admin/chat/mark-read', {
+              await fetch(`${API_URL}/admin/chat/mark-read`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ patientId: selectedPatient.id })
               });

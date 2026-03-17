@@ -4,6 +4,7 @@ import { Bell } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { io } from "socket.io-client";
+import { API_URL } from "@/lib/utils";
 
 type PatientNotification = {
   id: string | number;
@@ -16,7 +17,6 @@ type PatientNotification = {
 export function NotificationsSection() {
   const [items, setItems] = useState<PatientNotification[]>([]);
   const token = useMemo(()=> localStorage.getItem('token') || '', []);
-  const API_URL = 'http://localhost:5000';
 
   // Load existing notifications on mount
   const { data } = useQuery({
@@ -38,7 +38,7 @@ export function NotificationsSection() {
 
   useEffect(() => {
     if (!token) return;
-    const socket = io('http://localhost:5000', { auth: { token } });
+    const socket = io(API_URL, { auth: { token } });
     // when admin sends invoice, notify patient to pay
   socket.on('order:invoice_sent', (p: any) => {
       const n: PatientNotification = {

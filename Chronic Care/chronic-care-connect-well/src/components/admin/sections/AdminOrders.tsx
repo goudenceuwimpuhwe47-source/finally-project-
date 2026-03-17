@@ -13,8 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { io } from "socket.io-client";
-
-const API_URL = "http://localhost:5000";
+import { API_URL } from "@/lib/utils";
 
 export const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");

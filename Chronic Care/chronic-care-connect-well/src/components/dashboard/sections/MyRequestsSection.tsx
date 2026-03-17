@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MtnMomoDialog } from './RequestMedicationSection';
 import { io } from 'socket.io-client';
+import { API_URL } from '@/lib/utils';
 
 type Order = {
   id: number;
@@ -46,7 +47,7 @@ export function MyRequestsSection({ setActiveSection }: { setActiveSection?: (s:
 
   useEffect(() => {
     if (!token) return;
-    fetch('http://localhost:5000/orders/my', { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(d => setOrders(Array.isArray(d.orders) ? d.orders : []))
       .catch(() => {});
@@ -55,10 +56,10 @@ export function MyRequestsSection({ setActiveSection }: { setActiveSection?: (s:
   // Realtime: prescription created
   useEffect(() => {
     if (!token) return;
-    const socket = io('http://localhost:5000', { auth: { token } });
+    const socket = io(API_URL, { auth: { token } });
     socket.on('prescription:created', async (p: any) => {
       try {
-        const list = await fetch('http://localhost:5000/orders/my', { headers: { Authorization: `Bearer ${token}` } });
+        const list = await fetch(`${API_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } });
         const listData = await list.json();
         setOrders(Array.isArray(listData.orders) ? listData.orders : []);
       } catch {}
@@ -172,7 +173,7 @@ export function MyRequestsSection({ setActiveSection }: { setActiveSection?: (s:
         token={token}
         onPaid={async () => {
           try {
-            const list = await fetch('http://localhost:5000/orders/my', { headers: { Authorization: `Bearer ${token}` } });
+            const list = await fetch(`${API_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } });
             const listData = await list.json();
             setOrders(Array.isArray(listData.orders) ? listData.orders : []);
           } catch (e) {}
@@ -197,7 +198,7 @@ function PatientOrderPrescriptions({ orderId, token }: { orderId: number; token:
     let mounted = true;
     const load = async () => {
       try {
-        const r = await fetch(`http://localhost:5000/orders/${orderId}/prescriptions`, { headers: { Authorization: `Bearer ${token}` } });
+        const r = await fetch(`${API_URL}/orders/${orderId}/prescriptions`, { headers: { Authorization: `Bearer ${token}` } });
         const b = await r.json();
   const rows = Array.isArray(b?.prescriptions) ? b.prescriptions : [];
   // Only show the latest active prescription to the patient

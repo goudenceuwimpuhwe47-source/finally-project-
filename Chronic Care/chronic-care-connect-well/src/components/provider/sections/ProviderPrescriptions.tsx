@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-const API_URL = 'http://localhost:5000';
+import { API_URL } from "@/lib/utils";
 
 export const ProviderPrescriptions = () => {
   const { user } = useAuth();

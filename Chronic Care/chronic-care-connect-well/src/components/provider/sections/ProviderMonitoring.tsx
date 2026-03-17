@@ -4,9 +4,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-const API_URL = "http://localhost:5000";
+import { API_URL } from "@/lib/utils";
 
-export const ProviderMonitoring = () => {
+export function ProviderMonitoring() {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const qc = useQueryClient();
 

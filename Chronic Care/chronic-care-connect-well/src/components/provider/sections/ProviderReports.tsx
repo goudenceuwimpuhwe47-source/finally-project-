@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
-const API_URL = 'http://localhost:5000';
+import { API_URL } from "@/lib/utils";
 
 export const ProviderReports = () => {
   const token = (typeof window !== 'undefined' ? localStorage.getItem('token') : null) as string | null;

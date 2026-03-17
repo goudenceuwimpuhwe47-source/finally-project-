@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, FileText, Activity, TrendingUp, AlertCircle, Stethoscope } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { API_URL } from "@/lib/utils";
 
 type AdminStats = {
   pendingOrders: number;
@@ -29,7 +30,7 @@ type RecentOrder = {
   full_name?: string | null; // also stored on the order itself
 };
 
-const API_URL = "http://localhost:5000";
+
 
 export const AdminDashboard = () => {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;

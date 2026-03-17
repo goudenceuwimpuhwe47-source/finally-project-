@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { chronicDiseasesRW, dosageFrequencies, genders, paymentMethods } from '@/lib/diseases';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -121,7 +122,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
   useEffect(() => {
     if (!token || profileLoaded) return;
     
-    fetch('http://localhost:5000/users/me', {
+    fetch(`${API_URL}/users/me`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(r => r.json())
@@ -147,7 +148,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
 
   useEffect(() => {
     if (!token) return;
-    fetch('http://localhost:5000/orders/my', {
+    fetch(`${API_URL}/orders/my`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(r => r.json())
@@ -197,7 +198,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
       const cert = (watch('medicalCertificate') as FileList | undefined)?.[0];
       if (cert) fd.append('medicalCertificate', cert);
 
-      const res = await fetch('http://localhost:5000/orders', {
+      const res = await fetch(`${API_URL}/orders`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -210,7 +211,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
       toast({ title: 'Request submitted', description: 'Your request has been sent for review.' });
       reset();
       // refresh orders
-      const list = await fetch('http://localhost:5000/orders/my', { headers: { Authorization: `Bearer ${token}` } });
+      const list = await fetch(`${API_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } });
       const listData = await list.json();
       setOrders(Array.isArray(listData.orders) ? listData.orders : []);
     } catch (e) {
@@ -239,7 +240,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
       const cert = (watch('medicalCertificate') as FileList | undefined)?.[0];
       if (cert) fd.append('medicalCertificate', cert);
 
-      const res = await fetch(`http://localhost:5000/orders/${editing.id}`, {
+      const res = await fetch(`${API_URL}/orders/${editing.id}`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -252,7 +253,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
       toast({ title: 'Order updated', description: 'Your request was updated.' });
       setEditing(null);
       // refresh orders
-      const list = await fetch('http://localhost:5000/orders/my', { headers: { Authorization: `Bearer ${token}` } });
+      const list = await fetch(`${API_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } });
       const listData = await list.json();
       setOrders(Array.isArray(listData.orders) ? listData.orders : []);
     } catch (e) {
@@ -265,7 +266,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
   const onCancelOrder = async (id: number) => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:5000/orders/${id}/cancel`, {
+      const res = await fetch(`${API_URL}/orders/${id}/cancel`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -276,7 +277,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
       }
       toast({ title: 'Order canceled', description: 'Your request was canceled.' });
       // refresh
-      const list = await fetch('http://localhost:5000/orders/my', { headers: { Authorization: `Bearer ${token}` } });
+      const list = await fetch(`${API_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } });
       const listData = await list.json();
       setOrders(Array.isArray(listData.orders) ? listData.orders : []);
     } catch {
@@ -522,7 +523,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                                 (() => {
                                   const url = viewing?.medical_certificate?.startsWith('http')
                                     ? viewing.medical_certificate!
-                                    : `http://localhost:5000/${viewing?.medical_certificate}`;
+                                    : `${API_URL}/${viewing?.medical_certificate}`;
                                   const isPdf = (viewing?.medical_certificate || '').toLowerCase().endsWith('.pdf');
                                   if (isPdf) {
                                     return (
@@ -811,7 +812,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
         token={token}
         onPaid={async () => {
           try {
-            const list = await fetch('http://localhost:5000/orders/my', { headers: { Authorization: `Bearer ${token}` } });
+            const list = await fetch(`${API_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } });
             const listData = await list.json();
             setOrders(Array.isArray(listData.orders) ? listData.orders : []);
             if (viewing) setViewing(null);
@@ -846,7 +847,7 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
               className="bg-yellow-600 hover:bg-yellow-700"
               onClick={async ()=>{
                 try {
-                  const r = await fetch(`http://localhost:5000/payments/mtn/request`, {
+                  const r = await fetch(`${API_URL}/payments/mtn/request`, {
                     method: 'POST', headers: { 'Content-Type':'application/json', Authorization: `Bearer ${token}` },
                     body: JSON.stringify({ orderId: order?.id, msisdn })
                   });
@@ -870,7 +871,7 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
                   variant="outline"
                   onClick={async ()=>{
                     try {
-                      const r = await fetch(`http://localhost:5000/payments/mtn/status/${referenceId}`, { headers: { Authorization: `Bearer ${token}` } });
+                      const r = await fetch(`${API_URL}/payments/mtn/status/${referenceId}`, { headers: { Authorization: `Bearer ${token}` } });
                       const b = await r.json();
                       if (!r.ok || b?.error) throw new Error(b?.error || 'Status failed');
                       setStatus(b.status);

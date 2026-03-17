@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowRight, Play, Pill, Shield, Activity, Clock } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { API_URL } from '@/lib/utils';
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 
 interface SystemStats {
@@ -29,7 +30,6 @@ const Hero = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const response = await fetch(`${API_URL}/users/stats`);
         if (response.ok) {
           const data = await response.json();
@@ -45,18 +45,19 @@ const Hero = () => {
     fetchStats();
   }, []);
 
+  const { toast } = useToast();
   const handleGetStarted = () => {
     if (user) {
   navigate(dashPath);
-      toast.success("Welcome back to your dashboard!");
+      toast({ title: "Welcome back!", description: "Welcome back to your dashboard!" });
     } else {
       navigate('/auth');
-      toast.info("Sign up to start managing your chronic care!");
+      toast({ title: "Getting started", description: "Sign up to start managing your chronic care!" });
     }
   };
 
   const handleWatchDemo = () => {
-    toast.info("Demo video coming soon! Contact us for a live demonstration.");
+    toast({ title: "Demo mode", description: "Demo video coming soon! Contact us for a live demonstration." });
   };
 
   return (

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Plus, RefreshCw, Search, Edit3, Trash2, ArrowUpCircle, ArrowDownCircle, Equal } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const API_URL = 'http://localhost:5000';
+import { API_URL } from "@/lib/utils";
 
 function fmtDate(d?: string | null) {
   if (!d) return '-';

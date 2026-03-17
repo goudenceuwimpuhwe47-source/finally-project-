@@ -6,6 +6,7 @@ import { Send, MessageSquare, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useToast } from "@/hooks/use-toast";
+import { API_URL } from "@/lib/utils";
 
 type Msg = { id: number | string; from_role: string; to_role: string; content: string; created_at: string; status?: 'sent'|'delivered'|'read' };
 type ChatTarget = 'admin'|'doctor'|'pharmacy';
@@ -77,7 +78,7 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
           setClearedAt(0);
         }
         if (target === 'admin') {
-          const res = await fetch('http://localhost:5000/chat/messages/admin', {
+          const res = await fetch(`${API_URL}/chat/messages/admin`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           const data = await res.json();
@@ -95,7 +96,7 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
             setMessages(sortByTime(filtered));
             setClearedAt(ts);
           }
-          await fetch('http://localhost:5000/chat/mark-read/admin', {
+          await fetch(`${API_URL}/chat/mark-read/admin`, {
             method: 'POST', headers: { Authorization: `Bearer ${token}` }
           });
           // clear admin unread badge when entering
@@ -103,14 +104,14 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
           window.dispatchEvent(new CustomEvent('patient-unread-admin:update', { detail: { unread: 0 } }));
   } else if (target === 'doctor') {
           // Determine current assigned doctor from last order with under_review/doctor_status pending/approved
-          const ord = await fetch('http://localhost:5000/orders/my', { headers: { Authorization: `Bearer ${token}` } });
+          const ord = await fetch(`${API_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } });
           const list = await ord.json();
           const orders: any[] = Array.isArray(list.orders) ? list.orders : [];
           const active = orders.find((o:any) => o.admin_status === 'under_review' && o.doctor_status !== 'approved' && o.doctor_id) || orders.find((o:any) => o.doctor_id);
           const doctorId = active?.doctor_id;
           if (!doctorId) { setDoctorId(null); setMessages([]); setDoctorName('Doctor'); return; }
           setDoctorId(Number(doctorId));
-          const res = await fetch(`http://localhost:5000/chat/messages/doctor?doctorId=${doctorId}`, {
+          const res = await fetch(`${API_URL}/chat/messages/doctor?doctorId=${doctorId}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           const data = await res.json();
@@ -125,7 +126,7 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
             setMessages(sortByTime(filtered));
             setClearedAt(Number.isFinite(ts) ? ts : 0);
           }
-          await fetch('http://localhost:5000/chat/mark-read/doctor', {
+          await fetch(`${API_URL}/chat/mark-read/doctor`, {
             method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ doctorId })
           });
@@ -135,7 +136,7 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
           window.dispatchEvent(new CustomEvent('patient-unread-doctor:update', { detail: { unread: 0 } }));
           // try to resolve doctor name
           try {
-            const ures = await fetch('http://localhost:5000/admin/doctors', { headers: { Authorization: `Bearer ${token}` } });
+            const ures = await fetch(`${API_URL}/admin/doctors`, { headers: { Authorization: `Bearer ${token}` } });
             if (ures.ok) {
               const body = await ures.json();
               const list = Array.isArray(body.users) ? body.users : [];
@@ -145,14 +146,14 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
           } catch {}
         } else if (target === 'pharmacy') {
           // Determine current assigned provider from last active order (admin approved, paid, with provider assigned)
-          const ord = await fetch('http://localhost:5000/orders/my', { headers: { Authorization: `Bearer ${token}` } });
+          const ord = await fetch(`${API_URL}/orders/my`, { headers: { Authorization: `Bearer ${token}` } });
           const list = await ord.json();
           const orders: any[] = Array.isArray(list.orders) ? list.orders : [];
           const active = orders.find((o:any) => !!o.provider_id) || orders[0];
           const provId = active?.provider_id;
           if (!provId) { setProviderId(null); setMessages([]); return; }
           setProviderId(Number(provId));
-          const res = await fetch(`http://localhost:5000/chat/messages/provider?providerId=${provId}`, {
+          const res = await fetch(`${API_URL}/chat/messages/provider?providerId=${provId}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           const data = await res.json();
@@ -167,7 +168,7 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
             setMessages(sortByTime(filtered));
             setClearedAt(Number.isFinite(ts) ? ts : 0);
           }
-          await fetch('http://localhost:5000/chat/mark-read/provider', {
+          await fetch(`${API_URL}/chat/mark-read/provider`, {
             method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ providerId: provId })
           });
@@ -186,7 +187,7 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
   // Socket setup
   useEffect(() => {
     if (!token) return;
-    const socket = io('http://localhost:5000', { auth: { token } });
+    const socket = io(API_URL, { auth: { token } });
   socketRef.current = socket;
   socket.on('message:new', async (m: any) => {
       const isAdminPair = (m.from_role === 'admin' && m.to_role === 'patient') || (m.from_role === 'patient' && m.to_role === 'admin');
@@ -204,11 +205,11 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
         try {
           if (m.to_role === 'patient') {
             if (target === 'admin' && m.from_role === 'admin') {
-              await fetch('http://localhost:5000/chat/mark-read/admin', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+              await fetch(`${API_URL}/chat/mark-read/admin`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
             } else if (target === 'doctor' && m.from_role === 'doctor') {
               const d = Number(sessionStorage.getItem('chatDoctorId') || '0');
               if (isFinite(d) && d > 0) {
-                await fetch('http://localhost:5000/chat/mark-read/doctor', {
+                await fetch(`${API_URL}/chat/mark-read/doctor`, {
                   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                   body: JSON.stringify({ doctorId: d })
                 });
@@ -227,7 +228,7 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
                 }
               }
               if (isFinite(p) && p > 0) {
-                await fetch('http://localhost:5000/chat/mark-read/provider', {
+                await fetch(`${API_URL}/chat/mark-read/provider`, {
                   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                   body: JSON.stringify({ providerId: p })
                 });

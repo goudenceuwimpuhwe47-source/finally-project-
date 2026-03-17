@@ -9,20 +9,16 @@ interface MedicationsSectionProps {
   onRequestMedication?: () => void;
 }
 
-const API_FALLBACKS = [
-  typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_API_URL ? String((import.meta as any).env.VITE_API_URL).replace(/\/$/, '') : null,
-  'http://localhost:5000',
-  'http://localhost:5001',
-].filter(Boolean) as string[];
+import { API_URL } from '@/lib/utils';
 
 async function apiGetJson(path: string, token: string) {
-  for (const base of API_FALLBACKS) {
-    try {
-      const res = await fetch(`${base}${path}`, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) return await res.json();
-    } catch {}
+  try {
+    const res = await fetch(`${API_URL}${path}`, { headers: { Authorization: `Bearer ${token}` } });
+    if (res.ok) return await res.json();
+    return null;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 export function MedicationsSection({ onRequestMedication }: MedicationsSectionProps) {
@@ -95,17 +91,14 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
   // Mark alert as taken
   const markTaken = useMutation({
     mutationFn: async (id: number) => {
-      // try each base until one succeeds
-      let lastErr: any = null;
-      for (const base of API_FALLBACKS) {
-        try {
-          const res = await fetch(`${base}/alerts/${id}/mark-taken`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-          const b = await res.json();
-          if (!res.ok || b?.error) { lastErr = b?.error || 'Failed'; continue; }
-          return b;
-        } catch (e: any) { lastErr = e?.message || 'Failed'; }
+      try {
+        const res = await fetch(`${API_URL}/alerts/${id}/mark-taken`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+        const b = await res.json();
+        if (!res.ok || b?.error) throw new Error(b?.error || 'Failed');
+        return b;
+      } catch (e: any) {
+        throw new Error(e?.message || 'Failed');
       }
-      throw new Error(lastErr || 'Failed');
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['patientNextAlert'] });

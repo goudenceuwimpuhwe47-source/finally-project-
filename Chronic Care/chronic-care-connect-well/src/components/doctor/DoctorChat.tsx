@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Send, Search } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
 import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/utils';
 
 type UserItem = { id: number; name?: string; username?: string; email?: string; lastMessage?: string; unreadCount?: number };
 type Msg = { id: number|string; from_user_id?: number; from_role: string; to_user_id?: number|null; to_role: string; content: string; created_at: string; status?: 'sent'|'delivered'|'read' };
@@ -27,7 +28,7 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
   const fetchUsers = async () => {
     if (!token) return;
     try {
-      const res = await fetch('http://localhost:5000/doctor/chat/users', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/doctor/chat/users`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
   const list = Array.isArray(data.users) ? data.users : [];
   setUsers(list);
@@ -41,11 +42,11 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
   const fetchThread = async (patientId: number) => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:5000/doctor/chat/messages/${patientId}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/doctor/chat/messages/${patientId}`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       setMessages(Array.isArray(data.messages) ? data.messages.reverse() : []);
       // mark read
-      await fetch('http://localhost:5000/doctor/chat/mark-read', {
+      await fetch(`${API_URL}/doctor/chat/mark-read`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ patientId })
       });
@@ -67,7 +68,7 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
 
   useEffect(() => {
     if (!token) return;
-    const socket = io('http://localhost:5000', { auth: { token } });
+    const socket = io(API_URL, { auth: { token } });
     socketRef.current = socket;
     socket.on('message:new', async (m: any) => {
       const otherIsActive = (m.from_role === 'patient' && m.from_user_id === activeUserId) || (m.to_role === 'patient' && m.to_user_id === activeUserId);
@@ -84,7 +85,7 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
         // mark read if viewing this patient's thread
         try {
           if (otherIsActive && m.from_user_id) {
-            await fetch('http://localhost:5000/doctor/chat/mark-read', {
+            await fetch(`${API_URL}/doctor/chat/mark-read`, {
               method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
               body: JSON.stringify({ patientId: m.from_user_id })
             });
