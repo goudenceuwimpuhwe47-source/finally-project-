@@ -23,11 +23,11 @@ export function useDownloadPdf() {
     if (kind === 'about') {
       lines.push(
         'This is a Final Year Project (FYP) focused on Medication Ordering and Care Coordination.',
-        'Student: Byenvenue Fabrice',
-        'Program: Information Technology, Year 3',
-        'Institution: RP-College Ngoma',
-        'Email: medicationorderingsystemforchr@gmail.com',
-        'Phone: +250 786 500 175'
+        'Student: UWIMPUHWE Gaudence',
+        'Faculty: Faculty of Computing information sciences',
+        'Department: Department of software engineering',
+        'Email: goudenceuwimpuhwe47@gmail.com',
+        'Phone: +250 792369995'
       );
     } else {
       lines.push('This PDF was generated from the web application.');

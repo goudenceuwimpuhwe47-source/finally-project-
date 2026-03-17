@@ -52,21 +52,21 @@ const Footer = () => {
             <div className="space-y-3">
               <div 
                 className="flex items-center space-x-3 cursor-pointer hover:text-blue-400 transition-colors"
-                onClick={() => toast.info("Email us at medicationorderingsystemforchr@gmail.com")}
+                onClick={() => toast.info("Email us at goudenceuwimpuhwe47@gmail.com")}
               >
                 <Mail className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300">medicationorderingsystemforchr@gmail.com</span>
+                <span className="text-gray-300">goudenceuwimpuhwe47@gmail.com</span>
               </div>
               <div 
                 className="flex items-center space-x-3 cursor-pointer hover:text-blue-400 transition-colors"
-                onClick={() => toast.info("Call: +250 786 500 175")}
+                onClick={() => toast.info("Call: +250 792369995")}
               >
                 <Phone className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300">+250 786 500 175</span>
+                <span className="text-gray-300">+250 792369995</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300">RP-College Ngoma</span>
+                <span className="text-gray-300">Software Engineering Department</span>
               </div>
             </div>
           </div>
@@ -168,7 +168,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 mb-4 md:mb-0">© {new Date().getFullYear()} Byenvenue Fabrice — Chronic Care Connect Well (FYP).</p>
+            <p className="text-gray-400 mb-4 md:mb-0">© {new Date().getFullYear()} UWIMPUHWE Gaudence — Chronic Care Connect Well (FYP).</p>
             <div className="flex space-x-6">
               <button 
                 onClick={() => toast.info("HIPAA Compliant: Your health data is fully protected")}
@@ -177,7 +177,7 @@ const Footer = () => {
                 HIPAA Compliant
               </button>
               <button 
-                onClick={() => toast.info("Student Project: RP-College Ngoma, IT Year 3")}
+                onClick={() => toast.info("Student Project: Department of software engineering")}
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 Student Project

@@ -22,7 +22,7 @@ const CallToAction = () => {
   };
 
   const handleContactSales = () => {
-    toast.info("Contact: +250 786 500 175 • medicationorderingsystemforchr@gmail.com");
+    toast.info("Contact: +250 792369995 • goudenceuwimpuhwe47@gmail.com");
   };
 
   return (

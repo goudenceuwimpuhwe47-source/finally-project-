@@ -1000,9 +1000,9 @@ router.post('/:id/invoice', auth, requireRole('admin'), async (req, res) => {
       const [urows] = await pool.query('SELECT email FROM users WHERE id=?', [order.user_id]);
       const email = urows?.[0]?.email;
       if (email) {
-        const transporter = require('nodemailer').createTransport({ service: 'gmail', auth: { user: 'medicationorderingsystemforchr@gmail.com', pass: 'yuwhtxwxonnzdmvz' }});
+        const transporter = require('nodemailer').createTransport({ service: 'gmail', auth: { user: 'goudenceuwimpuhwe47@gmail.com', pass: 'yuwhtxwxonnzdmvz' }});
         await transporter.sendMail({
-          from: 'Medication Ordering System <medicationorderingsystemforchr@gmail.com>',
+          from: 'Medication Ordering System <goudenceuwimpuhwe47@gmail.com>',
           to: email,
           subject: `Invoice for Order #${orderId}`,
           html: `<p>Hello,</p><p>Your invoice for Order #${orderId} is ready.</p><ul>
