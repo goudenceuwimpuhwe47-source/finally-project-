@@ -4,12 +4,18 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // true for 465, false for other ports
+  port: 587,
+  secure: false, // Port 587 uses STARTTLS
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  tls: {
+    rejectUnauthorized: false
+  },
+  logger: true,
+  debug: true,
+  connectionTimeout: 30000 // 30 seconds
 });
 
 async function sendVerificationEmail(to, code) {
