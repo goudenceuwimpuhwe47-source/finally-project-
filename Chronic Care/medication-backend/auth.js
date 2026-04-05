@@ -163,7 +163,7 @@ router.post('/verify', async (req, res) => {
 
   // Find user by email
   const [users] = await pool.query(
-    'SELECT id, verification_code, verification_expires, is_verified FROM users WHERE email = ?',
+    'SELECT id, first_name, last_name, role, username, email, verification_code, verification_expires, is_verified FROM users WHERE email = ?',
     [email]
   );
   if (users.length === 0) {
