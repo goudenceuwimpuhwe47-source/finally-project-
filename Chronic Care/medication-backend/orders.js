@@ -260,8 +260,9 @@ router.patch('/:id', auth, upload.single('medicalCertificate'), async (req, res)
     const [rows] = await pool.query('SELECT * FROM orders WHERE id = ?', [id]);
     res.json(rows[0] || {});
   } catch (e) {
+    console.error('update order error:', e);
     const msg = e?.message?.includes('Invalid file type') ? 'Invalid file type' : 'Server error';
-    res.status(500).json({ error: msg });
+    res.status(500).json({ error: msg, details: e.message });
   }
 });
 
@@ -381,7 +382,8 @@ router.post('/:id/assign-doctor', auth, requireRole('admin'), async (req, res) =
     const [row] = await pool.query('SELECT * FROM orders WHERE id=?', [orderId]);
     res.json(row[0] || {});
   } catch (e) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('assign-doctor error:', e);
+    res.status(500).json({ error: 'Server error', details: e.message });
   }
 });
 

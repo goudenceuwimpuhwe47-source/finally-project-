@@ -104,9 +104,8 @@ async function ensureSchema() {
     console.error('Ensure orders table failed:', e.message);
   }
 
-  // ── STEP 1: ALTERs to add columns that may be missing from orders (Robust Checks) ──
+  // ── STEP 1: ALTERs to add columns that may be missing from orders (Robust Migration) ──
   try {
-    const dbName = process.env.DB_NAME;
     const ordersCols = [
       { name: 'doctor_id', ddl: "ALTER TABLE orders ADD COLUMN doctor_id INT NULL AFTER doctor_status" },
       { name: 'provider_id', ddl: "ALTER TABLE orders ADD COLUMN provider_id INT NULL AFTER doctor_id" },
@@ -136,17 +135,20 @@ async function ensureSchema() {
     ];
 
     for (const col of ordersCols) {
-      const [chk] = await pool.query(
-        `SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = COALESCE(?, DATABASE()) AND TABLE_NAME = 'orders' AND COLUMN_NAME = ?`,
-        [dbName || null, col.name]
-      );
-      if ((chk?.[0]?.cnt || 0) === 0) {
+      try {
         await pool.query(col.ddl);
-        console.log(`Added missing column '${col.name}' to orders table`);
+        console.log(`Successfully added missing column '${col.name}' to orders`);
+      } catch (err) {
+        // Error code 'ER_DUP_FIELDNAME' means column already exists, which is fine
+        if (err.code === 'ER_DUP_FIELDNAME') {
+          // Skip logging common already-exists messages to avoid spam
+        } else {
+          console.error(`Migration error on '${col.name}':`, err.message);
+        }
       }
     }
   } catch (e) {
-    console.error('Schema check/ALTER failed:', e.message);
+    console.error('Core migration failed:', e.message);
   }
 
   // Ensure messages table exists
@@ -286,30 +288,32 @@ async function ensureSchema() {
     console.error('Ensure users table failed:', e.message);
   }
 
-  // Ensure users optional columns referenced by admin endpoints exist
+  // Ensure users optional columns referenced by admin endpoints exist (Robust Migration)
   try {
-    const dbName = process.env.DB_NAME;
     const userCols = [
       { name: 'address', ddl: "ALTER TABLE users ADD COLUMN address VARCHAR(255) NULL" },
       { name: 'license_number', ddl: "ALTER TABLE users ADD COLUMN license_number VARCHAR(64) NULL" },
       { name: 'delivery_radius', ddl: "ALTER TABLE users ADD COLUMN delivery_radius INT NULL" },
       { name: 'status', ddl: "ALTER TABLE users ADD COLUMN status ENUM('active','inactive','suspended') NOT NULL DEFAULT 'active'" },
-  { name: 'verification_status', ddl: "ALTER TABLE users ADD COLUMN verification_status ENUM('pending','verified','rejected') NOT NULL DEFAULT 'pending'" },
+      { name: 'verification_status', ddl: "ALTER TABLE users ADD COLUMN verification_status ENUM('pending','verified','rejected') NOT NULL DEFAULT 'pending'" },
       { name: 'specialty', ddl: "ALTER TABLE users ADD COLUMN specialty VARCHAR(128) NULL" },
-      { name: 'hospital_affiliation', ddl: "ALTER TABLE users ADD COLUMN hospital_affiliation VARCHAR(255) NULL" },
-      { name: 'is_verified', ddl: "ALTER TABLE users ADD COLUMN is_verified TINYINT(1) NOT NULL DEFAULT 0" },
+      { name: 'hospital_affiliation', ddl: "ALTER TABLE users ADD COLUMN hospital_affiliation VARCHAR(255) NULL" }
     ];
+
     for (const col of userCols) {
       try {
-        const [chk] = await pool.query(
-          `SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='users' AND COLUMN_NAME=?`,
-          [dbName, col.name]
-        );
-        if ((chk?.[0]?.cnt || 0) === 0) await pool.query(col.ddl);
-      } catch {}
+        await pool.query(col.ddl);
+        console.log(`Successfully added missing column '${col.name}' to users`);
+      } catch (err) {
+        if (err.code === 'ER_DUP_FIELDNAME') {
+          // Skip
+        } else {
+          console.error(`Migration error on users.'${col.name}':`, err.message);
+        }
+      }
     }
   } catch (e) {
-    console.error('Ensure users optional columns failed:', e.message);
+    console.error('Users migration failed:', e.message);
   }
 
   // Ensure reports table exists for admin analytics
