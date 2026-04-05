@@ -481,6 +481,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                       <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-4xl max-h-[80vh]">
                         <DialogHeader>
                           <DialogTitle>Request details</DialogTitle>
+                          <DialogDescription className="sr-only">Detailed health information and tracking status for your medication request.</DialogDescription>
                         </DialogHeader>
                         <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -647,6 +648,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                           <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-3xl max-h-[80vh]">
                             <DialogHeader>
                               <DialogTitle>Edit Request</DialogTitle>
+                              <DialogDescription className="sr-only">Update your personal details, location, or medication information for this request.</DialogDescription>
                             </DialogHeader>
                             <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-4">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2">
@@ -833,6 +835,7 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
       <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-md">
         <DialogHeader>
           <DialogTitle>Pay with MTN MoMo</DialogTitle>
+          <DialogDescription className="sr-only">Initiate a secure mobile money payment to complete your medication order.</DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="text-sm text-gray-300">Order #{order?.id}</div>

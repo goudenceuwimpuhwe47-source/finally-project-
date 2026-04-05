@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
@@ -354,6 +354,7 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
       <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-lg">
         <DialogHeader>
           <DialogTitle>New Prescription {patient ? `for ${patient.full_name || 'Patient'}` : ''}</DialogTitle>
+          <DialogDescription className="sr-only">Enter the medication name, quantity, and specific instructions for the patient to follow.</DialogDescription>
         </DialogHeader>
         {isLoading ? (
           <div className="p-2 text-gray-300">Loading orders…</div>
@@ -505,6 +506,7 @@ function ReminderDialog({ open, onOpenChange, patient, token }: {
       <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-lg">
         <DialogHeader>
           <DialogTitle>Set Medication Reminder {patient ? `for ${patient.full_name || 'Patient'}` : ''}</DialogTitle>
+          <DialogDescription className="sr-only">Configure specific time alerts for the patient to ensure they take their medication as prescribed.</DialogDescription>
         </DialogHeader>
         {isLoading ? (
           <div className="p-2 text-gray-300">Loading…</div>

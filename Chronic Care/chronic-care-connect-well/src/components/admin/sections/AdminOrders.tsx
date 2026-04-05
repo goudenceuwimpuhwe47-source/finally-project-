@@ -458,6 +458,7 @@ export const AdminOrders = () => {
         <DialogContent className="bg-gray-900 border-gray-700 text-white">
           <DialogHeader>
             <DialogTitle>Assign a Doctor</DialogTitle>
+            <DialogDescription className="sr-only">Choose a healthcare professional to review and handle this medication order.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <Label className="text-gray-300">Select Doctor</Label>
@@ -627,6 +628,7 @@ export const AdminOrders = () => {
         <DialogContent className="bg-gray-900 border-gray-700 text-white">
           <DialogHeader>
             <DialogTitle>Assign a Provider/Pharmacy</DialogTitle>
+            <DialogDescription className="sr-only">Select a local pharmacy or healthcare provider to fulfill this prescription.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="text-sm text-gray-300">

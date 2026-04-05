@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, RefreshCw, Search, Edit3, Trash2, ArrowUpCircle, ArrowDownCircle, Equal } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -158,6 +158,7 @@ export const ProviderStock = () => {
         <DialogContent className="bg-gray-900 border-gray-700 text-white">
           <DialogHeader>
             <DialogTitle>{editing ? 'Edit Item' : 'New Item'}</DialogTitle>
+            <DialogDescription className="sr-only">Update the details of this stock item including quantity, price, and expiration dates.</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -194,7 +195,10 @@ export const ProviderStock = () => {
       {/* Movement Dialog */}
       <Dialog open={!!moveFor} onOpenChange={(v)=>setMoveFor(v ? moveFor : null)}>
         <DialogContent className="bg-gray-900 border-gray-700 text-white">
-          <DialogHeader><DialogTitle>Stock Movement: {moveFor?.name}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Stock Movement: {moveFor?.name}</DialogTitle>
+            <DialogDescription className="sr-only">Log a manual stock adjustment, incoming shipment, or outgoing inventory movement.</DialogDescription>
+          </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
               <label className="block text-sm text-gray-400 mb-1">Type</label>

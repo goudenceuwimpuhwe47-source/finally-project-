@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Package, MapPin, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -247,6 +247,7 @@ export const ProviderAssigned = () => {
         <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle>Confirm Availability for Order #{confirmOrder?.id}</DialogTitle>
+            <DialogDescription className="sr-only">Confirm if the requested medication is available in your current stock and provide a quote.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="text-sm text-gray-300">
@@ -329,7 +330,10 @@ export const ProviderAssigned = () => {
       {/* Not Available Dialog */}
       <Dialog open={!!unavailOrder} onOpenChange={(v)=>{ if(!v){ setUnavailOrder(null); setUnavailReason(""); } }}>
         <DialogContent className="bg-gray-900 border-gray-700 text-white">
-          <DialogHeader><DialogTitle>Not Available for Order #{unavailOrder?.id}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Not Available for Order #{unavailOrder?.id}</DialogTitle>
+            <DialogDescription className="sr-only">Notify the system that this medication is currently out of stock to allow for reassignment.</DialogDescription>
+          </DialogHeader>
           <div className="space-y-2">
             <div className="text-sm text-gray-300">Optional reason to help admin reassign faster:</div>
             <Textarea value={unavailReason} onChange={(e)=>setUnavailReason(e.target.value)} className="bg-gray-800 border-gray-700 text-white" />
@@ -358,6 +362,7 @@ export const ProviderAssigned = () => {
         <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-lg">
           <DialogHeader>
             <DialogTitle>New Prescription for Order #{prescOrder?.id}</DialogTitle>
+            <DialogDescription className="sr-only">Fill out the final prescription details for the patient after administrative approval.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div>

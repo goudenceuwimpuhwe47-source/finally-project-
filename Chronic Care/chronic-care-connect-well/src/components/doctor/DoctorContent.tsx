@@ -239,6 +239,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                   <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-4xl max-h-[80vh]">
                     <DialogHeader>
                       <DialogTitle>Request details</DialogTitle>
+                      <DialogDescription className="sr-only">Detailed health information and payment status for this medication request.</DialogDescription>
                     </DialogHeader>
                     <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -496,6 +497,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                   <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-4xl max-h-[80vh]">
                     <DialogHeader>
                       <DialogTitle>Request details</DialogTitle>
+                      <DialogDescription className="sr-only">Detailed health information and payment status for this medication request.</DialogDescription>
                     </DialogHeader>
                     <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
