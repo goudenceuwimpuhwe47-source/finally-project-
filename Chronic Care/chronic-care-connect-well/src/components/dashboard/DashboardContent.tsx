@@ -46,7 +46,7 @@ export function DashboardContent({ activeSection, setActiveSection }: DashboardC
   };
 
   return (
-    <div className="p-6">
+    <div className="p-2 sm:p-4 md:p-6 bg-gray-900 rounded-xl shadow-inner min-h-full">
       {renderContent()}
     </div>
   );

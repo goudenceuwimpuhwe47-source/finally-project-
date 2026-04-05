@@ -106,8 +106,8 @@ export function PatientAlertsSection() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Medication Alerts</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold">Medication Alerts</h1>
       </div>
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
@@ -139,7 +139,8 @@ export function PatientAlertsSection() {
             <div className="h-40 bg-gray-700/50 rounded animate-pulse" />
           ) : (
             <>
-              <Table>
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+              <Table className="min-w-[700px] sm:min-w-full">
                 <TableHeader>
                   <TableRow className="border-gray-700">
                     <TableHead className="text-gray-300">When</TableHead>
@@ -183,6 +184,7 @@ export function PatientAlertsSection() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
               <div className="flex items-center justify-between mt-4">
                 <span className="text-gray-400 text-sm">Page {page} / {totalPages}</span>
                 <div className="space-x-2">

@@ -1,8 +1,9 @@
 
 import { useState } from "react";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminContent } from "@/components/admin/AdminContent";
+import AdminHeader from "@/components/admin/sections/AdminHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -42,15 +43,14 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-gray-900">
       <SidebarProvider>
-        <div className="flex w-full min-h-screen">
           <AdminSidebar 
             activeSection={activeSection} 
             setActiveSection={setActiveSection} 
           />
-          <main className="flex-1 overflow-x-auto">
+          <SidebarInset className="bg-gray-900 flex flex-col min-h-screen overflow-x-hidden">
+            <AdminHeader />
             <AdminContent activeSection={activeSection} />
-          </main>
-        </div>
+          </SidebarInset>
       </SidebarProvider>
     </div>
   );

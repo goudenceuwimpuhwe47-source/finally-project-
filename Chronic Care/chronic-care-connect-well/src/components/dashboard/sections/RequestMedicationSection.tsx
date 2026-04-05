@@ -448,11 +448,11 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                       <p className="text-white font-medium capitalize">{o.disease.replace(/_/g,' ')}</p>
                       <p className="text-xs text-gray-300">{new Date(o.created_at).toLocaleString()}</p>
                     </div>
-                    <div className="flex gap-2 text-xs">
-                      <span className="px-2 py-1 rounded bg-gray-600 text-gray-100">Admin: {o.admin_status}</span>
-                      <span className="px-2 py-1 rounded bg-gray-600 text-gray-100">Doctor: {o.doctor_status}</span>
-                      <span className="px-2 py-1 rounded bg-gray-600 text-gray-100">Payment: {o.payment_status}</span>
-                      <span className="px-2 py-1 rounded bg-gray-600 text-gray-100">Pharmacy: {o.pharmacy_status}</span>
+                    <div className="flex flex-wrap gap-2 text-[10px] sm:text-xs">
+                      <span className="px-2 py-0.5 sm:py-1 rounded bg-gray-600 text-gray-100">Adm: {o.admin_status}</span>
+                      <span className="px-2 py-0.5 sm:py-1 rounded bg-gray-600 text-gray-100">Doc: {o.doctor_status}</span>
+                      <span className="px-2 py-0.5 sm:py-1 rounded bg-gray-600 text-gray-100">Pay: {o.payment_status}</span>
+                      <span className="px-2 py-0.5 sm:py-1 rounded bg-gray-600 text-gray-100">Phar: {o.pharmacy_status}</span>
                     </div>
                   </div>
                   {/* stage indicator */}
@@ -471,7 +471,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                       );
                     })()}
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
                     <Dialog onOpenChange={(open) => { if (!open) setViewing(null); }}>
                       <DialogTrigger asChild>
                         <Button variant="outline" className="text-gray-300 border-gray-400 hover:bg-gray-600/20" onClick={() => setViewing(o)}>

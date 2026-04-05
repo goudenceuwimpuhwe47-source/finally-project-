@@ -98,8 +98,8 @@ export const AdminPatients = () => {
         {filteredPatients.length > 0 ? (
           filteredPatients.map((patient) => (
             <Card key={patient.id} className="bg-gray-800 border-gray-700">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
@@ -159,14 +159,14 @@ export const AdminPatients = () => {
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">
+                  <div className="flex flex-row sm:flex-col gap-2 items-center sm:items-end">
+                    <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20 w-fit">
                       Active
                     </Badge>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                      className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-xs sm:text-sm"
                       onClick={() => setSelectedId(Number(patient.id))}
                     >
                       View Details

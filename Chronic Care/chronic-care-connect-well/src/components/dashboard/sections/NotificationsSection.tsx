@@ -71,10 +71,11 @@ export function NotificationsSection() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">Notifications</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-white">Notifications</h1>
         <Button
           variant="outline"
+          className="w-full sm:w-auto text-sm"
           onClick={()=> {
             setItems(prev => prev.map(i=> ({ ...i, status: 'read' })));
             // inform sidebar to clear unread badge immediately

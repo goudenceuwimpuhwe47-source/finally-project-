@@ -110,9 +110,9 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">My Medications</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => onRequestMedication && onRequestMedication()}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-white">My Medications</h1>
+        <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto text-sm" onClick={() => onRequestMedication && onRequestMedication()}>
           <Plus className="h-4 w-4 mr-2" />
           Request Medication
         </Button>

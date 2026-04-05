@@ -8,6 +8,7 @@ export interface AuthContextType {
   signUp: (data: RegisterData) => Promise<{ error: any; email?: string }>;
   signIn: (username: string, password: string) => Promise<{ error: any; user?: any; notVerified?: boolean; requiresOtp?: boolean; email?: string }>;
   signOut: () => Promise<void>;
+  verifyAccount: (email: string, code: string) => Promise<{ error: any; user?: any }>;
 }
 
 export interface RegisterData {
@@ -133,13 +134,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('token');
     setUser(null);
   };
+  
+  const verifyAccount = async (email: string, code: string): Promise<{ error: any; user?: any }> => {
+    try {
+      const res = await fetch(`${API_URL}/auth/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code })
+      });
+      const data = await res.json();
+      if (data.error) {
+        return { error: data.error };
+      }
+      if (data.token && data.user) {
+        localStorage.setItem('token', data.token);
+        setUser(data.user);
+        return { error: null, user: data.user };
+      }
+      return { error: null };
+    } catch (err) {
+      return { error: 'Server error.' };
+    }
+  };
 
   const value: AuthContextType = {
     user,
     loading,
     signUp,
     signIn,
-    signOut
+    signOut,
+    verifyAccount
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

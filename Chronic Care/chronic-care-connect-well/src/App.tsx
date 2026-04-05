@@ -13,6 +13,7 @@ import DashboardProvider from "./pages/DashboardProvider";
 import DashboardDoctor from "./pages/DashboardDoctor";
 import DashboardAdmin from "./pages/DashboardAdmin";
 import Auth from "./pages/Auth";
+import AuthOTP from "./pages/AuthOTP";
 import Order from "./pages/Order";
 import Orders from "./pages/Orders";
 import Admin from "./pages/Admin";
@@ -31,7 +32,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-      <Route path="/dashboard" element={
+            <Route path="/auth/otp" element={<AuthOTP />} />
+            <Route path="/dashboard" element={
               <ProtectedRoute>
         <DashboardPatient />
               </ProtectedRoute>

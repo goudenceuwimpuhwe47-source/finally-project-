@@ -15,9 +15,6 @@ import { API_URL } from '@/lib/utils';
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { user, signUp, signIn, loading } = useAuth();
-  const [showVerify, setShowVerify] = useState(false);
-  const [verifyEmail, setVerifyEmail] = useState('');
-  const [verifyMessage, setVerifyMessage] = useState('');
   const [signinError, setSigninError] = useState('');
   const [signupError, setSignupError] = useState('');
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
@@ -95,13 +92,8 @@ const Auth = () => {
         title: "Success!",
         description: "Account created successfully. Please check your email for the verification code."
       });
-      // switch to Sign In tab so verification form is visible
-      setActiveTab('signin');
-      setShowVerify(true);
-  // use email returned by backend when available
-  setVerifyEmail(email || data.email);
-      setVerifyMessage('Please check your email for the verification code.');
-
+      // Redirect to OTP verification page
+      navigate('/auth/otp', { state: { email: email || data.email } });
     }
     setIsLoading(false);
   };
@@ -119,9 +111,7 @@ const Auth = () => {
         title: "OTP Required",
         description: "A verification code has been sent to your email.",
       });
-      setShowVerify(true);
-      setVerifyEmail(email || '');
-      setVerifyMessage('Enter the verification code sent to your email.');
+      navigate('/auth/otp', { state: { email: email || '' } });
     } else if (notVerified) {
       // Account exists but email not yet verified — show the verification form
       toast({
@@ -129,9 +119,7 @@ const Auth = () => {
         description: "Please verify your email. Enter the code sent to your inbox.",
         variant: "destructive"
       });
-      setShowVerify(true);
-      setVerifyEmail(email || '');
-      setVerifyMessage('Enter the verification code sent to your email.');
+      navigate('/auth/otp', { state: { email: email || '' } });
     } else if (error) {
       const errorMsg = typeof error === 'string' ? error : (error.message || 'Sign in failed');
       setSigninError(errorMsg);
@@ -152,42 +140,6 @@ const Auth = () => {
   else if (role === 'doctor') navigate('/doctor');
   else if (role === 'admin') navigate('/admin');
   else navigate('/dashboard');
-    }
-    setIsLoading(false);
-  };
-
-
-  const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('verifyEmail') as string;
-    const code = formData.get('verifyCode') as string;
-    try {
-      const res = await fetch(`${API_URL}/auth/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code })
-      });
-      const data = await res.json();
-      if (data.error) {
-        setVerifyMessage(data.error);
-      } else {
-        if (data.token && data.user) {
-          localStorage.setItem('token', data.token);
-          // Manually update context state if needed, or rely on AuthContext if provided.
-          // Since we are in Auth.tsx, we can try to use a function from context or just 
-          // let the parent know. For now, since handleSignIn already has the redirect logic,
-          // let's just trigger a reload or navigate.
-          toast({ title: "Verified!", description: "You are now signed in." });
-          window.location.reload(); // Simplest way to trigger AuthContext restorer
-        } else {
-          setVerifyMessage('Account verified! You can now log in.');
-          setShowVerify(false);
-        }
-      }
-    } catch (err) {
-      setVerifyMessage('Server error.');
     }
     setIsLoading(false);
   };
@@ -227,71 +179,38 @@ const Auth = () => {
               </TabsList>
 
               <TabsContent value="signin" className="space-y-4 mt-6">
-                {showVerify ? (
-                  <form onSubmit={handleVerify} className="space-y-4">
-                    <div>
-                      <Label htmlFor="verifyEmail" className="text-gray-300">Email</Label>
-                      <Input
-                        id="verifyEmail"
-                        name="verifyEmail"
-                        type="email"
-                        required
-                        className="bg-gray-700 border-gray-600 text-white"
-                        value={verifyEmail}
-                        onChange={e => setVerifyEmail(e.target.value)}
-                        placeholder="Enter your email"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="verifyCode" className="text-gray-300">Verification Code</Label>
-                      <Input
-                        id="verifyCode"
-                        name="verifyCode"
-                        type="text"
-                        required
-                        className="bg-gray-700 border-gray-600 text-white"
-                        placeholder="Enter the code from your email"
-                      />
-                    </div>
-                    <div className="text-red-400 text-sm">{verifyMessage}</div>
-                    <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
-                      {isLoading ? 'Verifying...' : 'Verify Account'}
-                    </Button>
-                  </form>
-                ) : (
-                  <form onSubmit={handleSignIn} className="space-y-4">
-                    <div>
-                      <Label htmlFor="signin-username" className="text-gray-300">Username or Email</Label>
-                      <Input
-                        id="signin-username"
-                        name="username"
-                        type="text"
-                        required
-                        className="bg-gray-700 border-gray-600 text-white"
-                        placeholder="Username or email address"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="signin-password" className="text-gray-300">Password</Label>
-                      <Input
-                        id="signin-password"
-                        name="password"
-                        type="password"
-                        required
-                        className="bg-gray-700 border-gray-600 text-white"
-                        placeholder="Enter your password"
-                      />
-                    </div>
-                    {signinError && <div className="text-red-400 text-sm mb-2">{signinError}</div>}
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-blue-600 hover:bg-blue-700"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? 'Signing in...' : 'Sign In'}
-                    </Button>
-                  </form>
-                )}
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div>
+                    <Label htmlFor="signin-username" className="text-gray-300">Username or Email</Label>
+                    <Input
+                      id="signin-username"
+                      name="username"
+                      type="text"
+                      required
+                      className="bg-gray-700 border-gray-600 text-white"
+                      placeholder="Username or email address"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="signin-password" className="text-gray-300">Password</Label>
+                    <Input
+                      id="signin-password"
+                      name="password"
+                      type="password"
+                      required
+                      className="bg-gray-700 border-gray-600 text-white"
+                      placeholder="Enter your password"
+                    />
+                  </div>
+                  {signinError && <div className="text-red-400 text-sm mb-2">{signinError}</div>}
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Signing in...' : 'Sign In'}
+                  </Button>
+                </form>
               </TabsContent>
 
               <TabsContent value="signup" className="space-y-4 mt-6">

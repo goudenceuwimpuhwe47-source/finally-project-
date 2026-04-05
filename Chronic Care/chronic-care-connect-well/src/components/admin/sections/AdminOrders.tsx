@@ -189,12 +189,12 @@ export const AdminOrders = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-          <FileText className="h-8 w-8" />
-          Order Management
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
+          <FileText className="h-6 w-6 md:h-8 md:w-8" />
+          Orders
         </h1>
-  <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">{filteredOrders.length} Orders</Badge>
+        <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 w-fit">{filteredOrders.length} Orders</Badge>
       </div>
 
       {/* Filters */}
@@ -228,8 +228,8 @@ export const AdminOrders = () => {
         {filteredOrders.length > 0 ? (
           filteredOrders.map((order) => (
             <Card key={order.id} className="bg-gray-800 border-gray-700">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
                   <div className="flex-1 space-y-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">

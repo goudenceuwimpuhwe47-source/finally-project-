@@ -74,9 +74,9 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
-        <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-white">Admin Dashboard</h1>
+        <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20 w-fit">
           System Active
         </Badge>
       </div>

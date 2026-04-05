@@ -79,9 +79,9 @@ export function MyHealthSection() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">My Health Dashboard</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => createLog.mutate()} disabled={isLogging}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Health Dashboard</h1>
+        <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto" onClick={() => createLog.mutate()} disabled={isLogging}>
           <Plus className="h-4 w-4 mr-2" />
           {isLogging ? 'Logging…' : 'Log Symptoms'}
         </Button>
@@ -142,24 +142,24 @@ export function MyHealthSection() {
         <CardContent>
           <div className="space-y-4">
             {(today?.logs?.length ? today.logs : (todayAlerts || [])).slice(0, 4).map((l:any, idx:number) => (
-              <div key={l.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
+              <div key={idx} className="flex flex-col xs:flex-row items-start xs:items-center justify-between p-3 md:p-4 bg-gray-50 rounded-lg gap-2">
+                <div className="w-full xs:w-auto">
                   {today?.logs?.length ? (
                     <>
-                      <p className="font-medium">Pain: {l.pain_level ?? '—'}/10 {Number.isFinite(l.fatigue_level) ? `• Fatigue: ${l.fatigue_level}/10` : ''}</p>
-                      {l.notes && <p className="text-sm text-gray-600">{l.notes}</p>}
-                      <p className="text-xs text-gray-500">{format(new Date(l.created_at), 'p')}</p>
+                      <p className="font-medium text-sm md:text-base">Pain: {l.pain_level ?? '—'}/10 {Number.isFinite(l.fatigue_level) ? `• Fatigue: ${l.fatigue_level}/10` : ''}</p>
+                      {l.notes && <p className="text-xs md:text-sm text-gray-600 line-clamp-2">{l.notes}</p>}
+                      <p className="text-[10px] md:text-xs text-gray-500">{format(new Date(l.created_at), 'p')}</p>
                     </>
                   ) : (
                     <>
-                      <p className="font-medium">{l.medicine_name || 'Medication'}</p>
-                      <p className="text-sm text-gray-600">{l.dosage || ''} {l.frequency_per_day ? `• ${l.frequency_per_day}x/day` : ''}</p>
-                      <p className="text-xs text-gray-500">{l.when_at ? format(new Date(l.when_at), 'p') : ''}</p>
+                      <p className="font-medium text-sm md:text-base">{l.medicine_name || 'Medication'}</p>
+                      <p className="text-xs md:text-sm text-gray-600">{l.dosage || ''} {l.frequency_per_day ? `• ${l.frequency_per_day}x/day` : ''}</p>
+                      <p className="text-[10px] md:text-xs text-gray-500">{l.when_at ? format(new Date(l.when_at), 'p') : ''}</p>
                     </>
                   )}
                 </div>
-                <div className="text-right">
-                  <span className={`text-sm font-medium ${today?.logs?.length ? 'text-orange-600' : (String(l.status || '').toLowerCase()==='taken' ? 'text-green-600' : 'text-amber-600')}`}>
+                <div className="text-left xs:text-right w-full xs:w-auto">
+                  <span className={`text-xs md:text-sm font-medium ${today?.logs?.length ? 'text-orange-600' : (String(l.status || '').toLowerCase()==='taken' ? 'text-green-600' : 'text-amber-600')}`}>
                     {today?.logs?.length ? 'Logged' : (String(l.status || '').toLowerCase()==='taken' ? 'Taken' : 'Pending')}
                   </span>
                 </div>
