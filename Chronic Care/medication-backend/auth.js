@@ -170,19 +170,27 @@ router.post('/verify', async (req, res) => {
     return res.status(400).json({ error: 'User not found.' });
   }
   const user = users[0];
+  console.log(`[AUTH] Verifying code for email: ${email}. Code entered: ${code}. Expected: ${user.verification_code}`);
 
-  // Check if already verified
-  if (user.is_verified) {
-    return res.status(400).json({ error: 'Account already verified.' });
+  // Check if code was ever set
+  if (!user.verification_code) {
+    console.warn(`[AUTH] No active verification code found for ${email}`);
+    return res.status(400).json({ error: 'No active verification code found. Please request a new one.' });
   }
 
-  // Check code and expiry
+  // Check if code matches
   if (user.verification_code !== code) {
+    console.error(`[AUTH] Code mismatch for ${email}. Expected: ${user.verification_code}, Got: ${code}`);
     return res.status(400).json({ error: 'Invalid verification code.' });
   }
+
+  // Check expiry
   if (new Date() > new Date(user.verification_expires)) {
+    console.warn(`[AUTH] Code expired for ${email}. Expires: ${user.verification_expires}, Now: ${new Date().toISOString()}`);
     return res.status(400).json({ error: 'Verification code expired.' });
   }
+
+  console.log(`[AUTH] Successful verification for ${email}.`);
 
   // Mark as verified
   await pool.query(
