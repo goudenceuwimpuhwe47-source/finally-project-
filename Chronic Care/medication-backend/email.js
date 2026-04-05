@@ -1,16 +1,18 @@
 const nodemailer = require('nodemailer');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'goudenceuwimpuhwe47@gmail.com',
-    pass: 'yuwhtxwxonnzdmvz'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 
 async function sendVerificationEmail(to, code) {
   await transporter.sendMail({
-    from: 'Medication Ordering System <goudenceuwimpuhwe47@gmail.com>',
+    from: `"Medication Ordering System" <${process.env.EMAIL_USER}>`,
     to,
     subject: 'Your Medication Ordering System Verification Code',
     text: `Welcome to the Medication Ordering System!\n\nYour verification code is: ${code}\n\nPlease enter this code in the app to verify your account. The code is valid for 24 hours.\n\nIf you did not request this, please ignore this email.\n\nThank you!`,
@@ -28,7 +30,7 @@ async function sendVerificationEmail(to, code) {
 
 async function sendEmail(to, subject, html, text) {
   await transporter.sendMail({
-    from: 'Medication Ordering System <medicationorderingsystemforchr@gmail.com>',
+    from: `"Medication Ordering System" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     text: text || html?.replace(/<[^>]+>/g, '') || '',
