@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Send, Search, MessageSquare } from 'lucide-react';
+import { Send, Search, MessageSquare, User, Clock } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL } from '@/lib/utils';
@@ -160,83 +160,168 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card className="bg-gray-800 border-gray-700 md:col-span-1">
-        <CardContent className="p-4 space-y-3">
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Search patients" className="pl-8 bg-gray-700 border-gray-600 text-white" />
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[700px] max-w-7xl mx-auto overflow-hidden">
+      {/* Patients List */}
+      <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-xl lg:col-span-4 flex flex-col overflow-hidden shadow-2xl">
+        <CardHeader className="border-b border-slate-800/50 bg-slate-900/30 py-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-slate-100 flex items-center">
+              <User className="h-5 w-5 mr-2 text-indigo-400" />
+              Patients
+            </h3>
           </div>
-          <div className="max-h-[520px] overflow-y-auto space-y-1">
+          <div className="relative mt-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+            <Input 
+              value={filter} 
+              onChange={e=>setFilter(e.target.value)} 
+              placeholder="Search patients..." 
+              className="pl-10 bg-slate-950/50 border-slate-700 text-slate-200 rounded-xl placeholder:text-slate-600 focus:ring-indigo-500/30" 
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="p-2 flex-1 overflow-y-auto custom-scrollbar">
+          <div className="space-y-1">
             {visibleUsers.map(u => (
-              <button key={u.id} className={`w-full text-left p-3 rounded ${activeUserId === u.id ? 'bg-gray-700' : 'hover:bg-gray-700/60'} flex items-center justify-between`} onClick={() => openThread(u.id)}>
-                <div className="flex items-center gap-2">
-                  <span className={`inline-block w-2 h-2 rounded-full ${onlinePatients.has(u.id) ? 'bg-green-500' : 'bg-gray-500'}`} />
-                  <div>
-                    <div className="text-sm text-white font-medium">{u.username || u.name || u.email}</div>
-                    {u.lastMessage && <div className="text-xs text-gray-300 line-clamp-1">{u.lastMessage}</div>}
+              <button 
+                key={u.id} 
+                className={`w-full text-left p-4 rounded-2xl transition-all duration-200 group flex items-center justify-between ${activeUserId === u.id ? 'bg-indigo-600/20 border border-indigo-500/30 shadow-lg' : 'hover:bg-slate-800/40 border border-transparent'}`} 
+                onClick={() => openThread(u.id)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Avatar className="h-11 w-11 border-2 border-slate-800 group-hover:border-indigo-500/30 transition-all">
+                      <AvatarFallback className="bg-slate-800 text-slate-300 font-bold">
+                        {(u.username || u.name || 'P').charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-slate-900 ${onlinePatients.has(u.id) ? 'bg-emerald-500' : 'bg-slate-600'}`} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className={`text-sm font-bold truncate ${activeUserId === u.id ? 'text-indigo-300' : 'text-slate-200'}`}>
+                      {u.username || u.name || u.email}
+                    </div>
+                    {u.lastMessage && (
+                      <div className="text-xs text-slate-500 truncate mt-0.5 group-hover:text-slate-400">
+                        {u.lastMessage}
+                      </div>
+                    )}
                   </div>
                 </div>
-                {u.unreadCount ? <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">{u.unreadCount}</span> : null}
+                {u.unreadCount ? (
+                  <span className="bg-indigo-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-lg shadow-indigo-500/20 animate-in zoom-in duration-300 uppercase">
+                    {u.unreadCount} New
+                  </span>
+                ) : null}
               </button>
             ))}
-            {visibleUsers.length === 0 && <div className="text-gray-400 text-sm">No patients found.</div>}
+            {visibleUsers.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+                <div className="p-3 bg-slate-800/30 rounded-2xl mb-3">
+                  <Search className="h-6 w-6 text-slate-600" />
+                </div>
+                <p className="text-xs text-slate-500 font-medium tracking-wide italic">No active patient threads found.</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-gray-800 border-gray-700 md:col-span-2 h-[600px] flex flex-col">
-        <CardContent className="p-4 flex-1 flex flex-col">
-          <div className="flex items-center justify-between mb-3">
-            {activeUserId ? (
-              <div className="flex items-center space-x-3">
+
+      {/* Main Chat Window */}
+      <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-xl lg:col-span-8 flex flex-col overflow-hidden shadow-2xl relative">
+        {!activeUserId ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-4">
+             <div className="w-20 h-20 bg-indigo-500/10 rounded-full flex items-center justify-center border border-indigo-500/20 shadow-inner">
+               <MessageSquare className="h-10 w-10 text-indigo-400" />
+             </div>
+             <div>
+               <h2 className="text-xl font-bold text-slate-200">Clinical Consultation</h2>
+               <p className="text-sm text-slate-500 mt-2 max-w-[280px] mx-auto">
+                 Select a patient from the list to synchronize health data and begin the medical consultation.
+               </p>
+             </div>
+          </div>
+        ) : (
+          <>
+            <CardHeader className="border-b border-slate-800/50 bg-slate-900/30 py-4 flex flex-row items-center justify-between px-6">
+              <div className="flex items-center space-x-4">
                 <div className="relative">
-                  <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-blue-600 text-white">
+                  <Avatar className="h-12 w-12 border-2 border-indigo-500/20 shadow-xl">
+                    <AvatarFallback className="bg-indigo-600 text-white font-black text-lg">
                       {(() => {
                         const u = users.find(x => x.id === activeUserId);
-                        const label = u?.username || u?.name || u?.email || 'PT';
-                        const parts = String(label).split(' ');
-                        return (parts[0]?.[0] || 'P') + (parts[1]?.[0] || 'T');
+                        return (u?.username || u?.name || 'P').charAt(0).toUpperCase();
                       })()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-gray-800 ${onlinePatients.has(activeUserId) ? 'bg-green-500' : 'bg-gray-500'}`} />
+                  <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-slate-900 ${onlinePatients.has(activeUserId) ? 'bg-emerald-500 animate-pulse' : 'bg-slate-600'}`} />
                 </div>
                 <div>
-                  <div className="text-white text-sm font-medium">
+                  <div className="text-base font-bold text-slate-100 flex items-center gap-2">
                     {(() => {
                       const u = users.find(x => x.id === activeUserId);
                       return u?.username || u?.name || u?.email || `Patient #${activeUserId}`;
                     })()}
                   </div>
-                  <div className="text-xs text-gray-400">
-                    {patientTyping ? 'Typing…' : (onlinePatients.has(activeUserId) ? 'Online' : 'Offline')}
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className={`text-[10px] font-bold uppercase tracking-widest ${patientTyping ? 'text-indigo-400 animate-pulse' : 'text-slate-500'}`}>
+                      {patientTyping ? 'Typing…' : (onlinePatients.has(activeUserId) ? 'Active Now' : 'Offline')}
+                    </span>
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="text-sm text-gray-300">Select a patient</div>
-            )}
-          </div>
-          <div className="flex-1 overflow-y-auto space-y-3 bg-gray-900 rounded p-3">
-            {messages.map(m => {
-              const mine = m.from_role === 'doctor';
-              return (
-                <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-xs lg:max-w-md ${mine ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-100'} rounded-lg p-3`}>
-                    <div className="text-sm">{m.content}</div>
-                    <div className={`text-[10px] mt-1 ${mine ? 'text-blue-200' : 'text-gray-300'}`}>{new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{mine ? ` • ${m.status === 'read' ? '✓✓' : m.status === 'delivered' ? '✓✓' : '✓'}` : ''}</div>
-                  </div>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" className="text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl">
+                  <Search className="h-5 w-5" />
+                </Button>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="flex-1 flex flex-col p-0 min-h-0 bg-slate-950/20">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar">
+                {messages.map(m => {
+                  const mine = m.from_role === 'doctor';
+                  return (
+                    <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
+                      <div className={`relative group max-w-[85%] sm:max-w-md ${mine ? 'bg-indigo-600 rounded-2xl rounded-tr-none shadow-indigo-900/10' : 'bg-slate-800 rounded-2xl rounded-tl-none shadow-black/10'} p-3.5 sm:p-4 shadow-xl`}>
+                        <div className="text-[14px] sm:text-[15px] leading-relaxed text-slate-100 select-text font-medium">{m.content}</div>
+                        <div className={`text-[10px] mt-2 flex items-center gap-2 font-bold tracking-tight ${mine ? 'text-indigo-200/70' : 'text-slate-500'}`}>
+                          <Clock className="h-3 w-3" />
+                          <span>{new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          {mine && (
+                            <span className={`ml-1 ${m.status === 'read' ? 'text-emerald-400' : 'text-indigo-300'}`}>
+                              {m.status === 'read' ? '✓✓' : m.status === 'delivered' ? '✓✓' : '✓'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className="p-4 bg-slate-900/40 border-t border-slate-800">
+                <div className="flex space-x-2 items-center">
+                  <Input 
+                    disabled={!activeUserId} 
+                    value={text} 
+                    onChange={e=>{ setText(e.target.value); if (!typing) setTyping(true); if (typingTimer.current) clearTimeout(typingTimer.current); typingTimer.current = setTimeout(()=>setTyping(false), 1200); }} 
+                    onKeyDown={e=>{ if (e.key==='Enter') onSend(); }} 
+                    placeholder="Provide medical guidance..." 
+                    className="flex-1 bg-slate-950/50 border-slate-700 text-slate-200 h-11 sm:h-12 rounded-xl focus:ring-indigo-500/30 transition-all placeholder:text-slate-600" 
+                  />
+                  <Button 
+                    disabled={!activeUserId} 
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-900/20 rounded-xl w-11 sm:w-14 h-11 sm:h-12 flex items-center justify-center p-0 transition-all active:scale-95" 
+                    onClick={onSend}
+                  >
+                    <Send className="h-5 w-5" />
+                  </Button>
                 </div>
-              );
-            })}
-            {!activeUserId && <div className="text-gray-400 text-sm">Select a patient to view messages.</div>}
-          </div>
-          <div className="mt-3 flex gap-2">
-            <Input disabled={!activeUserId} value={text} onChange={e=>{ setText(e.target.value); if (!typing) setTyping(true); if (typingTimer.current) clearTimeout(typingTimer.current); typingTimer.current = setTimeout(()=>setTyping(false), 1200); }} onKeyDown={e=>{ if (e.key==='Enter') onSend(); }} placeholder={activeUserId ? 'Type a message...' : 'Select a patient to start chatting'} className="bg-gray-700 border-gray-600 text-white" />
-            <Button disabled={!activeUserId} className="bg-blue-600 hover:bg-blue-700" onClick={onSend}><Send className="h-4 w-4"/></Button>
-          </div>
-        </CardContent>
+              </div>
+            </CardContent>
+          </>
+        )}
       </Card>
     </div>
   );

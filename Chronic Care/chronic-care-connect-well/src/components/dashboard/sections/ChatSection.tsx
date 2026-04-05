@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, MessageSquare, Trash2 } from "lucide-react";
+import { Send, MessageSquare, Trash2, TrendingUp, Activity, FileWarning, Clock, AlertTriangle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useToast } from "@/hooks/use-toast";
@@ -383,23 +383,37 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
     }
   }, [typing, target]);
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-  <h1 className="text-3xl font-bold text-white">{`Chat with ${target === 'admin' ? 'Admin' : target === 'doctor' ? doctorName : 'Pharmacy'}`}</h1>
-        <div className="flex items-center text-sm text-gray-300">
-          <div className={`w-2 h-2 rounded-full mr-2 ${target === 'admin' ? (adminOnline ? 'bg-green-500' : 'bg-gray-500') : target === 'doctor' ? (doctorOnline ? 'bg-green-500' : 'bg-gray-500') : (providerOnline ? 'bg-green-500' : 'bg-gray-500')}`}></div>
-          {(target === 'admin' ? (adminOnline ? 'Admin Online' : 'Admin Offline') : target === 'doctor' ? (doctorOnline ? 'Doctor Online' : 'Doctor Offline') : (providerOnline ? 'Pharmacy Online' : 'Pharmacy Offline'))}
+    <div className="space-y-6 flex flex-col h-full max-w-5xl mx-auto">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            {target === 'admin' ? 'Support Portal' : target === 'doctor' ? `Consultation with ${doctorName}` : 'Pharmacy Chat'}
+          </h1>
+          <div className="flex items-center mt-1 space-x-2">
+            <span className={`relative flex h-2 w-2`}>
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${target === 'admin' ? (adminOnline ? 'bg-emerald-400' : 'bg-slate-500') : target === 'doctor' ? (doctorOnline ? 'bg-emerald-400' : 'bg-slate-500') : (providerOnline ? 'bg-emerald-400' : 'bg-slate-500')}`}></span>
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${target === 'admin' ? (adminOnline ? 'bg-emerald-500' : 'bg-slate-600') : target === 'doctor' ? (doctorOnline ? 'bg-emerald-500' : 'bg-slate-600') : (providerOnline ? 'bg-emerald-500' : 'bg-slate-600')}`}></span>
+            </span>
+            <span className="text-xs font-medium text-slate-400">
+              {(target === 'admin' ? (adminOnline ? 'Admin is online' : 'Admin is offline') : target === 'doctor' ? (doctorOnline ? 'Physician is online' : 'Physician is offline') : (providerOnline ? 'Pharmacy is online' : 'Pharmacy is offline'))}
+            </span>
+          </div>
         </div>
       </div>
 
-  <Card className="h-[600px] flex flex-col bg-gray-800 border-gray-700">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center">
-            <MessageSquare className="h-5 w-5 mr-2" />
-            Medical Support Chat {target === 'admin' ? (adminTyping ? '• Admin is typing…' : '') : target === 'doctor' ? (doctorTyping ? `• ${doctorName} is typing…` : '') : ''}
+      <Card className="h-[550px] sm:h-[650px] flex flex-col bg-slate-900/50 border-slate-800 backdrop-blur-xl overflow-hidden shadow-2xl">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-slate-800 bg-slate-900/30 py-3 px-4 sm:px-6">
+          <CardTitle className="text-base sm:text-lg font-bold flex items-center text-slate-200">
+            <div className="p-1.5 bg-indigo-500/10 rounded-lg mr-3">
+              <MessageSquare className="h-5 w-5 text-indigo-400" />
+            </div>
+            {target === 'admin' ? 'Administrative Help' : 'Clinical Direct'}
+            {target === 'admin' ? (adminTyping && <span className="ml-3 text-xs font-normal text-indigo-400 animate-pulse italic">typing…</span>) : target === 'doctor' ? (doctorTyping && <span className="ml-3 text-xs font-normal text-indigo-400 animate-pulse italic">typing…</span>) : ''}
           </CardTitle>
-          <button
-            className="ml-auto px-3 py-1 rounded bg-gray-700 text-gray-200 hover:bg-red-600 hover:text-white text-xs font-medium"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 text-xs font-semibold uppercase tracking-wider transition-all"
             onClick={() => {
               const key = getConvKey();
               const now = Date.now();
@@ -407,29 +421,44 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
               setClearedAt(now);
               setMessages([]);
             }}
-            title="Clear chat"
           >
-            Clear Chat
-          </button>
+            Clear History
+          </Button>
         </CardHeader>
         
-        <CardContent className="flex-1 flex flex-col">
-          <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto mb-4 p-4 bg-gray-900 rounded-lg">
+        <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+          <div ref={scrollRef} className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 bg-slate-950/40 custom-scrollbar scroll-smooth">
+            {messages.length === 0 && (
+              <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-20 px-6">
+                <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center border border-slate-700/50">
+                  <MessageSquare className="h-8 w-8 text-slate-600" />
+                </div>
+                <div>
+                  <h3 className="text-slate-300 font-semibold">Start a conversation</h3>
+                  <p className="text-sm text-slate-500 mt-2 max-w-[240px]">
+                    How can we assist you with your health concerns today?
+                  </p>
+                </div>
+              </div>
+            )}
             {messages.map((m) => {
               const mine = m.from_role === 'patient';
               return (
-                <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`relative group max-w-xs lg:max-w-md ${mine ? 'bg-blue-600 text-white' : 'bg-orange-500 text-white'} rounded-lg p-3 shadow-sm`}>
-                    <p className="text-sm">{m.content}</p>
-                    <div className={`text-xs mt-1 ${mine ? 'text-blue-200' : 'text-orange-200'} flex items-center gap-2`}>
+                <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
+                  <div className={`relative group max-w-[85%] sm:max-w-md ${mine ? 'bg-indigo-600 rounded-2xl rounded-tr-none' : 'bg-slate-800 rounded-2xl rounded-tl-none'} p-3.5 sm:p-4 shadow-lg shadow-black/20`}>
+                    <p className="text-[13px] sm:text-[15px] leading-relaxed select-text">{m.content}</p>
+                    <div className={`text-[10px] mt-2 flex items-center gap-2 font-medium tracking-tight ${mine ? 'text-indigo-200/80' : 'text-slate-500'}`}>
                       <span>{new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      {mine && <span className="text-[10px] opacity-80">{m.status === 'read' ? '✓✓' : m.status === 'delivered' ? '✓✓' : '✓'}</span>}
+                      {mine && (
+                        <span className={`text-[11px] font-bold ${m.status === 'read' ? 'text-emerald-300' : 'text-indigo-300'}`}>
+                          {m.status === 'read' ? '✓✓' : m.status === 'delivered' ? '✓✓' : '✓'}
+                        </span>
+                      )}
                     </div>
                     {mine && (
                       <button
-                        aria-label="Delete for me"
-                        title="Delete for me"
-                        className="hidden group-hover:flex absolute -top-2 -right-2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1"
+                        aria-label="Delete message"
+                        className="opacity-0 group-hover:opacity-100 absolute -top-2 -right-2 bg-slate-950/90 text-slate-400 hover:text-rose-400 rounded-full p-1.5 border border-slate-800 backdrop-blur-md transition-all scale-75 group-hover:scale-100"
                         onClick={() => {
                           const key = getConvKey();
                           if (key) {
@@ -450,59 +479,82 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
             })}
           </div>
 
-          <div className="flex space-x-2">
-            <Input 
-              placeholder="Type your message about your symptoms or medication concerns..."
-              className="flex-1"
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value);
-                if (!typing) setTyping(true);
-                if (typingTimer.current) clearTimeout(typingTimer.current);
-                typingTimer.current = setTimeout(() => setTyping(false), 1200);
-              }}
-              onKeyDown={(e) => { if (e.key === 'Enter') onSend(); }}
-            />
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={onSend}>
-              <Send className="h-4 w-4" />
-            </Button>
+          <div className="p-4 bg-slate-900/40 border-t border-slate-800">
+            <div className="flex space-x-2 relative items-center">
+              <Input 
+                placeholder="Type your health concern..."
+                className="flex-1 bg-slate-950/50 border-slate-700 text-slate-200 h-10 sm:h-12 rounded-xl focus:ring-indigo-500/30 transition-all placeholder:text-slate-600"
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  if (!typing) setTyping(true);
+                  if (typingTimer.current) clearTimeout(typingTimer.current);
+                  typingTimer.current = setTimeout(() => setTyping(false), 1200);
+                }}
+                onKeyDown={(e) => { if (e.key === 'Enter') onSend(); }}
+              />
+              <Button 
+                className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-900/20 rounded-xl w-10 sm:w-12 h-10 sm:h-12 flex items-center justify-center p-0 shrink-0" 
+                onClick={onSend}
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Health Topics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button variant="outline" className="h-auto p-3 text-left">
-              <div>
-                <p className="font-medium text-sm">Pain Management</p>
-                <p className="text-xs text-gray-500">Discuss pain levels</p>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto p-3 text-left">
-              <div>
-                <p className="font-medium text-sm">Medication Side Effects</p>
-                <p className="text-xs text-gray-500">Report side effects</p>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto p-3 text-left">
-              <div>
-                <p className="font-medium text-sm">Dosage Questions</p>
-                <p className="text-xs text-gray-500">Ask about dosing</p>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto p-3 text-left">
-              <div>
-                <p className="font-medium text-sm">Emergency</p>
-                <p className="text-xs text-gray-500">Urgent concerns</p>
-              </div>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2 px-1">
+          <TrendingUp className="h-4 w-4 text-slate-500" />
+          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Quick Health Topics</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <button 
+            onClick={() => setText("I need help managing my pain levels.")}
+            className="group h-auto p-4 text-left bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all shadow-lg"
+          >
+            <div className="p-2 bg-rose-500/10 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
+              <Activity className="h-5 w-5 text-rose-400" />
+            </div>
+            <p className="font-bold text-sm text-slate-200">Pain Management</p>
+            <p className="text-xs text-slate-500 mt-1 line-clamp-1">Discuss symptoms and levels</p>
+          </button>
+          
+          <button 
+            onClick={() => setText("I want to report medication side effects.")}
+            className="group h-auto p-4 text-left bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-emerald-500/50 hover:bg-slate-800/80 transition-all shadow-lg"
+          >
+            <div className="p-2 bg-emerald-500/10 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
+              <FileWarning className="h-5 w-5 text-emerald-400" />
+            </div>
+            <p className="font-bold text-sm text-slate-200">Side Effects</p>
+            <p className="text-xs text-slate-500 mt-1 line-clamp-1">Report new concerns</p>
+          </button>
+          
+          <button 
+            onClick={() => setText("I have a question about my medication dosage.")}
+            className="group h-auto p-4 text-left bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-blue-500/50 hover:bg-slate-800/80 transition-all shadow-lg"
+          >
+            <div className="p-2 bg-blue-500/10 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
+              <Clock className="h-5 w-5 text-blue-400" />
+            </div>
+            <p className="font-bold text-sm text-slate-200">Dosage Help</p>
+            <p className="text-xs text-slate-500 mt-1 line-clamp-1">Ask about timing or doses</p>
+          </button>
+          
+          <button 
+            onClick={() => setText("I need urgent medical assistance.")}
+            className="group h-auto p-4 text-left bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-red-500/50 hover:bg-slate-800/80 transition-all shadow-lg"
+          >
+            <div className="p-2 bg-red-500/10 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+            </div>
+            <p className="font-bold text-sm text-slate-200">Emergency</p>
+            <p className="text-xs text-slate-500 mt-1 line-clamp-1">Urgent clinical concerns</p>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
