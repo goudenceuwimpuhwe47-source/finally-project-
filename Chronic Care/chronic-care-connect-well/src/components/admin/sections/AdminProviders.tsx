@@ -51,7 +51,7 @@ export const AdminProviders = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Provider Management</h1>
+      <h1 className="text-3xl font-bold">Doctor Management</h1>
       
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>

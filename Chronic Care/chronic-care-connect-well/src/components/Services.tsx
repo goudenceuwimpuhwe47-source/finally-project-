@@ -146,37 +146,37 @@ const Services = () => {
             <CardContent className="p-0">
               <div className="bg-gradient-to-br from-purple-600 to-purple-700 p-8 text-white">
                 <Stethoscope className="h-12 w-12 mb-4" />
-                <h3 className="text-2xl font-bold mb-2">For Providers (Pharmacy)</h3>
-                <p className="text-purple-100">Professional healthcare tools</p>
+                <h3 className="text-2xl font-bold mb-2">For Pharmacies</h3>
+                <p className="text-purple-100">Professional pharmacy tools</p>
               </div>
               <div className="p-8">
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3"></div>
-                    <span className="text-gray-300">Access patient health profiles</span>
+                    <span className="text-gray-300">Manage medication inventory</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3"></div>
-                    <span className="text-gray-300">Prescribe and manage medications</span>
+                    <span className="text-gray-300">Process prescription orders</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3"></div>
-                    <span className="text-gray-300">Coordinate with care teams</span>
+                    <span className="text-gray-300">Coordinate with healthcare teams</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3"></div>
-                    <span className="text-gray-300">Monitor chronic condition progress</span>
+                    <span className="text-gray-300">Update stock availability</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3"></div>
-                    <span className="text-gray-300">Secure communication platform</span>
+                    <span className="text-gray-300">Secure pharmacy portal access</span>
                   </li>
                 </ul>
                 <Button 
-                  className="w-full bg-purple-600 hover:bg-purple-700"
+                   className="w-full bg-purple-600 hover:bg-purple-700"
                   onClick={handleProviderPortal}
                 >
-                  Provider (Pharmacy) Portal
+                  Pharmacy Portal
                 </Button>
               </div>
             </CardContent>

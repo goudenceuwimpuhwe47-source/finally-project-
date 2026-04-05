@@ -39,7 +39,7 @@ export default function DashboardAdmin() {
 							<TabsTrigger value="overview">Overview</TabsTrigger>
 							<TabsTrigger value="orders">Orders</TabsTrigger>
 							<TabsTrigger value="patients">Patients</TabsTrigger>
-							<TabsTrigger value="providers">Providers (Pharmacy)</TabsTrigger>
+							<TabsTrigger value="providers">Doctors</TabsTrigger>
 							<TabsTrigger value="pharmacies">Pharmacies</TabsTrigger>
 							<TabsTrigger value="inventory">Inventory</TabsTrigger>
 							<TabsTrigger value="reports">Reports</TabsTrigger>

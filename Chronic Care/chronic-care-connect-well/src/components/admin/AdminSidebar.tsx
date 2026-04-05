@@ -114,7 +114,7 @@ export const AdminSidebar = ({ activeSection, setActiveSection }: AdminSidebarPr
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
     { id: "patients", label: "Patients", icon: Users },
-    { id: "providers", label: "Providers (Pharmacy)", icon: UserPlus },
+    { id: "providers", label: "Doctors", icon: UserPlus },
     { id: "pharmacies", label: "Pharmacies", icon: Building2 },
     { id: "orders", label: "Order Requests", icon: FileText },
     { id: "inventory", label: "Inventory", icon: Package },
