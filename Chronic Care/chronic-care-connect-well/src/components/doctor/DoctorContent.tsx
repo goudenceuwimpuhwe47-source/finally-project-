@@ -73,9 +73,10 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
     try {
       const res = await fetch(`${API_URL}/orders/doctor/patients`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.details || data.error || 'Server error');
       setPatients(Array.isArray(data?.patients) ? data.patients : []);
-    } catch {
-      toast({ title: 'Error', description: 'Failed to load patients list.', variant: 'destructive' });
+    } catch (e: any) {
+      toast({ title: 'Error', description: `Failed to load patients list: ${e.message}`, variant: 'destructive' });
     }
   };
 
@@ -621,7 +622,9 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
           {patients.map(p => (
             <div key={p.id} className="p-4 bg-gray-700 rounded-lg border border-gray-600 flex flex-col justify-between">
               <div>
-                <div className="text-lg font-semibold text-white mb-1">{p.full_name || p.username || p.email}</div>
+                <div className="text-lg font-semibold text-white mb-1">
+                  {p.first_name || p.last_name ? `${p.first_name || ''} ${p.last_name || ''}`.trim() : (p.username || p.email)}
+                </div>
                 <div className="text-sm text-gray-300 space-y-1">
                   <div>Email: {p.email || '-'}</div>
                   <div>Phone: {p.phone || '-'}</div>
