@@ -19,6 +19,8 @@ const AuthOTP = () => {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     // Get email from navigation state if available
@@ -27,6 +29,30 @@ const AuthOTP = () => {
       setEmail(state.email);
     }
   }, [location]);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setInterval(() => {
+        setResendCooldown(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [resendCooldown]);
+
+  const { resendCode } = useAuth();
+
+  const handleResend = async () => {
+    if (resendCooldown > 0 || isResending) return;
+    setIsResending(true);
+    const { error, message } = await resendCode(email);
+    if (error) {
+      toast({ title: "Error", description: error, variant: "destructive" });
+    } else {
+      toast({ title: "OTP Resent", description: message || "Check your email for the new code." });
+      setResendCooldown(60);
+    }
+    setIsResending(false);
+  };
 
   const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -123,8 +149,13 @@ const AuthOTP = () => {
               <div className="text-center mt-4">
                 <p className="text-sm text-gray-400">
                   Didn't receive the code?{' '}
-                  <button type="button" className="text-blue-400 hover:text-blue-300 font-medium">
-                    Resend Code
+                  <button 
+                    type="button" 
+                    onClick={handleResend}
+                    disabled={resendCooldown > 0 || isResending}
+                    className={`font-medium transition-colors ${resendCooldown > 0 || isResending ? 'text-gray-600 cursor-not-allowed' : 'text-blue-400 hover:text-blue-300'}`}
+                  >
+                    {isResending ? 'Resending...' : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
                   </button>
                 </p>
               </div>

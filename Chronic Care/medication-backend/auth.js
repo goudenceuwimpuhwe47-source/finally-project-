@@ -255,4 +255,35 @@ router.get('/me', async (req, res) => {
   }
 });
 
+router.post('/resend-code', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required.' });
+
+  try {
+    const [rows] = await pool.query('SELECT id, email FROM users WHERE email = ?', [email]);
+    if (!rows.length) return res.status(400).json({ error: 'User not found.' });
+    
+    const user = rows[0];
+    const code = generateCode();
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes expiry
+
+    await pool.query(
+      'UPDATE users SET verification_code = ?, verification_expires = ? WHERE id = ?',
+      [code, expires, user.id]
+    );
+
+    try {
+      await sendVerificationEmail(user.email, code);
+    } catch (emailErr) {
+      console.error('Resend email error:', emailErr);
+    }
+
+    console.log(`\n\n=== 🚨 RESEND OTP FOR ${user.email}: ${code} 🚨 ===\n\n`);
+    res.json({ message: 'A new verification code has been sent to your email.', testCode: code });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 module.exports = router;

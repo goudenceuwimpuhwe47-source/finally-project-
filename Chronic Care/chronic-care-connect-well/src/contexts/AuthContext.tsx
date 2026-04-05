@@ -9,6 +9,7 @@ export interface AuthContextType {
   signIn: (username: string, password: string) => Promise<{ error: any; user?: any; notVerified?: boolean; requiresOtp?: boolean; email?: string }>;
   signOut: () => Promise<void>;
   verifyAccount: (email: string, code: string) => Promise<{ error: any; user?: any }>;
+  resendCode: (email: string) => Promise<{ error: any; message?: string }>;
 }
 
 export interface RegisterData {
@@ -157,13 +158,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const resendCode = async (email: string): Promise<{ error: any; message?: string }> => {
+    try {
+      const res = await fetch(`${API_URL}/auth/resend-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (data.error) {
+        return { error: data.error };
+      }
+      if (data.testCode) {
+        console.log(`%c🚨 YOUR RESENT OTP IS: ${data.testCode} 🚨`, 'background: #222; color: #bada55; font-size: 20px; font-weight: bold; padding: 10px;');
+      }
+      return { error: null, message: data.message };
+    } catch (err) {
+      return { error: 'Server error.' };
+    }
+  };
+
   const value: AuthContextType = {
     user,
     loading,
     signUp,
     signIn,
     signOut,
-    verifyAccount
+    verifyAccount,
+    resendCode
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
