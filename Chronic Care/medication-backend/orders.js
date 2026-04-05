@@ -378,7 +378,7 @@ router.post('/:id/assign-doctor', auth, requireRole('admin'), async (req, res) =
     if (!rows0.length) return res.status(404).json({ error: 'Order not found' });
     if (rows0[0].admin_status !== 'pending') return res.status(400).json({ error: 'Order must be in pending to assign a doctor' });
 
-    await pool.query('UPDATE orders SET doctor_id=?, admin_status="under_review", doctor_status="pending" WHERE id=?', [doctorId, orderId]);
+    await pool.query('UPDATE orders SET doctor_id=?, admin_status=\'under_review\', doctor_status=\'pending\' WHERE id=?', [doctorId, orderId]);
     const [row] = await pool.query('SELECT * FROM orders WHERE id=?', [orderId]);
     res.json(row[0] || {});
   } catch (e) {
