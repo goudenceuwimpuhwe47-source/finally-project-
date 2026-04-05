@@ -416,6 +416,26 @@ router.get('/doctor/history', auth, requireRole('doctor'), async (req, res) => {
   }
 });
 
+// Doctor: list my patients (privacy-locked: only those assigned to this doctor)
+router.get('/doctor/patients', auth, requireRole('doctor'), async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT DISTINCT
+         u.id, u.username, u.email, u.phone,
+         TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) AS full_name
+       FROM orders o
+       JOIN users u ON u.id = o.user_id
+       WHERE o.doctor_id = ?
+       ORDER BY full_name IS NULL, full_name, u.email`,
+      [req.user.id]
+    );
+    res.json({ patients: rows });
+  } catch (e) {
+    console.error('doctor/patients error', e);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Patient: list my prescriptions (current and recent)
 router.get('/my/prescriptions', auth, async (req, res) => {
   try {

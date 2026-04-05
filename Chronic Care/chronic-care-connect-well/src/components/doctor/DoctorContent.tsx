@@ -9,12 +9,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { availableMedicines } from '@/lib/medicines';
+import { MessageSquare } from 'lucide-react';
 import { API_URL } from '@/lib/utils';
 
 export default function DoctorContent({ activeSection, setActiveSection }: { activeSection: string; setActiveSection: (s: string)=>void; }) {
   const { user } = useAuth();
   const [orders, setOrders] = useState<any[]>([]); // assigned/pending
   const [history, setHistory] = useState<any[]>([]);
+  const [patients, setPatients] = useState<any[]>([]);
   const [viewing, setViewing] = useState<any | null>(null);
   const [approving, setApproving] = useState<any | null>(null);
   const [rejecting, setRejecting] = useState<any | null>(null);
@@ -66,12 +68,25 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
     }
   };
 
+  const loadPatients = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/doctor/patients`, { headers: { Authorization: `Bearer ${token}` } });
+      const data = await res.json();
+      setPatients(Array.isArray(data?.patients) ? data.patients : []);
+    } catch {
+      toast({ title: 'Error', description: 'Failed to load patients list.', variant: 'destructive' });
+    }
+  };
+
   useEffect(()=>{
   // Cleanup legacy unscoped cache key from older builds
   try { localStorage.removeItem('doctor_history_items'); } catch {}
 
     if (activeSection === 'history') {
       loadHistory();
+    } else if (activeSection === 'patients') {
+      loadPatients();
     } else {
       loadAssigned();
     }
@@ -594,9 +609,50 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
     </Card>
   );
 
+  // patients list section
+  const patientsSection = (
+    <Card className="bg-gray-800 border-gray-700">
+      <CardHeader>
+        <CardTitle className="text-white">Patients List</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {patients.length === 0 && <p className="text-gray-400">You haven't been assigned any patients yet.</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {patients.map(p => (
+            <div key={p.id} className="p-4 bg-gray-700 rounded-lg border border-gray-600 flex flex-col justify-between">
+              <div>
+                <div className="text-lg font-semibold text-white mb-1">{p.full_name || p.username || p.email}</div>
+                <div className="text-sm text-gray-300 space-y-1">
+                  <div>Email: {p.email || '-'}</div>
+                  <div>Phone: {p.phone || '-'}</div>
+                </div>
+              </div>
+              <div className="mt-4 flex gap-2">
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 flex-1" 
+                  onClick={()=> { 
+                    setViewing({ user_id: p.id }); 
+                    setActiveSection('chat-doctor'); 
+                  }}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Chat
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="p-4 space-y-4">
-      {activeSection === 'history' ? historySection : assignedSection}
+      {activeSection === 'history' 
+        ? historySection 
+        : activeSection === 'patients' 
+          ? patientsSection 
+          : assignedSection}
     </div>
   );
 }

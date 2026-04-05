@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Send, Search } from 'lucide-react';
+import { Send, Search, MessageSquare } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL } from '@/lib/utils';
@@ -68,7 +68,10 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
 
   useEffect(() => {
     if (!token) return;
-    const socket = io(API_URL, { auth: { token } });
+    const socket = io(API_URL, { 
+      auth: { token },
+      transports: ['polling', 'websocket'] 
+    });
     socketRef.current = socket;
     socket.on('message:new', async (m: any) => {
       const otherIsActive = (m.from_role === 'patient' && m.from_user_id === activeUserId) || (m.to_role === 'patient' && m.to_user_id === activeUserId);
