@@ -124,41 +124,45 @@ export const AdminReports = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Reports & Analytics</h1>
-        <div className="flex space-x-2">
+    <div className="space-y-6 flex flex-col h-full">
+      <div className="flex flex-col xl:flex-row gap-6 justify-between items-start xl:items-center">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Reports & Analytics</h1>
+          <p className="text-gray-400 text-sm mt-1">Generate and export system-wide clinical data reports.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap gap-2 w-full xl:w-auto">
           <Button
             onClick={() => generateReportMutation.mutate("patient_engagement")}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm font-semibold shadow-lg shadow-blue-900/20"
             disabled={generateReportMutation.isPending}
           >
             <TrendingUp className="h-4 w-4 mr-2" />
-            Patient Engagement
+            Engagements
           </Button>
           <Button
             onClick={() => generateReportMutation.mutate("medication_usage")}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm font-semibold shadow-lg shadow-green-900/20"
             disabled={generateReportMutation.isPending}
           >
             <FileText className="h-4 w-4 mr-2" />
-            Medication Usage
+            Usage
           </Button>
           <Button
             onClick={() => generateReportMutation.mutate("provider_activity")}
-            className="bg-purple-600 hover:bg-purple-700"
+            className="bg-purple-600 hover:bg-purple-700 text-xs sm:text-sm font-semibold shadow-lg shadow-purple-900/20"
             disabled={generateReportMutation.isPending}
           >
             <FileText className="h-4 w-4 mr-2" />
-            Provider Activity
+            Activity
           </Button>
           <Button
             onClick={generateAll}
-            className="bg-gray-600 hover:bg-gray-700"
+            variant="outline"
+            className="border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs sm:text-sm font-semibold"
             disabled={generateReportMutation.isPending}
             title="Generate all reports"
           >
-            <Layers className="h-4 w-4 mr-2" />
+            <Layers className="h-4 w-4 mr-2 text-gray-400" />
             Generate All
           </Button>
         </div>
@@ -172,75 +176,50 @@ export const AdminReports = () => {
           <div className="space-y-4">
             {reports?.map((report) => (
               <div key={report.id} className="p-4 bg-gray-700 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-white">{report.title}</h3>
-                    <p className="text-sm text-gray-400">
-                      Generated on {format(new Date(report.generated_at), 'MMM dd, yyyy HH:mm')}
-                    </p>
-                    <div className="mt-2 text-sm text-gray-300">
-                      {report.type === 'patient_engagement' && (
-                        <div>
-                          Total Patients: {(report.data as any)?.totalPatients || 0} | 
-                          Total Orders: {(report.data as any)?.totalOrders || 0}
-                        </div>
-                      )}
-                      {report.type === 'medication_usage' && (
-                        <div>
-                          Total Medication Orders: {(report.data as any)?.totalMedicationOrders || 0}
-                        </div>
-                      )}
-                      {report.type === 'provider_activity' && (
-                        <div>
-                          Total Providers: {(report.data as any)?.totalProviders || 0} | 
-                          Total Prescriptions: {(report.data as any)?.totalPrescriptions || 0}
-                        </div>
-                      )}
+                  <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0 w-full sm:w-auto">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="border border-blue-600/30 text-blue-400 hover:bg-blue-600 hover:text-white text-[10px] font-bold uppercase transition-all"
+                        onClick={() => exportJSON(report)}
+                        title="Export JSON"
+                      >
+                        <Download className="h-3.5 w-3.5 mr-1.5" />
+                        JSON
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="border border-green-600/30 text-green-400 hover:bg-green-600 hover:text-white text-[10px] font-bold uppercase transition-all"
+                        onClick={() => exportCSV(report)}
+                        title="Export CSV"
+                      >
+                        <Download className="h-3.5 w-3.5 mr-1.5" />
+                        CSV
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="border border-indigo-600/30 text-indigo-400 hover:bg-indigo-600 hover:text-white text-[10px] font-bold uppercase transition-all"
+                        onClick={() => exportServer(report, 'json')}
+                        title="Download from server (JSON)"
+                      >
+                        <CloudDownload className="h-3.5 w-3.5 mr-1.5" />
+                        Srvr JSON
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="border border-emerald-600/30 text-emerald-400 hover:bg-emerald-600 hover:text-white text-[10px] font-bold uppercase transition-all"
+                        onClick={() => exportServer(report, 'csv')}
+                        title="Download from server (CSV)"
+                      >
+                        <CloudDownload className="h-3.5 w-3.5 mr-1.5" />
+                        Srvr CSV
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-blue-600 text-blue-400 hover:bg-blue-600"
-                      onClick={() => exportJSON(report)}
-                      title="Export JSON"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      JSON
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-green-600 text-green-400 hover:bg-green-600"
-                      onClick={() => exportCSV(report)}
-                      title="Export CSV"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      CSV
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-blue-500 text-blue-300 hover:bg-blue-500"
-                      onClick={() => exportServer(report, 'json')}
-                      title="Download from server (JSON)"
-                    >
-                      <CloudDownload className="h-4 w-4 mr-2" />
-                      Server JSON
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-emerald-500 text-emerald-300 hover:bg-emerald-500"
-                      onClick={() => exportServer(report, 'csv')}
-                      title="Download from server (CSV)"
-                    >
-                      <CloudDownload className="h-4 w-4 mr-2" />
-                      Server CSV
-                    </Button>
-                  </div>
-                </div>
               </div>
             ))}
             {reports?.length === 0 && (

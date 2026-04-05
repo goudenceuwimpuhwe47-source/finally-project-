@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, Search, Mail, Phone, Calendar, MapPin } from "lucide-react";
+import { Users, Search, Mail, Phone, Calendar, MapPin, XCircle } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { API_URL } from "@/lib/utils";
 
@@ -191,46 +192,128 @@ export const AdminPatients = () => {
 
       {/* Details Drawer/Modal */}
       {selectedId !== null && (
-        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60">
-          <div className="w-full md:max-w-xl bg-gray-900 border border-gray-700 rounded-t-2xl md:rounded-2xl overflow-hidden">
-            <div className="p-4 border-b border-gray-700 flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Patient Details</h3>
-              <button className="text-gray-400 hover:text-white" onClick={() => setSelectedId(null)}>Close</button>
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+          <div className="absolute inset-0" onClick={() => setSelectedId(null)} />
+          <div className="w-full md:max-w-2xl bg-gray-900 border-t md:border border-gray-700/50 rounded-t-3xl md:rounded-2xl overflow-hidden shadow-2xl relative animate-in slide-in-from-bottom-10 duration-300">
+            <div className="p-4 sm:p-6 border-b border-gray-800 flex items-center justify-between bg-gray-900/50 backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-600/20 rounded-lg">
+                  <Users className="h-5 w-5 text-blue-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white">Patient Profile</h3>
+              </div>
+              <button 
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition-colors" 
+                onClick={() => setSelectedId(null)}
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
             </div>
-            <div className="p-4 space-y-3">
-              {loadingDetails && <div className="text-gray-400">Loading…</div>}
-              {!loadingDetails && details && !details.error && (
-                <div className="space-y-2">
-                  <div className="text-white text-xl font-semibold">{details.full_name || details.username || details.email}</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-300">
-                    <div><span className="text-gray-400">Email:</span> {details.email || '—'}</div>
-                    <div><span className="text-gray-400">Phone:</span> {details.phone || '—'}</div>
-                    <div><span className="text-gray-400">DOB:</span> {details.date_of_birth ? new Date(details.date_of_birth).toLocaleDateString() : '—'}</div>
-                    <div><span className="text-gray-400">Gender:</span> {details.gender || '—'}</div>
-                    <div className="sm:col-span-2"><span className="text-gray-400">Address:</span> {details.address || '—'}</div>
+            
+            <ScrollArea className="max-h-[80vh] md:max-h-[600px]">
+              <div className="p-4 sm:p-8 space-y-6">
+                {loadingDetails && (
+                  <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+                    <p className="text-gray-400 animate-pulse">Loading detailed patient records...</p>
                   </div>
-                  {details.stats && (
-                    <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-gray-800 rounded p-3">
-                        <div className="text-2xl font-bold text-white">{details.stats.ordersCount}</div>
-                        <div className="text-xs text-gray-400">Orders</div>
+                )}
+                
+                {!loadingDetails && details && !details.error && (
+                  <div className="space-y-8">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                      <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-900/20">
+                        <span className="text-4xl font-bold text-white">
+                          {(details.full_name || details.username || '?').charAt(0).toUpperCase()}
+                        </span>
                       </div>
-                      <div className="bg-gray-800 rounded p-3">
-                        <div className="text-2xl font-bold text-white">{details.stats.prescriptionsCount}</div>
-                        <div className="text-xs text-gray-400">Prescriptions</div>
-                      </div>
-                      <div className="bg-gray-800 rounded p-3">
-                        <div className="text-2xl font-bold text-white">{details.stats.remindersCount}</div>
-                        <div className="text-xs text-gray-400">Reminders</div>
+                      <div className="text-center sm:text-left space-y-1">
+                        <h2 className="text-2xl sm:text-3xl font-bold text-white">
+                          {details.full_name || details.username || details.email}
+                        </h2>
+                        <div className="flex flex-wrap justify-center sm:justify-start gap-2 pt-2">
+                          <Badge className="bg-green-500/10 text-green-400 border-green-500/20">Verified Account</Badge>
+                          <Badge variant="outline" className="text-gray-400">Regular Patient</Badge>
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
-              {!loadingDetails && details?.error && (
-                <div className="text-red-400">{details.error}</div>
-              )}
-            </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-gray-800/30 p-4 sm:p-6 rounded-2xl border border-gray-700/30">
+                      <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                          <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-tighter font-semibold">Email Address</p>
+                            <p className="text-white break-all">{details.email || '—'}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-tighter font-semibold">Phone Number</p>
+                            <p className="text-white">{details.phone || '—'}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                          <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-tighter font-semibold">Date of Birth</p>
+                            <p className="text-white">{details.date_of_birth ? new Date(details.date_of_birth).toLocaleDateString() : '—'}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-tighter font-semibold">Home Address</p>
+                            <p className="text-white text-sm">{details.address || '—'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {details.stats && (
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center hover:bg-gray-800 transition-colors">
+                          <p className="text-2xl font-black text-white">{details.stats.ordersCount}</p>
+                          <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest mt-1">Orders</p>
+                        </div>
+                        <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center hover:bg-gray-800 transition-colors">
+                          <p className="text-2xl font-black text-white">{details.stats.prescriptionsCount}</p>
+                          <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest mt-1">Scripts</p>
+                        </div>
+                        <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center hover:bg-gray-800 transition-colors">
+                          <p className="text-2xl font-black text-white">{details.stats.remindersCount}</p>
+                          <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest mt-1">Alarms</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="pt-4 flex flex-col sm:flex-row gap-3">
+                      <Button className="flex-1 bg-blue-600 hover:bg-blue-700 font-bold">Message Patient</Button>
+                      <Button variant="outline" className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800">Export Health Record</Button>
+                    </div>
+                  </div>
+                )}
+                
+                {!loadingDetails && details?.error && (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <div className="bg-red-500/10 p-4 rounded-full mb-4">
+                      <XCircle className="h-10 w-10 text-red-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Failed to Load Profile</h3>
+                    <p className="text-gray-400 max-w-xs mx-auto">{details.error}</p>
+                    <Button 
+                      className="mt-6 bg-gray-800 hover:bg-gray-700" 
+                      onClick={() => setSelectedId(null)}
+                    >
+                      Back to List
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </div>
         </div>
       )}

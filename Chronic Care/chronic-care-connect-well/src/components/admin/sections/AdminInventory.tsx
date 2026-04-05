@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { API_URL } from "@/lib/utils";
 
 export const AdminInventory = () => {
@@ -17,46 +18,59 @@ export const AdminInventory = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-white">Inventory (All Providers)</h1>
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Stock Items</CardTitle>
+      <h1 className="text-2xl sm:text-3xl font-bold text-white px-1">Inventory (All Providers)</h1>
+      <Card className="bg-gray-800 border-gray-700 overflow-hidden shadow-xl">
+        <CardHeader className="border-b border-gray-700/50 text-white">
+          <CardTitle>Stock Items</CardTitle>
         </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="text-gray-400">Loading...</div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-gray-700">
-                  <TableHead className="text-gray-300">Provider</TableHead>
-                  <TableHead className="text-gray-300">Item</TableHead>
-                  <TableHead className="text-gray-300">SKU</TableHead>
-                  <TableHead className="text-gray-300">Qty</TableHead>
-                  <TableHead className="text-gray-300">Unit Price</TableHead>
-                  <TableHead className="text-gray-300">Mfg</TableHead>
-                  <TableHead className="text-gray-300">Exp</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(data || []).length > 0 ? (data || []).map((i:any) => (
-                  <TableRow key={i.id} className="border-gray-700">
-                    <TableCell className="text-white">{i.provider_name || i.username}</TableCell>
-                    <TableCell className="text-gray-300">{i.name}</TableCell>
-                    <TableCell className="text-gray-300">{i.sku || '—'}</TableCell>
-                    <TableCell className="text-gray-300">{i.quantity}</TableCell>
-                    <TableCell className="text-gray-300">{Number(i.unit_price).toFixed(2)}</TableCell>
-                    <TableCell className="text-gray-300">{i.mfg_date || '—'}</TableCell>
-                    <TableCell className="text-gray-300">{i.exp_date || '—'}</TableCell>
-                  </TableRow>
-                )) : (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-gray-400">No stock found</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          )}
+        <CardContent className="p-0">
+          <ScrollArea className="w-full">
+            <div className="min-w-[800px]">
+              {isLoading ? (
+                <div className="p-8 text-gray-400 text-center">Loading inventory data...</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-gray-700 hover:bg-transparent">
+                      <TableHead className="text-gray-300 font-semibold">Provider</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Item</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">SKU</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Qty</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Unit Price</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Mfg Date</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Exp Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(data || []).length > 0 ? (data || []).map((i:any) => (
+                      <TableRow key={i.id} className="border-gray-700 hover:bg-gray-700/30 transition-colors">
+                        <TableCell className="text-white font-medium">{i.provider_name || i.username}</TableCell>
+                        <TableCell className="text-gray-300">{i.name}</TableCell>
+                        <TableCell className="text-gray-300 font-mono text-xs">{i.sku || '—'}</TableCell>
+                        <TableCell className="text-gray-300">
+                          <span className={`${i.quantity < 10 ? 'text-red-400 font-bold' : 'text-gray-300'}`}>
+                            {i.quantity}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-gray-300 font-mono whitespace-nowrap">
+                          {Number(i.unit_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </TableCell>
+                        <TableCell className="text-gray-300 text-xs">{i.mfg_date || '—'}</TableCell>
+                        <TableCell className="text-gray-300 text-xs">{i.exp_date || '—'}</TableCell>
+                      </TableRow>
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-20 text-gray-500">
+                          No stock items found in the system.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </CardContent>
       </Card>
     </div>

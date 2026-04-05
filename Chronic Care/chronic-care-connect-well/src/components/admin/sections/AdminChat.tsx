@@ -228,25 +228,33 @@ export const AdminChat = () => {
   }, [isTyping, selectedPatient]);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-white">Patient Communication</h1>
+    <div className="space-y-4 sm:space-y-6 flex flex-col h-full max-h-[calc(100vh-200px)]">
+      <h1 className="text-2xl sm:text-3xl font-bold text-white px-1">Patient Communication</h1>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[700px]">
-        {/* Patient List */}
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <MessageSquare className="h-5 w-5 mr-2" />
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Patient List - Hidden on mobile if a patient is selected */}
+        <Card className={`bg-gray-800 border-gray-700 flex flex-col min-h-0 ${selectedPatient ? 'hidden lg:flex' : 'flex'}`}>
+          <CardHeader className="py-3 px-4 sm:py-4 sm:px-6">
+            <CardTitle className="text-white text-lg flex items-center">
+              <MessageSquare className="h-5 w-5 mr-2 text-blue-500" />
               Patients
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 flex-1 flex flex-col min-h-0">
             <div className="px-4 pb-2">
-              <Input placeholder="Search patients…" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Input 
+                placeholder="Search patients…" 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)}
+                className="bg-gray-900/50 border-gray-700 focus:border-blue-500 transition-colors"
+              />
             </div>
-            <ScrollArea className="h-[600px]">
-              <div className="space-y-1 p-4">
-                {patients.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || String(p.id).includes(search)).map((patient) => (
+            <ScrollArea className="flex-1 p-2">
+              <div className="space-y-1">
+                {patients.filter(p => 
+                  p.name.toLowerCase().includes(search.toLowerCase()) || 
+                  String(p.id).includes(search)
+                ).map((patient) => (
                   <PatientListItem
                     key={patient.id}
                     patient={patient}
@@ -259,12 +267,12 @@ export const AdminChat = () => {
           </CardContent>
         </Card>
 
-        {/* Chat Area */}
-        <div className="lg:col-span-2">
+        {/* Chat Area - Full width on mobile if a patient is selected */}
+        <div className={`lg:col-span-2 min-h-0 ${!selectedPatient ? 'hidden lg:block' : 'block'}`}>
           {selectedPatient ? (
-            <Card className="bg-gray-800 border-gray-700 h-full flex flex-col">
+            <Card className="bg-gray-800 border-gray-700 h-full flex flex-col min-h-0 shadow-2xl relative overflow-hidden">
               {/* Chat Header */}
-              <CardHeader className="border-b border-gray-700">
+              <CardHeader className="border-b border-gray-700 py-3 px-4 sm:py-4 sm:px-6 bg-gray-800/80 backdrop-blur-sm sticky top-0 z-10">
                 <ChatHeader
                   patient={selectedPatient}
                   onBack={() => setSelectedPatient(null)}
@@ -273,22 +281,36 @@ export const AdminChat = () => {
                 />
               </CardHeader>
 
-              {/* Messages */}
-              <CardContent className="flex-1 p-0">
-                <ScrollArea className="h-[450px] p-4">
-                  <div className="space-y-4">
-                    {messages.map((message) => (
-                      <ChatMessage key={message.id} message={message} />
-                    ))}
+              {/* Messages Area */}
+              <CardContent className="flex-1 p-0 min-h-0 relative">
+                <ScrollArea className="h-full max-h-[400px] lg:max-h-[500px]">
+                  <div className="p-4 space-y-4">
+                    {messages.length > 0 ? (
+                      messages.map((message) => (
+                        <ChatMessage key={message.id} message={message} />
+                      ))
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full text-gray-500 py-20">
+                        <MessageSquare className="h-12 w-12 mb-2 opacity-20" />
+                        <p>No messages yet. Start the conversation!</p>
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
               </CardContent>
-              <div className="px-4 pb-2">
-                <button className="text-xs text-gray-400 hover:text-white" onClick={() => setPage(p => p + 1)}>Load more</button>
+
+              {/* Load More Button */}
+              <div className="px-4 py-1 border-t border-gray-700/50 bg-gray-900/10">
+                <button 
+                  className="text-[10px] uppercase tracking-wider font-semibold text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-1" 
+                  onClick={() => setPage(p => p + 1)}
+                >
+                  Load older messages
+                </button>
               </div>
 
               {/* Message Input */}
-              <div className="p-4 border-t border-gray-700">
+              <div className="p-3 sm:p-4 border-t border-gray-700 bg-gray-800/80 backdrop-blur-sm">
                 <MessageInput
                   value={newMessage}
                   onChange={setNewMessage}
@@ -297,7 +319,7 @@ export const AdminChat = () => {
               </div>
             </Card>
           ) : (
-            <Card className="bg-gray-800 border-gray-700 h-full flex items-center justify-center">
+            <Card className="bg-gray-800 border-gray-700 h-full flex items-center justify-center border-dashed border-2 opacity-50">
               <EmptyChat />
             </Card>
           )}
