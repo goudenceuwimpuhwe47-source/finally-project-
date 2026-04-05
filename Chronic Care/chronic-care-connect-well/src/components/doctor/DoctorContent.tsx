@@ -71,7 +71,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
   const loadPatients = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`${API_URL}/doctor/patients`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/orders/doctor/patients`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       setPatients(Array.isArray(data?.patients) ? data.patients : []);
     } catch {
