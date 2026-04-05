@@ -18,6 +18,8 @@ const Auth = () => {
   const [showVerify, setShowVerify] = useState(false);
   const [verifyEmail, setVerifyEmail] = useState('');
   const [verifyMessage, setVerifyMessage] = useState('');
+  const [signinError, setSigninError] = useState('');
+  const [signupError, setSignupError] = useState('');
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const navigate = useNavigate();
 
@@ -43,6 +45,7 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setSignupError('');
     const formData = new FormData(e.currentTarget);
     const data = {
       firstName: formData.get('firstName') as string,
@@ -80,9 +83,11 @@ const Auth = () => {
     }
   const { error, email } = await signUp(data);
   if (error) {
+      const errorMsg = typeof error === 'string' ? error : (error.message || 'Registration failed');
+      setSignupError(errorMsg);
       toast({
         title: "Sign up failed",
-        description: error.message,
+        description: errorMsg,
         variant: "destructive"
       });
     } else {
@@ -104,6 +109,7 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setSigninError('');
     const formData = new FormData(e.currentTarget);
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
@@ -119,9 +125,11 @@ const Auth = () => {
       setVerifyEmail(email || '');
       setVerifyMessage('Enter the verification code sent to your email.');
     } else if (error) {
+      const errorMsg = typeof error === 'string' ? error : (error.message || 'Sign in failed');
+      setSigninError(errorMsg);
       toast({
         title: "Sign in failed",
-        description: typeof error === 'string' ? error : (error.message || 'Sign in failed'),
+        description: errorMsg,
         variant: "destructive"
       });
     } else if (user) {
@@ -256,6 +264,7 @@ const Auth = () => {
                         placeholder="Enter your password"
                       />
                     </div>
+                    {signinError && <div className="text-red-400 text-sm mb-2">{signinError}</div>}
                     <Button 
                       type="submit" 
                       className="w-full bg-blue-600 hover:bg-blue-700"
@@ -377,6 +386,7 @@ const Auth = () => {
                     <Label htmlFor="signup-profilePhoto" className="text-gray-300">Profile Photo</Label>
                     <Input id="signup-profilePhoto" name="profilePhoto" type="file" className="bg-gray-700 border-gray-600 text-white" />
                   </div>
+                  {signupError && <div className="text-red-400 text-sm mb-2">{signupError}</div>}
                   <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
                     {isLoading ? 'Creating account...' : 'Create Account'}
                   </Button>
