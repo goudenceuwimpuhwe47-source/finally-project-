@@ -190,7 +190,9 @@ router.post('/verify', async (req, res) => {
     [user.id]
   );
 
-  res.json({ message: 'Account verified! You can now log in.' });
+  const JWT_SECRET = process.env.JWT_SECRET || 'your_secret';
+  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ message: 'Account verified!', token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
 });
 
 // POST /auth/login
@@ -211,17 +213,23 @@ router.post('/login', async (req, res) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ error: 'Invalid credentials.' });
 
-  // Account not yet email-verified
-  if (!user.is_verified) {
-    return res.status(401).json({
-      error: 'Please verify your email before logging in.',
-      notVerified: true,
-      email: user.email
-    });
+  // Account is verified — now send an OTP for login
+  const code = generateCode();
+  const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+  await pool.query(
+    'UPDATE users SET verification_code = ?, verification_expires = ? WHERE id = ?',
+    [code, expires, user.id]
+  );
+
+  try {
+    await sendVerificationEmail(user.email, code);
+  } catch (err) {
+    console.error('Login email error:', err);
   }
 
-  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
-  res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
+  console.log(`\n\n=== 🚨 LOGIN OTP FOR ${user.email}: ${code} 🚨 ===\n\n`);
+  res.json({ requiresOtp: true, email: user.email, testCode: code });
 });
 
 router.get('/me', async (req, res) => {

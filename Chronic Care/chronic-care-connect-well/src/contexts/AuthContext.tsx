@@ -6,7 +6,7 @@ export interface AuthContextType {
   user: any | null;
   loading: boolean;
   signUp: (data: RegisterData) => Promise<{ error: any; email?: string }>;
-  signIn: (username: string, password: string) => Promise<{ error: any; user?: any; notVerified?: boolean; email?: string }>;
+  signIn: (username: string, password: string) => Promise<{ error: any; user?: any; notVerified?: boolean; requiresOtp?: boolean; email?: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -100,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signIn = async (username: string, password: string): Promise<{ error: any; user?: any; notVerified?: boolean; email?: string }> => {
+  const signIn = async (username: string, password: string): Promise<{ error: any; user?: any; notVerified?: boolean; requiresOtp?: boolean; email?: string }> => {
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
@@ -110,6 +110,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await res.json();
       if (data.notVerified) {
         return { error: data.error, notVerified: true, email: data.email };
+      }
+      if (data.requiresOtp) {
+        if (data.testCode) {
+          console.log(`%c🚨 YOUR LOGIN OTP IS: ${data.testCode} 🚨`, 'background: #222; color: #bada55; font-size: 20px; font-weight: bold; padding: 10px;');
+        }
+        return { error: null, requiresOtp: true, email: data.email };
       }
       if (data.error) {
         return { error: data.error };

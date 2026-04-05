@@ -113,8 +113,16 @@ const Auth = () => {
     const formData = new FormData(e.currentTarget);
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
-    const { error, user, notVerified, email } = await signIn(username, password);
-    if (notVerified) {
+    const { error, user, notVerified, requiresOtp, email } = await signIn(username, password);
+    if (requiresOtp) {
+      toast({
+        title: "OTP Required",
+        description: "A verification code has been sent to your email.",
+      });
+      setShowVerify(true);
+      setVerifyEmail(email || '');
+      setVerifyMessage('Enter the verification code sent to your email.');
+    } else if (notVerified) {
       // Account exists but email not yet verified — show the verification form
       toast({
         title: "Email not verified",
@@ -165,8 +173,18 @@ const Auth = () => {
       if (data.error) {
         setVerifyMessage(data.error);
       } else {
-        setVerifyMessage('Account verified! You can now log in.');
-        setShowVerify(false);
+        if (data.token && data.user) {
+          localStorage.setItem('token', data.token);
+          // Manually update context state if needed, or rely on AuthContext if provided.
+          // Since we are in Auth.tsx, we can try to use a function from context or just 
+          // let the parent know. For now, since handleSignIn already has the redirect logic,
+          // let's just trigger a reload or navigate.
+          toast({ title: "Verified!", description: "You are now signed in." });
+          window.location.reload(); // Simplest way to trigger AuthContext restorer
+        } else {
+          setVerifyMessage('Account verified! You can now log in.');
+          setShowVerify(false);
+        }
       }
     } catch (err) {
       setVerifyMessage('Server error.');
