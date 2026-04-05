@@ -186,7 +186,7 @@ router.post('/verify', async (req, res) => {
 
   // Mark as verified
   await pool.query(
-    'UPDATE users SET is_verified = true, verification_code = NULL, verification_expires = NULL WHERE id = ?',
+    "UPDATE users SET is_verified = true, verification_status = 'verified', verification_code = NULL, verification_expires = NULL WHERE id = ?",
     [user.id]
   );
 
