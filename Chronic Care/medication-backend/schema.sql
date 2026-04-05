@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -14,15 +13,36 @@ CREATE TABLE IF NOT EXISTS orders (
   age INT NOT NULL,
   gender VARCHAR(16) NOT NULL,
   payment_method VARCHAR(32) NOT NULL,
-  medical_certificate VARCHAR(255),
+  medical_certificate VARCHAR(255) NULL,
+  medicine_name VARCHAR(255) NULL,
+  prescription_quantity VARCHAR(64) NULL,
+  doctor_instructions TEXT NULL,
+  doctor_advice TEXT NULL,
+  adherence_plan TEXT NULL,
+  doctor_reject_reason TEXT NULL,
   canceled TINYINT(1) NOT NULL DEFAULT 0,
   admin_status ENUM('pending','under_review','approved','rejected') DEFAULT 'pending',
+  admin_reject_reason TEXT NULL,
   doctor_status ENUM('pending','approved','rejected') DEFAULT 'pending',
+  doctor_id INT NULL,
+  provider_id INT NULL,
+  provider_status ENUM('unassigned','assigned','rejected') NOT NULL DEFAULT 'unassigned',
+  provider_reject_reason TEXT NULL,
+  provider_confirmed TINYINT(1) NOT NULL DEFAULT 0,
+  provider_confirmed_qty INT NULL,
+  provider_confirmed_price DECIMAL(10,2) NULL,
+  provider_stock_id INT NULL,
+  provider_note TEXT NULL,
   payment_status ENUM('pending','confirmed','approved','failed') DEFAULT 'pending',
   pharmacy_status ENUM('pending','ready_pickup','ready_delivery','dispatched','delivered') DEFAULT 'pending',
+  invoice_status ENUM('draft','sent','paid') NULL,
+  invoice_method ENUM('online','home_delivery','pharmacy_pickup') NULL,
+  invoice_total DECIMAL(10,2) NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_user (user_id)
+  INDEX idx_user (user_id),
+  INDEX idx_doctor (doctor_id),
+  INDEX idx_provider (provider_id)
 );
 
 -- MTN MoMo payment tracking

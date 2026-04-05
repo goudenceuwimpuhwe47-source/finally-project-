@@ -71,42 +71,82 @@ async function ensureSchema() {
         gender VARCHAR(16) NOT NULL,
         payment_method VARCHAR(32) NOT NULL,
         medical_certificate VARCHAR(255) NULL,
+        medicine_name VARCHAR(255) NULL,
+        prescription_quantity VARCHAR(64) NULL,
+        doctor_instructions TEXT NULL,
+        doctor_advice TEXT NULL,
+        adherence_plan TEXT NULL,
+        doctor_reject_reason TEXT NULL,
         canceled TINYINT(1) NOT NULL DEFAULT 0,
         admin_status ENUM('pending','under_review','approved','rejected') DEFAULT 'pending',
+        admin_reject_reason TEXT NULL,
         doctor_status ENUM('pending','approved','rejected') DEFAULT 'pending',
+        doctor_id INT NULL,
+        provider_id INT NULL,
+        provider_status ENUM('unassigned','assigned','rejected') NOT NULL DEFAULT 'unassigned',
+        provider_reject_reason TEXT NULL,
+        provider_confirmed TINYINT(1) NOT NULL DEFAULT 0,
+        provider_confirmed_qty INT NULL,
+        provider_confirmed_price DECIMAL(10,2) NULL,
+        provider_stock_id INT NULL,
+        provider_note TEXT NULL,
         payment_status ENUM('pending','confirmed','approved','failed') DEFAULT 'pending',
         pharmacy_status ENUM('pending','ready_pickup','ready_delivery','dispatched','delivered') DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_user (user_id)
+        INDEX idx_user (user_id),
+        INDEX idx_doctor (doctor_id),
+        INDEX idx_provider (provider_id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
-    console.log('Ensured orders table');
+    console.log('Ensured orders table with full schema');
   } catch (e) {
     console.error('Ensure orders table failed:', e.message);
   }
 
-  // ── STEP 1: ALTERs to add columns that may be missing from orders ──
+  // ── STEP 1: ALTERs to add columns that may be missing from orders (Robust Checks) ──
   try {
     const dbName = process.env.DB_NAME;
-    const [cols] = await pool.query(
-      "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='orders' AND COLUMN_NAME='canceled'",
-      [dbName]
-    );
-    if ((cols?.[0]?.cnt || 0) === 0) {
-      await pool.query("ALTER TABLE orders ADD COLUMN canceled TINYINT(1) NOT NULL DEFAULT 0 AFTER medical_certificate");
-      console.log("Added missing 'canceled' column to orders table");
-    }
-    const [cols2] = await pool.query(
-      "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='orders' AND COLUMN_NAME='admin_reject_reason'",
-      [dbName]
-    );
-    if ((cols2?.[0]?.cnt || 0) === 0) {
-      await pool.query("ALTER TABLE orders ADD COLUMN admin_reject_reason TEXT NULL AFTER admin_status");
-      console.log("Added missing 'admin_reject_reason' column to orders table");
+    const ordersCols = [
+      { name: 'doctor_id', ddl: "ALTER TABLE orders ADD COLUMN doctor_id INT NULL AFTER doctor_status" },
+      { name: 'provider_id', ddl: "ALTER TABLE orders ADD COLUMN provider_id INT NULL AFTER doctor_id" },
+      { name: 'medicine_name', ddl: "ALTER TABLE orders ADD COLUMN medicine_name VARCHAR(255) NULL AFTER medical_certificate" },
+      { name: 'prescription_quantity', ddl: "ALTER TABLE orders ADD COLUMN prescription_quantity VARCHAR(64) NULL AFTER medicine_name" },
+      { name: 'doctor_instructions', ddl: "ALTER TABLE orders ADD COLUMN doctor_instructions TEXT NULL AFTER prescription_quantity" },
+      { name: 'doctor_advice', ddl: "ALTER TABLE orders ADD COLUMN doctor_advice TEXT NULL AFTER doctor_instructions" },
+      { name: 'adherence_plan', ddl: "ALTER TABLE orders ADD COLUMN adherence_plan TEXT NULL AFTER doctor_advice" },
+      { name: 'doctor_reject_reason', ddl: "ALTER TABLE orders ADD COLUMN doctor_reject_reason TEXT NULL AFTER adherence_plan" },
+      { name: 'admin_reject_reason', ddl: "ALTER TABLE orders ADD COLUMN admin_reject_reason TEXT NULL AFTER admin_status" },
+      { name: 'provider_status', ddl: "ALTER TABLE orders ADD COLUMN provider_status ENUM('unassigned','assigned','rejected') NOT NULL DEFAULT 'unassigned' AFTER provider_id" },
+      { name: 'provider_reject_reason', ddl: "ALTER TABLE orders ADD COLUMN provider_reject_reason TEXT NULL AFTER provider_status" },
+      { name: 'provider_confirmed', ddl: "ALTER TABLE orders ADD COLUMN provider_confirmed TINYINT(1) NOT NULL DEFAULT 0 AFTER provider_reject_reason" },
+      { name: 'provider_confirmed_qty', ddl: "ALTER TABLE orders ADD COLUMN provider_confirmed_qty INT NULL AFTER provider_confirmed" },
+      { name: 'provider_confirmed_price', ddl: "ALTER TABLE orders ADD COLUMN provider_confirmed_price DECIMAL(10,2) NULL AFTER provider_confirmed_qty" },
+      { name: 'provider_stock_id', ddl: "ALTER TABLE orders ADD COLUMN provider_stock_id INT NULL AFTER provider_confirmed_price" },
+      { name: 'provider_note', ddl: "ALTER TABLE orders ADD COLUMN provider_note TEXT NULL AFTER provider_stock_id" },
+      { name: 'invoice_status', ddl: "ALTER TABLE orders ADD COLUMN invoice_status ENUM('draft','sent','paid') NULL AFTER provider_note" },
+      { name: 'invoice_method', ddl: "ALTER TABLE orders ADD COLUMN invoice_method ENUM('online','home_delivery','pharmacy_pickup') NULL AFTER invoice_status" },
+      { name: 'invoice_medicine_total', ddl: "ALTER TABLE orders ADD COLUMN invoice_medicine_total DECIMAL(10,2) NULL AFTER invoice_method" },
+      { name: 'invoice_doctor_fee', ddl: "ALTER TABLE orders ADD COLUMN invoice_doctor_fee DECIMAL(10,2) NULL AFTER invoice_medicine_total" },
+      { name: 'invoice_service_fee', ddl: "ALTER TABLE orders ADD COLUMN invoice_service_fee DECIMAL(10,2) NULL AFTER invoice_doctor_fee" },
+      { name: 'invoice_delivery_fee', ddl: "ALTER TABLE orders ADD COLUMN invoice_delivery_fee DECIMAL(10,2) NULL AFTER invoice_service_fee" },
+      { name: 'invoice_total', ddl: "ALTER TABLE orders ADD COLUMN invoice_total DECIMAL(10,2) NULL AFTER invoice_delivery_fee" },
+      { name: 'invoice_sent_at', ddl: "ALTER TABLE orders ADD COLUMN invoice_sent_at DATETIME NULL AFTER invoice_total" },
+      { name: 'invoice_paid_at', ddl: "ALTER TABLE orders ADD COLUMN invoice_paid_at DATETIME NULL AFTER invoice_sent_at" }
+    ];
+
+    for (const col of ordersCols) {
+      const [chk] = await pool.query(
+        `SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = COALESCE(?, DATABASE()) AND TABLE_NAME = 'orders' AND COLUMN_NAME = ?`,
+        [dbName || null, col.name]
+      );
+      if ((chk?.[0]?.cnt || 0) === 0) {
+        await pool.query(col.ddl);
+        console.log(`Added missing column '${col.name}' to orders table`);
+      }
     }
   } catch (e) {
-    console.error('Schema check failed:', e.message);
+    console.error('Schema check/ALTER failed:', e.message);
   }
 
   // Ensure messages table exists
@@ -130,135 +170,7 @@ async function ensureSchema() {
     console.error('Ensure messages table failed:', e.message);
   }
 
-  // Ensure orders.doctor_id exists
-  try {
-    const dbName = process.env.DB_NAME;
-    const [has] = await pool.query(
-      "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='orders' AND COLUMN_NAME='doctor_id'",
-      [dbName]
-    );
-    if ((has?.[0]?.cnt || 0) === 0) {
-      await pool.query("ALTER TABLE orders ADD COLUMN doctor_id INT NULL AFTER doctor_status");
-      console.log("Added 'doctor_id' column to orders table");
-    }
-  } catch (e) {
-    console.error('Ensure orders.doctor_id failed:', e.message);
-  }
-
-  // Ensure orders.provider_id exists (assigned pharmacy/provider)
-  try {
-    const dbName = process.env.DB_NAME;
-    const [hasProv] = await pool.query(
-      "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='orders' AND COLUMN_NAME='provider_id'",
-      [dbName]
-    );
-    if ((hasProv?.[0]?.cnt || 0) === 0) {
-      await pool.query("ALTER TABLE orders ADD COLUMN provider_id INT NULL AFTER doctor_id");
-      console.log("Added 'provider_id' column to orders table");
-    }
-  } catch (e) {
-    console.error('Ensure orders.provider_id failed:', e.message);
-  }
-
-  // Ensure provider assignment tracking columns
-  try {
-    const dbName = process.env.DB_NAME;
-    const [hasStatus] = await pool.query(
-      "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='orders' AND COLUMN_NAME='provider_status'",
-      [dbName]
-    );
-    if ((hasStatus?.[0]?.cnt || 0) === 0) {
-      await pool.query("ALTER TABLE orders ADD COLUMN provider_status ENUM('unassigned','assigned','rejected') NOT NULL DEFAULT 'unassigned' AFTER provider_id");
-      console.log("Added 'provider_status' column to orders table");
-    }
-    const [hasReason] = await pool.query(
-      "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='orders' AND COLUMN_NAME='provider_reject_reason'",
-      [dbName]
-    );
-    if ((hasReason?.[0]?.cnt || 0) === 0) {
-      await pool.query("ALTER TABLE orders ADD COLUMN provider_reject_reason TEXT NULL AFTER provider_status");
-      console.log("Added 'provider_reject_reason' column to orders table");
-    }
-  } catch (e) {
-    console.error('Ensure provider assignment columns failed:', e.message);
-  }
-
-  // Ensure provider confirmation columns (availability + quote)
-  try {
-    const dbName = process.env.DB_NAME;
-    const needCols = [
-      { name: 'provider_confirmed', ddl: "ALTER TABLE orders ADD COLUMN provider_confirmed TINYINT(1) NOT NULL DEFAULT 0 AFTER provider_reject_reason" },
-      { name: 'provider_confirmed_qty', ddl: "ALTER TABLE orders ADD COLUMN provider_confirmed_qty INT NULL AFTER provider_confirmed" },
-      { name: 'provider_confirmed_price', ddl: "ALTER TABLE orders ADD COLUMN provider_confirmed_price DECIMAL(10,2) NULL AFTER provider_confirmed_qty" },
-      { name: 'provider_stock_id', ddl: "ALTER TABLE orders ADD COLUMN provider_stock_id INT NULL AFTER provider_confirmed_price" },
-      { name: 'provider_note', ddl: "ALTER TABLE orders ADD COLUMN provider_note TEXT NULL AFTER provider_stock_id" }
-    ];
-    for (const col of needCols) {
-      const [chk] = await pool.query(
-        "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='orders' AND COLUMN_NAME=?",
-        [dbName, col.name]
-      );
-      if ((chk?.[0]?.cnt || 0) === 0) {
-        await pool.query(col.ddl);
-        console.log(`Added '${col.name}' to orders`);
-      }
-    }
-  } catch (e) {
-    console.error('Ensure provider confirmation columns failed:', e.message);
-  }
-
-  // Ensure doctor guidance fields exist
-  try {
-    const dbName = process.env.DB_NAME;
-    const needed = [
-      { name: 'medicine_name', ddl: "ALTER TABLE orders ADD COLUMN medicine_name VARCHAR(255) NULL AFTER medical_certificate" },
-      { name: 'prescription_quantity', ddl: "ALTER TABLE orders ADD COLUMN prescription_quantity VARCHAR(64) NULL AFTER medicine_name" },
-      { name: 'doctor_instructions', ddl: "ALTER TABLE orders ADD COLUMN doctor_instructions TEXT NULL AFTER prescription_quantity" },
-      { name: 'doctor_advice', ddl: "ALTER TABLE orders ADD COLUMN doctor_advice TEXT NULL AFTER doctor_instructions" },
-      { name: 'adherence_plan', ddl: "ALTER TABLE orders ADD COLUMN adherence_plan TEXT NULL AFTER doctor_advice" },
-      { name: 'doctor_reject_reason', ddl: "ALTER TABLE orders ADD COLUMN doctor_reject_reason TEXT NULL AFTER adherence_plan" },
-    ];
-    for (const col of needed) {
-      const [chk] = await pool.query(
-        "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='orders' AND COLUMN_NAME=?",
-        [dbName, col.name]
-      );
-      if ((chk?.[0]?.cnt || 0) === 0) {
-        await pool.query(col.ddl);
-        console.log(`Added missing '${col.name}' column to orders table`);
-      }
-    }
-  } catch (e) {
-    console.error('Ensure doctor guidance columns failed:', e.message);
-  }
-
-  // Ensure invoice columns on orders
-  try {
-    const dbName = process.env.DB_NAME;
-    const invoiceCols = [
-      { name: 'invoice_status', ddl: "ALTER TABLE orders ADD COLUMN invoice_status ENUM('draft','sent','paid') NULL AFTER provider_note" },
-      { name: 'invoice_method', ddl: "ALTER TABLE orders ADD COLUMN invoice_method ENUM('online','home_delivery','pharmacy_pickup') NULL AFTER invoice_status" },
-      { name: 'invoice_medicine_total', ddl: "ALTER TABLE orders ADD COLUMN invoice_medicine_total DECIMAL(10,2) NULL AFTER invoice_method" },
-      { name: 'invoice_doctor_fee', ddl: "ALTER TABLE orders ADD COLUMN invoice_doctor_fee DECIMAL(10,2) NULL AFTER invoice_medicine_total" },
-      { name: 'invoice_service_fee', ddl: "ALTER TABLE orders ADD COLUMN invoice_service_fee DECIMAL(10,2) NULL AFTER invoice_doctor_fee" },
-      { name: 'invoice_delivery_fee', ddl: "ALTER TABLE orders ADD COLUMN invoice_delivery_fee DECIMAL(10,2) NULL AFTER invoice_service_fee" },
-      { name: 'invoice_total', ddl: "ALTER TABLE orders ADD COLUMN invoice_total DECIMAL(10,2) NULL AFTER invoice_delivery_fee" },
-      { name: 'invoice_sent_at', ddl: "ALTER TABLE orders ADD COLUMN invoice_sent_at DATETIME NULL AFTER invoice_total" },
-      { name: 'invoice_paid_at', ddl: "ALTER TABLE orders ADD COLUMN invoice_paid_at DATETIME NULL AFTER invoice_sent_at" },
-    ];
-    for (const col of invoiceCols) {
-      const [chk] = await pool.query(
-        "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='orders' AND COLUMN_NAME=?",
-        [dbName, col.name]
-      );
-      if ((chk?.[0]?.cnt || 0) === 0) {
-        await pool.query(col.ddl);
-        console.log(`Added invoice column '${col.name}'`);
-      }
-    }
-  } catch (e) {
-    console.error('Ensure invoice columns failed:', e.message);
-  }
+  // Ensure messages table exists
 
   // Ensure provider stock tables exist
   try {
