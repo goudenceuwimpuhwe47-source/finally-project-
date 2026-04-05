@@ -1,27 +1,13 @@
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // Port 587 uses STARTTLS
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
-  },
-  logger: true,
-  debug: true,
-  connectionTimeout: 30000 // 30 seconds
-});
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function sendVerificationEmail(to, code) {
-  await transporter.sendMail({
-    from: `"Medication Ordering System" <${process.env.EMAIL_USER}>`,
+  const msg = {
     to,
+    from: process.env.EMAIL_USER, // Your verified Single Sender email
     subject: 'Your Medication Ordering System Verification Code',
     text: `Welcome to the Medication Ordering System!\n\nYour verification code is: ${code}\n\nPlease enter this code in the app to verify your account. The code is valid for 24 hours.\n\nIf you did not request this, please ignore this email.\n\nThank you!`,
     html: `<div style="font-family: Arial, sans-serif; color: #222;">
@@ -33,17 +19,33 @@ async function sendVerificationEmail(to, code) {
       <br>
       <p>Thank you!</p>
     </div>`
-  });
+  };
+  
+  try {
+    await sgMail.send(msg);
+    console.log(`[SendGrid] Verification email sent to ${to}`);
+  } catch (err) {
+    console.error('[SendGrid Error]', err.response?.body?.errors || err.message);
+    throw err;
+  }
 }
 
 async function sendEmail(to, subject, html, text) {
-  await transporter.sendMail({
-    from: `"Medication Ordering System" <${process.env.EMAIL_USER}>`,
+  const msg = {
     to,
+    from: process.env.EMAIL_USER,
     subject,
     text: text || html?.replace(/<[^>]+>/g, '') || '',
     html: html || (text ? `<pre>${text}</pre>` : undefined)
-  });
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log(`[SendGrid] Email sent to ${to}`);
+  } catch (err) {
+    console.error('[SendGrid Error]', err.response?.body?.errors || err.message);
+    throw err;
+  }
 }
 
 module.exports = { sendVerificationEmail, sendEmail };
