@@ -90,6 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (result.error) {
         return { error: result.error };
       }
+      if (result.testCode) {
+        console.log(`%c🚨 YOUR VERIFICATION OTP IS: ${result.testCode} 🚨`, 'background: #222; color: #bada55; font-size: 20px; font-weight: bold; padding: 10px;');
+      }
       // Return email for verification UI
       return { error: null, email: data.email };
     } catch (err) {

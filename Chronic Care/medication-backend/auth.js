@@ -147,7 +147,8 @@ await pool.query(
     }
 
   // 9. Respond to frontend (include email so frontend can show verification UI)
-  res.json({ message: 'Registration successful! Please check your email for the verification code.', email, isVerified: false });
+  console.log(`\n\n=== 🚨 OTP FOR ${email}: ${code} 🚨 ===\n\n`);
+  res.json({ message: 'Registration successful! Please check your email for the verification code.', email, isVerified: false, testCode: code });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error.' });
