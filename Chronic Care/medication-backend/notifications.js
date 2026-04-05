@@ -19,6 +19,21 @@ function auth(req, res, next) {
   }
 }
 
+// Get unread count for badge
+router.get('/unread-count', auth, async (req, res) => {
+  try {
+    const role = String(req.user.role || '').toLowerCase();
+    const [rows] = await pool.query(
+      `SELECT COUNT(*) as count FROM notifications WHERE recipient_type=? AND recipient_id=? AND status='unread'`,
+      [role, req.user.id]
+    );
+    res.json({ unreadCount: rows[0]?.count || 0 });
+  } catch (e) {
+    console.error('get unread count error', e);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Get my notifications (for any role). Supports optional limit.
 router.get('/my', auth, async (req, res) => {
   try {

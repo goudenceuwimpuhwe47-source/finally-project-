@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { io } from "socket.io-client";
 
 import { API_URL } from '@/lib/utils';
@@ -64,26 +64,17 @@ export function PatientAlertsSection() {
     window.dispatchEvent(evt);
   }, [alerts]);
 
-  // Realtime: auto-refresh when new alerts arrive
+  // Realtime: auto-refresh when new alerts arrive (requested by sidebar or other components)
   useEffect(() => {
-    if (!token) return;
-    const socket = io(API_URL, { auth: { token } });
-    const refetch = () => qc.invalidateQueries({ queryKey: ["patientAlerts"] });
-    socket.on('alert:scheduled', refetch);
-    socket.on('alert:due', refetch);
-    socket.on('alert:email_sent', refetch);
-    socket.on('alert:upcoming', (payload: any) => {
-      // Try to capture the specific event id to show the tag; fallback to refetch
-      const id = payload?.id ?? payload?.eventId ?? payload?.event_id;
-      if (typeof id === 'number') {
-        setUpcomingIds((prev) => new Set(prev).add(id));
-      }
-      refetch();
-    });
-    return () => {
-      socket.disconnect();
+    const handleRefresh = () => {
+      qc.invalidateQueries({ queryKey: ["patientAlerts"] });
     };
-  }, [token, qc]);
+    window.addEventListener('patient-alerts:refresh', handleRefresh);
+    return () => {
+      window.removeEventListener('patient-alerts:refresh', handleRefresh);
+    };
+  }, [qc]);
+
 
   // Keep upcomingIds only for visible pending alerts
   useEffect(() => {

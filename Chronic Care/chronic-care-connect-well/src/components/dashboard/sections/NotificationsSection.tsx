@@ -16,10 +16,10 @@ type PatientNotification = {
 
 export function NotificationsSection() {
   const [items, setItems] = useState<PatientNotification[]>([]);
-  const token = useMemo(()=> localStorage.getItem('token') || '', []);
+  const token = useMemo(() => (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '', []);
 
   // Load existing notifications on mount
-  const { data } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ["patientNotifications"],
     queryFn: async () => {
       if (!token) return [] as PatientNotification[];
@@ -32,58 +32,22 @@ export function NotificationsSection() {
     staleTime: 30_000,
   });
 
+  // Listen for refresh signals from Sidebar or markAllRead
   useEffect(() => {
-    if (Array.isArray(data) && data.length) setItems(data);
-  }, [data]);
+    const handleRefresh = () => {
+      refetch();
+    };
+    window.addEventListener('patient-notifications:refresh', handleRefresh);
+    window.addEventListener('patient-notifications:markAllRead', handleRefresh);
+    return () => {
+      window.removeEventListener('patient-notifications:refresh', handleRefresh);
+      window.removeEventListener('patient-notifications:markAllRead', handleRefresh);
+    };
+  }, [refetch]);
 
   useEffect(() => {
-    if (!token) return;
-    const socket = io(API_URL, { auth: { token } });
-    // when admin sends invoice, notify patient to pay
-  socket.on('order:invoice_sent', (p: any) => {
-      const n: PatientNotification = {
-        id: `inv-${p?.orderId}-${Date.now()}`,
-        title: `Invoice for Order #${p?.orderId}`,
-    message: 'Your invoice is ready. We sent it to your email and posted it here. Please pay to proceed.',
-        created_at: new Date().toISOString(),
-        status: 'unread',
-      };
-      setItems(prev => [n, ...prev]);
-    });
-    socket.on('order:payment_received', (p: any) => {
-      const n: PatientNotification = {
-        id: `pay-${p?.orderId}-${Date.now()}`,
-        title: `Payment received for Order #${p?.orderId}`,
-        message: 'Thanks! Your order will move to pharmacy stage now.',
-        created_at: new Date().toISOString(),
-        status: 'unread',
-      };
-      setItems(prev => [n, ...prev]);
-    });
-    socket.on('prescription:created', (p: any) => {
-      const orderId = p?.orderId;
-      const n: PatientNotification = {
-        id: `presc-${orderId}-${Date.now()}`,
-        title: `New prescription for Order #${orderId}`,
-        message: `The pharmacy created your prescription: ${p?.prescription?.medicine_name || ''} — ${p?.prescription?.quantity || ''}.`,
-        created_at: new Date().toISOString(),
-        status: 'unread',
-      };
-      setItems(prev => [n, ...prev]);
-    });
-    socket.on('order:admin_approved', (p: any) => {
-      const providerName = p?.provider?.name || 'assigned provider';
-      const n: PatientNotification = {
-        id: `adm-appr-${p?.orderId}-${Date.now()}`,
-        title: `Order #${p?.orderId} approved`,
-        message: `Your order is approved. You can now coordinate with ${providerName}.`,
-        created_at: new Date().toISOString(),
-        status: 'unread',
-      };
-      setItems(prev => [n, ...prev]);
-    });
-    return () => { socket.disconnect(); };
-  }, [token]);
+    if (Array.isArray(data)) setItems(data);
+  }, [data]);
 
   const markOneRead = async (n: PatientNotification) => {
     if (!token) return;
@@ -99,10 +63,11 @@ export function NotificationsSection() {
     }
     // Update local state
     setItems(prev => prev.map(i => i.id === n.id ? { ...i, status: 'read' } : i));
-    // Decrement sidebar badge by 1
+    // Decrement sidebar badge by 1 (local sync)
     const evt = new CustomEvent('patient-notifications:decUnread', { detail: { n: 1 } });
     window.dispatchEvent(evt);
   };
+
 
   return (
     <div className="space-y-6">

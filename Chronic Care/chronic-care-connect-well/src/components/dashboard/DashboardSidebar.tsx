@@ -53,48 +53,67 @@ export function DashboardSidebar({ activeSection, setActiveSection }: DashboardS
     };
   }, []);
 
-  // Load unread notifications count and subscribe to realtime events for new ones
+  // Load unread counts (debounced to prevent request storms)
   useEffect(() => {
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
+
     const loadUnread = async () => {
       if (!token) return;
       try {
-        const res = await fetch(`${API_URL}/notifications/my?limit=50`, { headers: { Authorization: `Bearer ${token}` } });
-        if (!res.ok) return;
-        const body = await res.json();
-        const rows = Array.isArray(body?.notifications) ? body.notifications : [];
-        const count = rows.reduce((acc: number, r: any) => acc + (String(r.status).toLowerCase() === 'unread' ? 1 : 0), 0);
-        if (mounted) setUnreadNotifications(count);
-      } catch {}
-      // alerts: prefer exact count endpoint
-      try {
+        // Notifications: use the lightweight count endpoint
+        const res = await fetch(`${API_URL}/notifications/unread-count`, { headers: { Authorization: `Bearer ${token}` } });
+        if (res.ok) {
+          const body = await res.json();
+          if (mounted) setUnreadNotifications(Number(body?.unreadCount || 0));
+        }
+
+        // Alerts: count endpoint
         const resA = await fetch(`${API_URL}/alerts/my/count`, { headers: { Authorization: `Bearer ${token}` } });
         if (resA.ok) {
           const bodyA = await resA.json();
-          const countA = Number(bodyA?.pending || 0);
-          if (mounted) setUnreadAlerts(countA);
+          if (mounted) setUnreadAlerts(Number(bodyA?.pending || 0));
         }
-      } catch {}
+      } catch (err) {
+        console.error("Sidebar loadUnread error:", err);
+      }
     };
-    loadUnread();
+
+    const debouncedLoad = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(loadUnread, 500);
+    };
+
+    debouncedLoad();
+
     if (!token) return;
-  const socket = io(API_URL, { auth: { token } });
-  const onInvoice = () => setUnreadNotifications((c) => c + 1);
-  const onInvoiceCanceled = () => setUnreadNotifications((c) => c + 1);
-  const onPayment = () => setUnreadNotifications((c) => c + 1);
-  const onPrescription = () => setUnreadNotifications((c) => c + 1);
-  socket.on('order:invoice_sent', onInvoice);
-  socket.on('order:invoice_canceled', onInvoiceCanceled);
-  socket.on('order:payment_received', onPayment);
-  socket.on('order:admin_approved', onPayment); // also increment for admin approval
-  socket.on('prescription:created', onPrescription);
-  const refreshAlerts = () => loadUnread();
-  socket.on('alert:scheduled', refreshAlerts);
-  socket.on('alert:due', refreshAlerts);
-  socket.on('alert:email_sent', refreshAlerts);
-  const onRefreshAlerts = () => loadUnread();
-  window.addEventListener('patient-alerts:refreshCount', onRefreshAlerts as any);
-    return () => { mounted = false; window.removeEventListener('patient-alerts:refreshCount', onRefreshAlerts as any); socket.disconnect(); };
+    const socket = io(API_URL, { auth: { token }, transports: ['polling', 'websocket'] });
+
+    const handleUpdate = () => {
+      debouncedLoad();
+      window.dispatchEvent(new CustomEvent('patient-notifications:refresh'));
+      window.dispatchEvent(new CustomEvent('patient-alerts:refresh'));
+    };
+
+    socket.on('order:invoice_sent', handleUpdate);
+    socket.on('order:invoice_canceled', handleUpdate);
+    socket.on('order:payment_received', handleUpdate);
+    socket.on('order:admin_approved', handleUpdate);
+    socket.on('prescription:created', handleUpdate);
+    socket.on('alert:scheduled', handleUpdate);
+    socket.on('alert:due', handleUpdate);
+    socket.on('alert:email_sent', handleUpdate);
+    socket.on('alert:upcoming', handleUpdate);
+
+
+    window.addEventListener('patient-alerts:refreshCount', debouncedLoad as any);
+
+    return () => {
+      mounted = false;
+      clearTimeout(timeoutId);
+      window.removeEventListener('patient-alerts:refreshCount', debouncedLoad as any);
+      socket.disconnect();
+    };
   }, [token]);
   return (
     <Sidebar className="border-r border-gray-700 bg-gray-800">
