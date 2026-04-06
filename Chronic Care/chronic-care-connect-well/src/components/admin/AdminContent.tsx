@@ -43,7 +43,7 @@ export const AdminContent = ({ activeSection }: AdminContentProps) => {
   };
 
   return (
-    <div className="p-2 sm:p-4 md:p-6 bg-gray-900 text-white min-h-screen">
+    <div className="p-2 sm:p-4 md:p-6 min-h-screen">
       {renderContent()}
     </div>
   );

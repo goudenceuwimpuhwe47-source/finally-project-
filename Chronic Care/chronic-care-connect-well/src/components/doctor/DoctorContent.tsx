@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { availableMedicines } from '@/lib/medicines';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Activity } from 'lucide-react';
 import { API_URL } from '@/lib/utils';
 import { getMedType } from '@/lib/med-utils';
 
@@ -233,7 +233,12 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
   if (activeSection === 'chat' || activeSection === 'chat-doctor') {
     return (
       <div className="p-4">
-        <h2 className="text-xl font-semibold text-white mb-3">Patient Chat</h2>
+        <h2 className="text-xl font-black text-slate-800 mb-4 uppercase tracking-tight flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-xl shadow-sm">
+            <MessageSquare className="h-5 w-5 text-primary" />
+          </div>
+          Clinical Direct
+        </h2>
         <DoctorChat initialPatientId={viewing?.user_id || approving?.user_id || rejecting?.user_id || undefined} />
       </div>
     );
@@ -241,19 +246,24 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
 
   // assigned orders section
   const assignedSection = (
-    <Card className="bg-gray-800 border-gray-700">
-      <CardHeader>
-        <CardTitle className="text-white">Assigned Orders</CardTitle>
+    <Card className="bg-white border-slate-100 shadow-xl rounded-3xl overflow-hidden border-t-4 border-t-primary">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+        <CardTitle className="text-slate-800 font-black uppercase tracking-tight">Active Assignments</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         {orders.filter(o => o.doctor_status !== 'approved').length === 0 && <p className="text-gray-400">No assigned orders.</p>}
         <div className="space-y-3">
           {orders.filter(o => o.doctor_status !== 'approved').map(o => (
-            <div key={o.id} className="p-3 bg-gray-700 rounded flex items-center justify-between">
-              <div>
-                <div className="text-white font-medium capitalize">{String(o.disease||'request').replace(/_/g,' ')}</div>
-                <div className="text-xs text-gray-300">Order #{o.id} • {new Date(o.created_at).toLocaleString()}</div>
-                <div className="text-xs text-gray-300">Patient: {o.full_name || o.username || o.email}</div>
+            <div key={o.id} className="p-4 bg-white border border-slate-100 rounded-2xl flex items-center justify-between hover:shadow-md transition-all group">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 bg-primary/5 rounded-xl flex items-center justify-center border border-primary/10">
+                   <Activity className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <div className="text-slate-800 font-black capitalize tracking-tight">{String(o.disease||'request').replace(/_/g,' ')}</div>
+                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Order #{o.id} • {new Date(o.created_at).toLocaleDateString()}</div>
+                  <div className="text-xs text-slate-500 font-medium">Patient: {o.full_name || o.username || o.email}</div>
+                </div>
               </div>
               <div className="flex gap-2">
                 <Dialog onOpenChange={(open)=> { if (!open) setViewing(null); }}>
@@ -261,16 +271,16 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-gray-200 border-gray-400 hover:bg-gray-600/20"
+                      className="text-slate-500 border-slate-200 hover:bg-slate-50 rounded-xl font-bold uppercase text-[10px] tracking-widest"
                       onClick={()=> setViewing(o)}
                     >
-                      View details
+                      Audit
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-4xl max-h-[80vh]">
+                  <DialogContent className="bg-white border-slate-200 text-slate-800 max-w-4xl max-h-[80vh] rounded-3xl shadow-2xl">
                     <DialogHeader>
-                      <DialogTitle>Request details</DialogTitle>
-                      <DialogDescription className="sr-only">Detailed health information and payment status for this medication request.</DialogDescription>
+                      <DialogTitle className="font-black uppercase tracking-tight text-slate-800">Review Clinical Request</DialogTitle>
+                      <DialogDescription className="text-slate-500 font-medium italic">Satellite synchronization data for medication fulfillment.</DialogDescription>
                     </DialogHeader>
                     <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -380,13 +390,13 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button className="bg-blue-600 hover:bg-blue-700" size="sm" onClick={()=> { setViewing(o); setActiveSection('chat-doctor'); }}>Open Chat</Button>
+                <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl font-black uppercase text-[10px] tracking-widest px-4 shadow-lg shadow-primary/20" size="sm" onClick={()=> { setViewing(o); setActiveSection('chat-doctor'); }}>Sync Chat</Button>
                   <Dialog onOpenChange={(open)=> { if (!open) setApproving(null); }}>
                     <DialogTrigger asChild>
                       <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
-                        className="text-green-300 border-green-400 hover:bg-green-600/10"
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-black uppercase text-[10px] tracking-widest px-4 shadow-lg shadow-emerald-500/20"
                         onClick={()=> {
                           setApproving(o);
                           setForm({
@@ -401,13 +411,13 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                           });
                         }}
                       >
-                        Verify & Approve
+                        Authenticate
                       </Button>
                     </DialogTrigger>
-          <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-2xl">
+          <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-2xl rounded-3xl shadow-2xl">
                       <DialogHeader>
-            <DialogTitle>Approve prescription</DialogTitle>
-            <DialogDescription className="sr-only">Provide prescription details and guidance for the patient.</DialogDescription>
+            <DialogTitle className="font-black uppercase tracking-tight">Clinical Authorization</DialogTitle>
+            <DialogDescription className="text-slate-500 italic">Determine regimen parameters for this medication request.</DialogDescription>
                       </DialogHeader>
                       {approving?.doctor_status === 'approved' && (
                         <div className="mb-3 text-sm p-2 rounded border border-yellow-500/30 bg-yellow-500/10 text-yellow-200">
@@ -663,11 +673,11 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
 
   // order history section
   const historySection = (
-    <Card className="bg-gray-800 border-gray-700">
-      <CardHeader>
-        <CardTitle className="text-white">Order History</CardTitle>
+    <Card className="bg-white border-slate-100 shadow-xl rounded-3xl overflow-hidden border-t-4 border-t-slate-400">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+        <CardTitle className="text-slate-800 font-black uppercase tracking-tight">Fulfillment History</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         {history.length === 0 && <p className="text-gray-400">No orders in history yet.</p>}
         <div className="space-y-3">
           {history.map(o => (
@@ -807,11 +817,11 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
 
   // patients list section
   const patientsSection = (
-    <Card className="bg-gray-800 border-gray-700">
-      <CardHeader>
-        <CardTitle className="text-white">Patients List</CardTitle>
+    <Card className="bg-white border-slate-100 shadow-xl rounded-3xl overflow-hidden border-t-4 border-t-primary">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+        <CardTitle className="text-slate-800 font-black uppercase tracking-tight">Assigned Patients</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         {patients.length === 0 && <p className="text-gray-400">You haven't been assigned any patients yet.</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {patients.map(p => (

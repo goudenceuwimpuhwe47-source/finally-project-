@@ -2,7 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, MessageSquare, Trash2, TrendingUp, Activity, FileWarning, Clock, AlertTriangle } from "lucide-react";
+import { Send, MessageSquare, Trash2, TrendingUp, Activity, FileWarning, Clock, AlertTriangle, MoreVertical, ShieldCheck } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useToast } from "@/hooks/use-toast";
@@ -402,28 +403,35 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
       </div>
 
       <Card className="h-[550px] sm:h-[650px] flex flex-col bg-white border-border overflow-hidden shadow-2xl rounded-2xl ring-1 ring-black/[0.03]">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-slate-50/50 py-4 px-4 sm:px-6">
-          <CardTitle className="text-base sm:text-lg font-black flex items-center text-foreground uppercase tracking-tight">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 bg-white py-4 px-4 sm:px-6">
+          <CardTitle className="text-base sm:text-lg font-black flex items-center text-slate-800 uppercase tracking-tight">
             <div className="p-2 bg-primary/10 rounded-xl mr-3 shadow-sm">
               <MessageSquare className="h-5 w-5 text-primary" />
             </div>
             {target === 'admin' ? 'Care Support' : 'Clinical Direct'}
             {target === 'admin' ? (adminTyping && <span className="ml-3 text-[10px] font-black text-primary animate-pulse uppercase tracking-widest">typiing…</span>) : target === 'doctor' ? (doctorTyping && <span className="ml-3 text-[10px] font-black text-primary animate-pulse uppercase tracking-widest">typing…</span>) : ''}
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-red-600 hover:bg-red-50 text-[10px] font-black uppercase tracking-widest transition-all h-8"
-            onClick={() => {
-              const key = getConvKey();
-              const now = Date.now();
-              if (key) localStorage.setItem(`chatClearedAt:${key}`, String(now));
-              setClearedAt(now);
-              setMessages([]);
-            }}
-          >
-            Clear Thread
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600 transition-all">
+                <MoreVertical className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-white border-slate-100 rounded-xl shadow-xl">
+              <DropdownMenuItem 
+                className="text-red-600 focus:text-red-700 focus:bg-red-50 font-bold uppercase text-[10px] tracking-widest py-3 cursor-pointer"
+                onClick={() => {
+                  const key = getConvKey();
+                  const now = Date.now();
+                  if (key) localStorage.setItem(`chatClearedAt:${key}`, String(now));
+                  setClearedAt(now);
+                  setMessages([]);
+                }}
+              >
+                Clear Entire History
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardHeader>
         
         <CardContent className="flex-1 flex flex-col p-0 min-h-0">
@@ -456,51 +464,61 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
                       )}
                     </div>
                      {mine && (
-                      <button
-                        aria-label="Delete message"
-                        className="opacity-0 group-hover:opacity-100 absolute -top-2 -right-2 bg-background text-muted-foreground hover:text-red-500 rounded-full p-1.5 border border-border shadow-sm backdrop-blur-md transition-all scale-75 group-hover:scale-100"
-                        onClick={() => {
-                          const key = getConvKey();
-                          if (key) {
-                            const arr = JSON.parse(localStorage.getItem(`chatHidden:${key}`) || '[]');
-                            const set = new Set<string>(Array.isArray(arr) ? arr.map(String) : []);
-                            set.add(String(m.id));
-                            localStorage.setItem(`chatHidden:${key}`, JSON.stringify(Array.from(set)));
-                          }
-                          setMessages(prev => prev.filter(x => x.id !== m.id));
-                        }}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    )}
+                        <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 z-10">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full border border-slate-100 shadow-xl bg-white/90 backdrop-blur-md text-slate-500 hover:text-primary">
+                                <MoreVertical className="h-3.5 w-3.5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-white border-slate-100 rounded-xl shadow-xl">
+                              <DropdownMenuItem 
+                                className="text-red-600 focus:text-red-700 focus:bg-red-50 font-bold uppercase text-[9px] tracking-widest cursor-pointer"
+                                onClick={() => {
+                                  const key = getConvKey();
+                                  if (key) {
+                                    const arr = JSON.parse(localStorage.getItem(`chatHidden:${key}`) || '[]');
+                                    const set = new Set<string>(Array.isArray(arr) ? arr.map(String) : []);
+                                    set.add(String(m.id));
+                                    localStorage.setItem(`chatHidden:${key}`, JSON.stringify(Array.from(set)));
+                                  }
+                                  setMessages(prev => prev.filter(x => x.id !== m.id));
+                                }}
+                              >
+                                Clear Message
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="p-4 sm:p-6 bg-slate-50/50 border-t border-border">
-            <div className="flex space-x-3 relative items-center">
-              <Input 
-                placeholder="Talk to your healthcare team..."
-                className="flex-1 bg-white border-border text-foreground h-12 sm:h-14 rounded-2xl focus:ring-primary/40 focus:border-primary shadow-sm transition-all placeholder:text-muted-foreground/50 font-medium px-5"
-                value={text}
-                onChange={(e) => {
-                  setText(e.target.value);
-                  if (!typing) setTyping(true);
-                  if (typingTimer.current) clearTimeout(typingTimer.current);
-                  typingTimer.current = setTimeout(() => setTyping(false), 1200);
-                }}
-                onKeyDown={(e) => { if (e.key === 'Enter') onSend(); }}
-              />
-              <Button 
-                className="bg-primary hover:bg-primary-hover text-white shadow-xl shadow-primary/25 rounded-2xl w-12 sm:w-14 h-12 sm:h-14 flex items-center justify-center p-0 shrink-0 transition-all active:scale-95" 
-                onClick={onSend}
-              >
-                <Send className="h-6 w-6" />
-              </Button>
+                );
+              })}
             </div>
-          </div>
+  
+            <div className="p-4 sm:p-6 bg-slate-50/80 border-t border-slate-100">
+              <div className="flex space-x-3 relative items-center">
+                <Input 
+                  placeholder="Talk to your healthcare team..."
+                  className="flex-1 bg-white border-slate-200 text-slate-800 h-12 sm:h-14 rounded-2xl focus:ring-primary/40 focus:border-primary shadow-sm transition-all placeholder:text-slate-400 font-medium px-5"
+                  value={text}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                    if (!typing) setTyping(true);
+                    if (typingTimer.current) clearTimeout(typingTimer.current);
+                    typingTimer.current = setTimeout(() => setTyping(false), 1200);
+                  }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') onSend(); }}
+                />
+                <Button 
+                  className="bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/25 rounded-2xl w-12 sm:w-14 h-12 sm:h-14 flex items-center justify-center p-0 shrink-0 transition-all active:scale-95" 
+                  onClick={onSend}
+                >
+                  <Send className="h-6 w-6" />
+                </Button>
+              </div>
+            </div>
         </CardContent>
       </Card>
 

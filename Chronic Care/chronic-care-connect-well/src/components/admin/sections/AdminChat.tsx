@@ -1,7 +1,6 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, User } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChatMessage } from "./chat/ChatMessage";
 import { ChatHeader } from "./chat/ChatHeader";
@@ -45,7 +44,6 @@ export const AdminChat = () => {
 
   const token = useMemo(() => localStorage.getItem('token') || '', []);
 
-  // Load users for admin list
   useEffect(() => {
     const loadUsers = async () => {
       try {
@@ -60,7 +58,6 @@ export const AdminChat = () => {
               name: u.name || u.email,
               lastMessage: u.lastMessage || '',
               unreadCount: u.unreadCount || 0,
-              // default to offline; will flip to online via presence events
               status: 'offline'
             }))
           );
@@ -70,7 +67,6 @@ export const AdminChat = () => {
     if (token) loadUsers();
   }, [token]);
 
-  // Load conversation when selecting a patient
   useEffect(() => {
     const loadMessages = async () => {
       if (!selectedPatient) return;
@@ -89,7 +85,6 @@ export const AdminChat = () => {
             status: m.status
           }));
           setMessages(msgs);
-          // mark read
           await fetch(`${API_URL}/admin/chat/mark-read`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -101,19 +96,14 @@ export const AdminChat = () => {
     loadMessages();
   }, [selectedPatient, token, page]);
 
-  // Socket setup
   useEffect(() => {
     if (!token) return;
     const socket = io(API_URL, { auth: { token } });
     socketRef.current = socket;
-    socket.on('connect', () => {});
     socket.on('presence:snapshot', (snap: any) => {
-      // snap.providersOnline, doctorsOnline already exist; handle patients via updates later
-      // For admin chat, use updates as they happen; snapshot is useful for adminOnline state
       if (typeof snap?.adminOnline === 'boolean') setAdminOnline(!!snap.adminOnline);
     });
     socket.on('message:new', async (m: any) => {
-      // If message belongs to the current thread, append; else bump unread in list
       if (selectedPatient) {
         const isInThread =
           (m.from_role === 'patient' && m.from_user_id === Number(selectedPatient.id) && m.to_role === 'admin') ||
@@ -130,7 +120,6 @@ export const AdminChat = () => {
               status: m.status
             }
           ]);
-          // If incoming from patient while open, mark read immediately
           if (m.from_role === 'patient') {
             try {
               await fetch(`${API_URL}/admin/chat/mark-read`, {
@@ -142,7 +131,6 @@ export const AdminChat = () => {
           return;
         }
       }
-      // Not current thread: if from a patient -> admin, update unread counts in list
       if (m.from_role === 'patient' && m.to_role === 'admin') {
         setPatients(prev => {
           const found = prev.some(p => Number(p.id) === Number(m.from_user_id));
@@ -150,7 +138,6 @@ export const AdminChat = () => {
             ? { ...p, unreadCount: (p.unreadCount || 0) + 1, lastMessage: m.content }
             : p
           );
-          // If sender not in list yet, add it
           if (!found) {
             updated.unshift({ id: m.from_user_id, name: `Patient ${m.from_user_id}`, lastMessage: m.content, unreadCount: 1, status: 'online' });
           }
@@ -165,7 +152,6 @@ export const AdminChat = () => {
     });
     socket.on('presence:update', (p: any) => {
       if (p.role === 'admin') setAdminOnline(!!p.online);
-      // reflect patient online/offline in list and header
       if (p.role === 'patient' && p.userId != null) {
         setPatients(prev => prev.map(pt => Number(pt.id) === Number(p.userId) ? { ...pt, status: p.online ? 'online' : 'offline' } : pt));
         setSelectedPatient(curr => curr && Number(curr.id) === Number(p.userId) ? { ...curr, status: p.online ? 'online' : 'offline' } as any : curr);
@@ -210,7 +196,6 @@ export const AdminChat = () => {
 
   const handlePatientSelect = (patient: Patient) => {
     setSelectedPatient(patient);
-  // Clear unread for this patient locally
     setPatients(prev => {
       const updated = prev.map(p => p.id === patient.id ? { ...p, unreadCount: 0 } : p);
       const total = updated.reduce((sum, p) => sum + (p.unreadCount || 0), 0);
@@ -219,7 +204,6 @@ export const AdminChat = () => {
     });
   };
 
-  // Emit typing events
   useEffect(() => {
     const socket = socketRef.current; if (!socket) return;
     if (!selectedPatient) return;
@@ -240,12 +224,11 @@ export const AdminChat = () => {
       </div>
       
       <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Patient List - Hidden on mobile if a patient is selected */}
-        <Card className={`bg-gray-800 border-gray-700 flex flex-col min-h-0 ${selectedPatient ? 'hidden lg:flex' : 'flex'}`}>
-          <CardHeader className="py-3 px-4 sm:py-4 sm:px-6">
-            <CardTitle className="text-slate-800 text-xl font-black tracking-tight flex items-center">
-              <MessageSquare className="h-6 w-6 mr-3 text-primary" />
-              Satellite Nodes
+        <Card className={`bg-white border-slate-200 flex flex-col min-h-0 shadow-xl rounded-3xl overflow-hidden border-t-4 border-t-primary ${selectedPatient ? 'hidden lg:flex' : 'flex'}`}>
+          <CardHeader className="py-3 px-4 sm:py-4 sm:px-6 bg-slate-50/50 border-b border-slate-100">
+            <CardTitle className="text-slate-800 text-lg font-black tracking-tight flex items-center uppercase">
+              <User className="h-5 w-5 mr-3 text-primary" />
+              Active Nodes
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 flex-1 flex flex-col min-h-0">
@@ -254,7 +237,7 @@ export const AdminChat = () => {
                 placeholder="Search registries…" 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)}
-                className="bg-slate-50 border-slate-100 focus:ring-primary/40 focus:border-primary transition-all h-12 rounded-xl font-bold placeholder:font-black placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+                className="bg-slate-50 border-slate-100 focus:ring-primary/40 focus:border-primary transition-all h-12 rounded-xl font-bold placeholder:font-black placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest mt-4"
               />
             </div>
             <ScrollArea className="flex-1 p-2">
@@ -288,11 +271,9 @@ export const AdminChat = () => {
           </CardContent>
         </Card>
 
-        {/* Chat Area - Full width on mobile if a patient is selected */}
         <div className={`lg:col-span-2 min-h-0 ${!selectedPatient ? 'hidden lg:block' : 'block'}`}>
           {selectedPatient ? (
             <Card className="bg-white border-slate-100 shadow-sm h-full flex flex-col min-h-0 rounded-[32px] relative overflow-hidden">
-              {/* Chat Header */}
               <CardHeader className="border-b border-slate-50 py-5 px-8 bg-white/80 backdrop-blur-md sticky top-0 z-10">
                 <div>
                   <h3 className="font-black text-slate-800 tracking-tight leading-none">{selectedPatient.name}</h3>
@@ -313,7 +294,6 @@ export const AdminChat = () => {
                 </div>
               </CardHeader>
 
-              {/* Messages Area */}
               <CardContent className="flex-1 p-0 min-h-0 relative">
                 <ScrollArea className="h-full max-h-[400px] lg:max-h-[500px]">
                   <div className="p-4 space-y-4">
@@ -331,7 +311,6 @@ export const AdminChat = () => {
                 </ScrollArea>
               </CardContent>
 
-              {/* Load More Button */}
               <div className="px-8 py-2 border-t border-slate-50 bg-slate-50/50">
                 <button 
                   className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-all flex items-center gap-2" 
@@ -342,7 +321,6 @@ export const AdminChat = () => {
                 </button>
               </div>
 
-              {/* Message Input */}
               <div className="p-6 border-t border-slate-50 bg-white">
                 <MessageInput
                   value={newMessage}

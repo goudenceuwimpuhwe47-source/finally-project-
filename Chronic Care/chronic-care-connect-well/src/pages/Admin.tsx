@@ -30,8 +30,8 @@ const Admin = () => {
 
   if (loading || checkingAdmin) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-slate-50/50 flex items-center justify-center">
+        <div className="text-slate-500 text-xl font-bold animate-pulse uppercase tracking-widest">Loading Satellite...</div>
       </div>
     );
   }
@@ -41,13 +41,13 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-slate-100/40">
       <SidebarProvider>
           <AdminSidebar 
             activeSection={activeSection} 
             setActiveSection={setActiveSection} 
           />
-          <SidebarInset className="bg-gray-900 flex flex-col min-h-screen overflow-x-hidden">
+          <SidebarInset className="bg-slate-100/40 flex flex-col min-h-screen overflow-x-hidden">
             <AdminHeader />
             <AdminContent activeSection={activeSection} />
           </SidebarInset>
