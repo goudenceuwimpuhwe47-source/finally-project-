@@ -179,7 +179,7 @@ router.post('/:id/provider-availability', auth, requireRole('provider'), async (
     if (!available) {
       // mark rejected and free for reassignment
       const reason = (note || 'Not available').toString();
-      await pool.query('UPDATE orders SET provider_status="rejected", provider_reject_reason=?, provider_id=NULL, provider_confirmed=0, provider_confirmed_qty=NULL, provider_confirmed_price=NULL, provider_stock_id=NULL, provider_note=? WHERE id=?', [reason, reason, orderId]);
+      await pool.query('UPDATE orders SET provider_status=\'rejected\', provider_reject_reason=?, provider_id=NULL, provider_confirmed=0, provider_confirmed_qty=NULL, provider_confirmed_price=NULL, provider_stock_id=NULL, provider_note=? WHERE id=?', [reason, reason, orderId]);
       // Notify admins via socket
       try { const io = req.app.get('io'); io && io.emit('order:provider_unavailable', { orderId: Number(orderId), reason }); } catch {}
       return res.json({ ok: true, status: 'rejected' });
@@ -203,7 +203,7 @@ router.post('/:id/provider-availability', auth, requireRole('provider'), async (
     }
 
     await pool.query(
-      'UPDATE orders SET provider_confirmed=1, provider_confirmed_qty=?, provider_confirmed_price=?, provider_stock_id=?, provider_note=?, provider_status="assigned" WHERE id=?',
+      'UPDATE orders SET provider_confirmed=1, provider_confirmed_qty=?, provider_confirmed_price=?, provider_stock_id=?, provider_note=?, provider_status=\'assigned\' WHERE id=?',
       [qty, price, stock_id, (note || null), orderId]
     );
 
