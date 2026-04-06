@@ -21,6 +21,7 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
   const [typing, setTyping] = useState(false);
   const [patientTyping, setPatientTyping] = useState(false);
   const [onlinePatients, setOnlinePatients] = useState<Set<number>>(new Set());
+  const [clearedAt, setClearedAt] = useState<number>(0);
   const socketRef = useRef<Socket | null>(null);
   const typingTimer = useRef<NodeJS.Timeout | null>(null);
   const token = useMemo(() => localStorage.getItem('token') || '', []);
@@ -46,7 +47,15 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
       const res = await fetch(`${API_URL}/doctor/chat/messages/${patientId}`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       const list = Array.isArray(data.messages) ? data.messages : [];
-      setMessages(list.slice().sort((a,b)=> new Date(a.created_at||0).getTime() - new Date(b.created_at||0).getTime()));
+      const key = `doctor:patient:${patientId}`;
+      const ts = Number(localStorage.getItem(`chatClearedAt:${key}`) || '0');
+      const hidden = new Set<string>(JSON.parse(localStorage.getItem(`chatHidden:${key}`) || '[]'));
+      const activeMsgs = list.filter((m: any) => {
+        const t = new Date(m.created_at || 0).getTime();
+        return (!ts || t >= ts) && !hidden.has(String(m.id));
+      });
+      setMessages(activeMsgs.sort((a,b)=> new Date(a.created_at||0).getTime() - new Date(b.created_at||0).getTime()));
+      setClearedAt(Number.isFinite(ts) ? ts : 0);
       // mark read
       await fetch(`${API_URL}/doctor/chat/mark-read`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -80,6 +89,12 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
       
       setMessages(prev => {
         if (!otherIsActive) return prev;
+        const t = new Date((m as any).created_at || 0).getTime();
+        if (clearedAt && t < clearedAt) return prev;
+        const key = `doctor:patient:${activeUserId}`;
+        const hidden = new Set<string>(JSON.parse(localStorage.getItem(`chatHidden:${key}`) || '[]'));
+        if (hidden.has(String((m as any).id))) return prev;
+
         const next = [...prev, m];
         return next.sort((a,b)=> new Date(a.created_at||0).getTime() - new Date(b.created_at||0).getTime());
       });
@@ -144,6 +159,9 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
   });
 
   const openThread = async (patientId: number) => {
+    const key = `doctor:patient:${patientId}`;
+    const ts = Number(localStorage.getItem(`chatClearedAt:${key}`) || '0');
+    setClearedAt(Number.isFinite(ts) ? ts : 0);
     setActiveUserId(patientId);
     await fetchThread(patientId);
     setUsers(prev => {
@@ -280,9 +298,27 @@ export default function DoctorChat({ initialPatientId }: { initialPatientId?: nu
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-primary transition-all">
-                  <Search className="h-5 w-5" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600 transition-all rounded-xl">
+                      <MoreVertical className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-white border-slate-100 rounded-xl shadow-xl">
+                    <DropdownMenuItem 
+                      className="text-red-600 focus:text-red-700 focus:bg-red-50 font-bold uppercase text-[10px] tracking-widest py-3 cursor-pointer"
+                      onClick={() => {
+                        const key = `doctor:patient:${activeUserId}`;
+                        const now = Date.now();
+                        localStorage.setItem(`chatClearedAt:${key}`, String(now));
+                        setClearedAt(now);
+                        setMessages([]);
+                      }}
+                    >
+                      Clear Conversation History
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </CardHeader>
             

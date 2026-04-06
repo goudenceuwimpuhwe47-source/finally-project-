@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare, User } from "lucide-react";
+import { MessageSquare, User, MoreVertical } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { ChatMessage } from "./chat/ChatMessage";
 import { ChatHeader } from "./chat/ChatHeader";
 import { MessageInput } from "./chat/MessageInput";
@@ -38,6 +40,8 @@ export const AdminChat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [counterpartyTyping, setCounterpartyTyping] = useState(false);
   const [adminOnline, setAdminOnline] = useState(true);
+  const [clearedAt, setClearedAt] = useState<number>(0);
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
   const pageSize = 30;
   const socketRef = useRef<Socket | null>(null);
@@ -84,7 +88,16 @@ export const AdminChat = () => {
             senderName: m.from_role === 'admin' ? 'Admin' : selectedPatient.name,
             status: m.status
           }));
-          setMessages(msgs);
+          const key = `admin:patient:${selectedPatient.id}`;
+          const ts = Number(localStorage.getItem(`chatClearedAt:${key}`) || '0');
+          const hidden = new Set<string>(JSON.parse(localStorage.getItem(`chatHidden:${key}`) || '[]'));
+          const filtered = msgs.filter((m: any) => {
+            const t = new Date((m as any).created_at || 0).getTime();
+            return (!ts || t >= ts) && !hidden.has(String(m.id));
+          });
+          setMessages(filtered);
+          setClearedAt(Number.isFinite(ts) ? ts : 0);
+          setHiddenIds(hidden);
           await fetch(`${API_URL}/admin/chat/mark-read`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -109,17 +122,23 @@ export const AdminChat = () => {
           (m.from_role === 'patient' && m.from_user_id === Number(selectedPatient.id) && m.to_role === 'admin') ||
           (m.from_role === 'admin' && m.to_role === 'patient' && m.to_user_id === Number(selectedPatient.id));
         if (isInThread) {
-          setMessages(prev => [
-            ...prev,
-            {
-              id: m.id,
-              sender: m.from_role === 'admin' ? 'admin' : 'patient',
-              message: m.content,
-              timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              senderName: m.from_role === 'admin' ? 'Admin' : selectedPatient.name,
-              status: m.status
-            }
-          ]);
+          const t = new Date(m.created_at || 0).getTime();
+          const key = `admin:patient:${selectedPatient.id}`;
+          const hidden = new Set<string>(JSON.parse(localStorage.getItem(`chatHidden:${key}`) || '[]'));
+          
+          if ((!clearedAt || t >= clearedAt) && !hidden.has(String(m.id))) {
+            setMessages(prev => [
+              ...prev,
+              {
+                id: m.id,
+                sender: m.from_role === 'admin' ? 'admin' : 'patient',
+                message: m.content,
+                timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                senderName: m.from_role === 'admin' ? 'Admin' : selectedPatient.name,
+                status: m.status
+              }
+            ]);
+          }
           if (m.from_role === 'patient') {
             try {
               await fetch(`${API_URL}/admin/chat/mark-read`, {
@@ -195,6 +214,10 @@ export const AdminChat = () => {
   };
 
   const handlePatientSelect = (patient: Patient) => {
+    const key = `admin:patient:${patient.id}`;
+    const ts = Number(localStorage.getItem(`chatClearedAt:${key}`) || '0');
+    setClearedAt(Number.isFinite(ts) ? ts : 0);
+    setHiddenIds(new Set(JSON.parse(localStorage.getItem(`chatHidden:${key}`) || '[]')));
     setSelectedPatient(patient);
     setPatients(prev => {
       const updated = prev.map(p => p.id === patient.id ? { ...p, unreadCount: 0 } : p);
@@ -274,7 +297,7 @@ export const AdminChat = () => {
         <div className={`lg:col-span-2 min-h-0 ${!selectedPatient ? 'hidden lg:block' : 'block'}`}>
           {selectedPatient ? (
             <Card className="bg-white border-slate-100 shadow-sm h-full flex flex-col min-h-0 rounded-[32px] relative overflow-hidden">
-              <CardHeader className="border-b border-slate-50 py-5 px-8 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+              <CardHeader className="border-b border-slate-50 py-5 px-8 bg-white/80 backdrop-blur-md sticky top-0 z-10 flex flex-row items-center justify-between">
                 <div>
                   <h3 className="font-black text-slate-800 tracking-tight leading-none">{selectedPatient.name}</h3>
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1.5 flex items-center gap-2">
@@ -292,6 +315,27 @@ export const AdminChat = () => {
                     )}
                   </p>
                 </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600 transition-all rounded-xl">
+                      <MoreVertical className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-white border-slate-100 rounded-xl shadow-xl">
+                    <DropdownMenuItem 
+                      className="text-red-600 focus:text-red-700 focus:bg-red-50 font-bold uppercase text-[10px] tracking-widest py-3 cursor-pointer"
+                      onClick={() => {
+                        const key = `admin:patient:${selectedPatient.id}`;
+                        const now = Date.now();
+                        localStorage.setItem(`chatClearedAt:${key}`, String(now));
+                        setClearedAt(now);
+                        setMessages([]);
+                      }}
+                    >
+                      Clear Conversation History
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </CardHeader>
 
               <CardContent className="flex-1 p-0 min-h-0 relative">
