@@ -2,8 +2,8 @@ import React from 'react';
 
 export default function DoctorFooter() {
 	return (
-		<footer className="bg-gray-800 border-t border-gray-700 p-4 text-center text-sm text-gray-400">
-			© {new Date().getFullYear()} ChronicCare — Doctor area
+		<footer className="bg-white border-t border-slate-100 p-8 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+			© {new Date().getFullYear()} chronic care connect • clinical division
 		</footer>
 	);
 }

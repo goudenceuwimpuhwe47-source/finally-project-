@@ -254,15 +254,22 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
         {orders.filter(o => o.doctor_status !== 'approved').length === 0 && <p className="text-gray-400">No assigned orders.</p>}
         <div className="space-y-3">
           {orders.filter(o => o.doctor_status !== 'approved').map(o => (
-            <div key={o.id} className="p-4 bg-white border border-slate-100 rounded-2xl flex items-center justify-between hover:shadow-md transition-all group">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 bg-primary/5 rounded-xl flex items-center justify-center border border-primary/10">
-                   <Activity className="h-6 w-6 text-primary" />
+            <div key={o.id} className="p-5 bg-white border border-slate-100 rounded-[24px] flex items-center justify-between hover:shadow-xl hover:-translate-y-1 transition-all group duration-300">
+              <div className="flex items-center gap-5">
+                <div className="h-14 w-14 bg-primary/5 rounded-[20px] flex items-center justify-center border border-primary/10 shadow-sm group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                   <Activity className="h-7 w-7 text-primary group-hover:text-white transition-colors" />
                 </div>
                 <div>
-                  <div className="text-slate-800 font-black capitalize tracking-tight">{String(o.disease||'request').replace(/_/g,' ')}</div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Order #{o.id} • {new Date(o.created_at).toLocaleDateString()}</div>
-                  <div className="text-xs text-slate-500 font-medium">Patient: {o.full_name || o.username || o.email}</div>
+                  <div className="text-slate-800 font-black capitalize tracking-tight text-lg">{String(o.disease||'request').replace(/_/g,' ')}</div>
+                  <div className="text-[10px] text-slate-400 font-black uppercase tracking-[0.15em] mt-1 flex items-center gap-2">
+                    <span className="bg-slate-100 px-2 py-0.5 rounded-md text-slate-500">Order #{o.id}</span>
+                    <span>•</span>
+                    <span>{new Date(o.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <div className="text-xs text-slate-500 font-bold mt-1.5 flex items-center gap-1.5">
+                    <div className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+                    Patient: <span className="text-slate-700">{o.full_name || o.username || o.email}</span>
+                  </div>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -463,35 +470,34 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                       )}
 
                       <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-4">
-                        <div className="bg-blue-900/10 border border-blue-800/30 p-3 rounded flex flex-col gap-2">
+                        <div className="bg-slate-50 border border-slate-100 p-5 rounded-3xl shadow-inner space-y-4">
                           <div className="flex items-center justify-between">
-                            <Label className="text-blue-300 font-semibold">Medicine selection</Label>
-                            <div className="flex items-center gap-2">
+                            <Label className="text-slate-800 font-black uppercase text-[10px] tracking-widest">Clinical Search Engine</Label>
+                            <label className="flex items-center gap-2 cursor-pointer group">
                               <input 
                                 type="checkbox" 
-                                id="show-all" 
-                                className="w-4 h-4 rounded border-gray-600 bg-gray-700"
+                                className="w-4 h-4 rounded-md border-slate-200 bg-white text-primary focus:ring-primary/20"
                                 checked={showAll}
                                 onChange={e => setShowAll(e.target.checked)}
                               />
-                              <label htmlFor="show-all" className="text-xs text-gray-400 cursor-pointer">Show all categories</label>
-                            </div>
+                              <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors uppercase tracking-widest">Show all categories</span>
+                            </label>
                           </div>
                           <div className="relative">
                             <Input
-                              placeholder="Search medicine..."
-                              className="bg-gray-800 border-gray-700 text-white pl-9 text-sm h-9"
+                              placeholder="Search medicine database..."
+                              className="bg-white border-slate-100 text-slate-800 pl-10 rounded-2xl h-12 shadow-sm focus:ring-primary/20"
                               value={searchQuery}
                               onChange={e => setSearchQuery(e.target.value)}
                             />
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                             </div>
                           </div>
                         </div>
 
                         <div>
-                          <Label className="text-gray-300 mb-1.5 block">Recommended / Selected Medicine *</Label>
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Clinical Regimen Selection *</Label>
                           <Select
                             value={form.medicineName}
                             onValueChange={(value) => {
@@ -499,12 +505,12 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                               setForm(f => ({ ...f, medicineName: medicine?.label || value }));
                             }}
                           >
-                            <SelectTrigger className="bg-gray-700 border-gray-600 text-white min-h-[44px]">
-                              <SelectValue placeholder="Select a medicine">
-                                {form.medicineName || "Select a medicine"}
+                            <SelectTrigger className="bg-slate-50 border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm">
+                              <SelectValue placeholder="Select diagnostic medication">
+                                {form.medicineName || "Select diagnostic medication"}
                               </SelectValue>
                             </SelectTrigger>
-                            <SelectContent className="bg-gray-800 border-gray-700 text-white max-h-[400px]">
+                            <SelectContent className="bg-white border-slate-100 text-slate-800 max-h-[400px] rounded-2xl shadow-2xl">
                               {(() => {
                                 const diseaseToCategory: Record<string, string[]> = {
                                   'diabetes': ['Diabetes'],
@@ -585,18 +591,18 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         {(() => {
                           const info = getMedType(form.medicineName);
                           return (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-900/40 p-3 rounded-lg border border-gray-700/50">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 p-6 rounded-[28px] border border-slate-100 shadow-inner">
                               <div className="md:col-span-2">
-                                <Label className="text-gray-300 font-semibold">{info.totalLabel} *</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Clinical Quantity *</Label>
                                 <Input
                                   type="number"
                                   min="1"
                                   placeholder={info.placeholder}
-                                  className="bg-gray-700 border-gray-600 text-white"
+                                  className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm"
                                   value={form.prescriptionQuantity}
                                   onChange={e => setForm(f => ({ ...f, prescriptionQuantity: e.target.value }))}
                                 />
-                                <p className="text-[10px] text-gray-500 mt-1">Total quantity to be dispensed (in {info.unit})</p>
+                                <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-wide">Volume to be dispensed in {info.unit}</p>
                               </div>
                               <div className="grid grid-cols-2 gap-2">
                                 <div>
@@ -613,11 +619,12 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                                 <Input type="number" min="1" className="bg-gray-700 border-gray-600 text-white h-8" value={form.times_per_day} onChange={e=> setForm(f=>({...f, times_per_day: Number(e.target.value)||1}))} />
                               </div>
                               <div className="md:col-span-2">
-                                <Label className="text-gray-300 font-semibold">Regimen Instructions *</Label>
-                                <textarea className="w-full bg-gray-700 border border-gray-600 text-white rounded p-2 text-sm italic" rows={2} value={form.instructions} onChange={e=> setForm(f=> ({...f, instructions: e.target.value}))} placeholder="e.g. Take after meals" />
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Regimen Instructions *</Label>
+                                <textarea className="w-full bg-white border border-slate-100 text-slate-800 rounded-2xl p-4 text-sm font-bold italic shadow-sm focus:ring-primary/10 transition-all placeholder:text-slate-300" rows={3} value={form.instructions} onChange={e=> setForm(f=> ({...f, instructions: e.target.value}))} placeholder="e.g. Sync-take after 20:00 clinical cycles" />
                                 {Number(form.times_per_day) > 0 && Number(form.prescriptionQuantity) > 0 && (
-                                  <p className="text-[10px] text-emerald-400 mt-1 font-medium bg-emerald-950/20 p-1 rounded inline-block">
-                                    Planned Duration: {Math.ceil(Number(form.prescriptionQuantity) / (Number(form.dose_amount) * Number(form.times_per_day)))} days
+                                  <p className="text-[10px] text-emerald-600 mt-2 font-black uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full inline-flex items-center gap-2">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    Dynamic Duration: {Math.ceil(Number(form.prescriptionQuantity) / (Number(form.dose_amount) * Number(form.times_per_day)))} days
                                   </p>
                                 )}
                               </div>
@@ -625,20 +632,20 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                           );
                         })()}
                         <div>
-                          <Label className="text-gray-300">Advice</Label>
-                          <textarea className="w-full bg-gray-700 border border-gray-600 text-white rounded p-2" rows={3} value={form.advice} onChange={e=> setForm(f=> ({...f, advice: e.target.value}))} placeholder="Additional medical advice for the patient" />
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Physician Guidance Advisory</Label>
+                          <textarea className="w-full bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl p-4 shadow-sm focus:ring-primary/10 transition-all font-medium" rows={3} value={form.advice} onChange={e=> setForm(f=> ({...f, advice: e.target.value}))} placeholder="Precision medical advice for patient telemetry..." />
                         </div>
                         <div>
-                          <Label className="text-gray-300">Adherence plan (optional)</Label>
-                          <textarea className="w-full bg-gray-700 border border-gray-600 text-white rounded p-2" rows={2} value={form.adherencePlan} onChange={e=> setForm(f=> ({...f, adherencePlan: e.target.value}))} placeholder="Follow-up schedule and monitoring plan" />
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Adherence Strategy (Optional)</Label>
+                          <textarea className="w-full bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl p-4 shadow-sm focus:ring-primary/10 transition-all font-medium" rows={2} value={form.adherencePlan} onChange={e=> setForm(f=> ({...f, adherencePlan: e.target.value}))} placeholder="Monitoring plan and follow-up clinical cycles..." />
                         </div>
                       </div>
 
-                      <div className="mt-4 flex justify-end gap-2">
+                      <div className="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-50">
                         <DialogClose asChild>
-                          <Button variant="outline" onClick={()=> setApproving(null)}>Cancel</Button>
+                          <Button variant="ghost" onClick={()=> setApproving(null)} className="rounded-xl font-bold text-slate-400">Cancel</Button>
                         </DialogClose>
-                        <Button className="bg-green-600 hover:bg-green-700" onClick={submitApprove}>Approve & Send</Button>
+                        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase text-[10px] tracking-widest px-8 rounded-xl shadow-lg shadow-emerald-500/20 h-10" onClick={submitApprove}>Authenticate & Sync</Button>
                       </div>
                     </DialogContent>
                   </Dialog>
@@ -646,20 +653,22 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="text-red-300 border-red-400 hover:bg-red-600/10" onClick={()=> { setRejecting(o); setRejectReason(''); }}>Reject</Button>
                     </DialogTrigger>
-          <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-md">
+           <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-md rounded-3xl shadow-2xl">
                       <DialogHeader>
-            <DialogTitle>Reject order</DialogTitle>
-            <DialogDescription className="sr-only">Provide a reason for rejecting this order.</DialogDescription>
+                        <DialogTitle className="font-black uppercase tracking-tight text-red-500">Clinical Rejection</DialogTitle>
+                        <DialogDescription className="text-slate-400 italic">Provide clinical justification for rejecting this fulfillment request.</DialogDescription>
                       </DialogHeader>
-                      <div>
-                        <Label className="text-gray-300">Reason</Label>
-                        <textarea className="w-full bg-gray-700 border border-gray-600 text-white rounded p-2" rows={3} value={rejectReason} onChange={e=> setRejectReason(e.target.value)} />
+                      <div className="mt-4 space-y-4">
+                        <div>
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Rejection Justification *</Label>
+                          <textarea className="w-full bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl p-4 text-sm font-medium focus:ring-red-500/10 focus:border-red-500 transition-all" rows={4} value={rejectReason} onChange={e=> setRejectReason(e.target.value)} placeholder="Explain the clinical basis for rejection..." />
+                        </div>
                       </div>
-                      <div className="mt-4 flex justify-end gap-2">
+                      <div className="mt-6 flex justify-end gap-2">
                         <DialogClose asChild>
-                          <Button variant="outline" onClick={()=> setRejecting(null)}>Cancel</Button>
+                          <Button variant="ghost" onClick={()=> setRejecting(null)} className="rounded-xl font-bold text-slate-400">Cancel</Button>
                         </DialogClose>
-                        <Button className="bg-red-600 hover:bg-red-700" onClick={submitReject}>Reject</Button>
+                        <Button className="bg-red-500 hover:bg-red-600 text-white font-black uppercase text-[10px] tracking-widest px-8 rounded-xl shadow-lg shadow-red-500/20 h-10" onClick={submitReject}>Confirm Rejection</Button>
                       </div>
                     </DialogContent>
                   </Dialog>
@@ -679,14 +688,25 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
       </CardHeader>
       <CardContent className="p-6">
         {history.length === 0 && <p className="text-gray-400">No orders in history yet.</p>}
-        <div className="space-y-3">
+        <div className="space-y-4">
           {history.map(o => (
-            <div key={o.id} className="p-3 bg-gray-700 rounded flex items-center justify-between">
-              <div>
-                <div className="text-white font-medium capitalize">{String(o.disease||'request').replace(/_/g,' ')}</div>
-                <div className="text-xs text-gray-300">Order #{o.id} • {new Date(o.created_at).toLocaleString()}</div>
-                <div className="text-xs text-gray-300">Patient: {o.full_name || o.username || o.email}</div>
-                <div className="text-xs text-gray-400 mt-1">Doctor status: {o.doctor_status}</div>
+            <div key={o.id} className="p-5 bg-white border border-slate-100 rounded-[28px] flex items-center justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+              <div className="flex items-center gap-5">
+                <div className="h-14 w-14 bg-slate-50 rounded-[22px] flex items-center justify-center border border-slate-100 shadow-sm group-hover:bg-slate-800 group-hover:text-white transition-colors duration-300">
+                  <Activity className="h-7 w-7 text-slate-400 group-hover:text-white transition-colors" />
+                </div>
+                <div>
+                  <div className="text-slate-800 font-black capitalize tracking-tight text-lg">{String(o.disease||'request').replace(/_/g,' ')}</div>
+                  <div className="text-[10px] text-slate-400 font-black uppercase tracking-[0.15em] mt-1 flex items-center gap-2">
+                    <span className="bg-slate-100 px-2 py-0.5 rounded-md text-slate-500">Log ID #{o.id}</span>
+                    <span>•</span>
+                    <span>{new Date(o.created_at).toLocaleString()}</span>
+                  </div>
+                  <div className="text-xs text-slate-500 font-bold mt-2 flex items-center gap-2">
+                    <div className={`h-2 w-2 rounded-full ${o.doctor_status === 'approved' ? 'bg-emerald-500' : 'bg-red-500'} shadow-sm`} />
+                    Channel Status: <span className={`uppercase text-[10px] tracking-widest ${o.doctor_status === 'approved' ? 'text-emerald-600' : 'text-red-500'}`}>{o.doctor_status}</span>
+                  </div>
+                </div>
               </div>
               <div className="flex gap-2">
                 <Dialog onOpenChange={(open)=> { if (!open) setViewing(null); }}>
