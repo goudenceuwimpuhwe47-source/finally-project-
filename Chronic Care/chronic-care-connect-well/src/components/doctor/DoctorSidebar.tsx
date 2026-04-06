@@ -23,13 +23,13 @@ export default function DoctorSidebar({ activeSection, setActiveSection }: Docto
     return () => window.removeEventListener('doctor-unread:update', handler as any);
   }, []);
   return (
-    <Sidebar className="border-r border-gray-700 bg-gray-800">
-      <SidebarHeader className="p-6 border-b border-gray-700">
+    <Sidebar className="border-r border-slate-100 bg-white shadow-sm">
+      <SidebarHeader className="p-8 border-b border-slate-50 bg-slate-50/10">
         <div className="flex items-center space-x-2">
-          <div className="bg-blue-600 p-2 rounded-lg">
+          <div className="bg-primary p-2.5 rounded-2xl shadow-lg shadow-primary/20">
             <MessageSquare className="h-6 w-6 text-white" />
           </div>
-          <span className="text-xl font-bold text-white">Doctor</span>
+          <span className="text-2xl font-black text-slate-800 tracking-tight">Clinical</span>
         </div>
       </SidebarHeader>
       <SidebarContent className="p-4">
@@ -41,7 +41,7 @@ export default function DoctorSidebar({ activeSection, setActiveSection }: Docto
                   <SidebarMenuButton
                     onClick={() => setActiveSection(i.id)}
                     isActive={activeSection === i.id}
-                    className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-700 data-[state=open]:bg-blue-600 data-[state=open]:text-white"
+                    className={`w-full justify-start h-12 rounded-xl transition-all duration-200 font-bold uppercase text-[10px] tracking-widest ${activeSection === i.id ? 'bg-primary/5 text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
                   >
                     <div className="relative">
                       <i.icon className="h-5 w-5" />
@@ -56,9 +56,9 @@ export default function DoctorSidebar({ activeSection, setActiveSection }: Docto
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <div className="mt-auto pt-4 border-t border-gray-700">
+        <div className="mt-auto pt-6 border-t border-slate-50 px-4 pb-8">
           <div className="px-2">
-            <LogoutConfirm triggerClassName="w-full justify-start text-red-400 hover:text-red-300" />
+            <LogoutConfirm triggerClassName="w-full justify-start text-red-500 hover:text-red-700 font-black uppercase text-[10px] tracking-widest h-12 rounded-xl hover:bg-red-50" />
           </div>
         </div>
       </SidebarContent>

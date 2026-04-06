@@ -10,7 +10,7 @@ export default function DashboardDoctor() {
 	return (
 		<>
 			<DoctorHeader />
-			<div className="min-h-screen bg-gray-900">
+			<div className="min-h-screen bg-slate-50/50">
 				<SidebarProvider>
 					<div className="flex w-full min-h-screen">
 						<DoctorSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
