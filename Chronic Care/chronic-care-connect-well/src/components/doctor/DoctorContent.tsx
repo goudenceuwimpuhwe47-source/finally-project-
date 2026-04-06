@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { availableMedicines } from '@/lib/medicines';
-import { MessageSquare, Activity } from 'lucide-react';
+import { MessageSquare, Activity, FileText, User, MapPin } from 'lucide-react';
 import { API_URL } from '@/lib/utils';
 import { getMedType } from '@/lib/med-utils';
 
@@ -433,28 +433,30 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                       )}
                       
                       {approving?.medical_certificate && (
-                        <div className="mb-4 p-3 bg-gray-900/50 border border-gray-700 rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                             <Label className="text-blue-300 font-semibold flex items-center gap-2">
-                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <div className="mb-6 p-5 bg-slate-50 border border-slate-100 rounded-3xl shadow-inner group">
+                          <div className="flex items-center justify-between mb-3 px-1">
+                             <Label className="text-slate-800 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
+                               <div className="p-1.5 bg-primary/10 rounded-lg">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                               </div>
                                Patient Medical Certificate
                              </Label>
                              <a 
                                href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
                                target="_blank" 
                                rel="noreferrer" 
-                               className="text-xs text-blue-400 hover:text-blue-300 underline"
+                               className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
                              >
                                Open Full View
                              </a>
                           </div>
-                          <div className="relative group">
+                          <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
                             {approving.medical_certificate.toLowerCase().endsWith('.pdf') ? (
-                              <div className="bg-gray-800 rounded p-4 text-center border border-dashed border-gray-600">
-                                <p className="text-sm text-gray-400">PDF Document attached</p>
-                                <Button variant="link" className="text-blue-400 text-xs" asChild>
+                              <div className="p-8 text-center bg-slate-50/50">
+                                <p className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">PDF Attachment</p>
+                                <Button variant="link" className="text-primary font-black uppercase text-[10px] tracking-widest p-0 h-auto" asChild>
                                   <a href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} target="_blank" rel="noreferrer">
-                                    Click to preview PDF
+                                    Launch Preview
                                   </a>
                                 </Button>
                               </div>
@@ -462,14 +464,14 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                                <img 
                                  src={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
                                  alt="Certificate Preview" 
-                                 className="max-h-40 w-full object-contain rounded bg-gray-950/50 border border-gray-800"
+                                 className="max-h-48 w-full object-contain grayscale hover:grayscale-0 transition-all duration-500"
                                />
                             )}
                           </div>
                         </div>
                       )}
 
-                      <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-4">
+                      <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-5 custom-scrollbar">
                         <div className="bg-slate-50 border border-slate-100 p-5 rounded-3xl shadow-inner space-y-4">
                           <div className="flex items-center justify-between">
                             <Label className="text-slate-800 font-black uppercase text-[10px] tracking-widest">Clinical Search Engine</Label>
@@ -561,18 +563,18 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                                   return a[0].localeCompare(b[0]);
                                 }).map(([cat, meds]) => (
                                   <div key={cat} className="mb-2 last:mb-0">
-                                    <div className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-gray-900/50 flex justify-between items-center">
+                                    <div className="px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.1em] text-slate-400 bg-slate-50/80 flex justify-between items-center border-y border-slate-100/50 mb-1">
                                       <span>{cat}</span>
-                                      {recommendedCategories.includes(cat) && <span className="bg-blue-500 text-white px-1.5 rounded-full lowercase text-[9px] font-normal">recommended</span>}
+                                      {recommendedCategories.includes(cat) && <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full lowercase text-[8px] font-black tracking-widest border border-primary/10">recommended</span>}
                                     </div>
                                     {meds.map((med) => (
                                       <SelectItem
                                         key={med.value}
                                         value={med.value}
-                                        className="text-white hover:bg-gray-700/50 focus:bg-gray-700/50 pl-6 cursor-pointer"
+                                        className="text-slate-700 hover:bg-slate-50 focus:bg-slate-50 pl-8 cursor-pointer rounded-xl font-bold py-3 transition-colors"
                                       >
                                         <div className="flex flex-col">
-                                          <span className="font-medium text-sm">{med.label}</span>
+                                          <span className="text-sm tracking-tight">{med.label}</span>
                                         </div>
                                       </SelectItem>
                                     ))}
@@ -582,7 +584,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                             </SelectContent>
                           </Select>
                           {!showAll && !searchQuery && (
-                            <p className="text-[10px] text-blue-400/80 mt-1.5 flex items-center gap-1">
+                            <p className="text-[10px] text-primary/80 mt-1.5 flex items-center gap-1">
                               <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                               Showing clinical matches for {approving?.disease?.replace(/_/g,' ')}. Toggle "Show all" for full list.
                             </p>
@@ -604,20 +606,20 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                                 />
                                 <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-wide">Volume to be dispensed in {info.unit}</p>
                               </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                  <Label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Dose Amount</Label>
-                                  <Input type="number" step="0.5" className="bg-gray-700 border-gray-600 text-white h-8" value={form.dose_amount} onChange={e=> setForm(f=>({...f, dose_amount: e.target.value}))} />
+                              <div className="grid grid-cols-2 gap-4">
+                                  <div>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Dose Amount</Label>
+                                    <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-10 rounded-xl shadow-sm font-bold" value={form.dose_amount} onChange={e=> setForm(f=>({...f, dose_amount: e.target.value}))} />
+                                  </div>
+                                  <div>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
+                                    <Input className="bg-white border-slate-100 text-slate-800 h-10 rounded-xl shadow-sm font-bold" value={form.dose_unit} onChange={e=> setForm(f=>({...f, dose_unit: e.target.value}))} />
+                                  </div>
                                 </div>
                                 <div>
-                                  <Label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Unit</Label>
-                                  <Input className="bg-gray-700 border-gray-600 text-white h-8" value={form.dose_unit} onChange={e=> setForm(f=>({...f, dose_unit: e.target.value}))} />
+                                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Day Frequency</Label>
+                                  <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-10 rounded-xl shadow-sm font-bold" value={form.times_per_day} onChange={e=> setForm(f=>({...f, times_per_day: Number(e.target.value)||1}))} />
                                 </div>
-                              </div>
-                              <div>
-                                <Label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Times per Day</Label>
-                                <Input type="number" min="1" className="bg-gray-700 border-gray-600 text-white h-8" value={form.times_per_day} onChange={e=> setForm(f=>({...f, times_per_day: Number(e.target.value)||1}))} />
-                              </div>
                               <div className="md:col-span-2">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Regimen Instructions *</Label>
                                 <textarea className="w-full bg-white border border-slate-100 text-slate-800 rounded-2xl p-4 text-sm font-bold italic shadow-sm focus:ring-primary/10 transition-all placeholder:text-slate-300" rows={3} value={form.instructions} onChange={e=> setForm(f=> ({...f, instructions: e.target.value}))} placeholder="e.g. Sync-take after 20:00 clinical cycles" />
@@ -711,66 +713,73 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
               <div className="flex gap-2">
                 <Dialog onOpenChange={(open)=> { if (!open) setViewing(null); }}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="text-gray-200 border-gray-400 hover:bg-gray-600/20" onClick={()=> setViewing(o)}>View details</Button>
+                    <Button variant="outline" size="sm" className="rounded-xl border-slate-200 text-slate-500 font-bold hover:bg-slate-50 transition-all" onClick={()=> setViewing(o)}>Details</Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-4xl max-h-[80vh]">
-                    <DialogHeader>
-                      <DialogTitle>Request details</DialogTitle>
-                      <DialogDescription className="sr-only">Detailed health information and payment status for this medication request.</DialogDescription>
+                  <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-4xl max-h-[85vh] rounded-[32px] shadow-2xl p-0 overflow-hidden ring-1 ring-black/[0.05]">
+                    <DialogHeader className="px-8 pt-8 pb-4 bg-slate-50/50 border-b border-slate-100">
+                      <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-800">Clinical Log Analysis</DialogTitle>
+                      <DialogDescription className="text-slate-400 font-bold italic">Detailed health telemetry and fulfillment status for manifest #{viewing?.id}.</DialogDescription>
                     </DialogHeader>
-                    <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="flex justify-between"><span className="text-gray-400">Full name</span><span className="font-medium">{viewing?.full_name || '-'}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">ID card</span><span className="font-medium">{viewing?.id_card || '-'}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">Phone</span><span className="font-medium">{viewing?.phone || '-'}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">Age</span><span className="font-medium">{viewing?.age ?? '-'}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">Gender</span><span className="font-medium capitalize">{(viewing?.gender || '-').toString().replace(/_/g,' ')}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">Payment</span><span className="font-medium capitalize">{(viewing?.payment_method || '-').toString().replace(/_/g,' ')}</span></div>
+                    <div className="px-8 py-6 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-3">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2 opacity-60">Patient Telemetry</p>
+                          <div className="flex justify-between items-center border-b border-slate-50 pb-2"><span className="text-xs font-bold text-slate-400">Identity</span><span className="text-xs font-black text-slate-800">{viewing?.full_name || '-'}</span></div>
+                          <div className="flex justify-between items-center border-b border-slate-50 pb-2"><span className="text-xs font-bold text-slate-400">National ID</span><span className="text-xs font-black text-slate-800">{viewing?.id_card || '-'}</span></div>
+                          <div className="flex justify-between items-center border-b border-slate-50 pb-2"><span className="text-xs font-bold text-slate-400">Chronological Age</span><span className="text-xs font-black text-slate-800">{viewing?.age ?? '-'}</span></div>
+                          <div className="flex justify-between items-center border-b border-slate-50 pb-2"><span className="text-xs font-bold text-slate-400">Gender Identity</span><span className="text-xs font-black text-slate-800 capitalize">{(viewing?.gender || '-').toString().replace(/_/g,' ')}</span></div>
                         </div>
-                        <div className="space-y-2">
-                          <div className="flex justify-between"><span className="text-gray-400">District</span><span className="font-medium">{viewing?.district || '-'}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">Sector</span><span className="font-medium">{viewing?.sector || '-'}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">Cell</span><span className="font-medium">{viewing?.cell || '-'}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">Village</span><span className="font-medium">{viewing?.village || '-'}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">Disease</span><span className="font-medium capitalize">{viewing?.disease?.replace(/_/g,' ')}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">Quantity</span><span className="font-medium capitalize">{viewing?.dosage?.replace(/_/g,' ')}</span></div>
+                        <div className="space-y-3">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2 opacity-60">Distribution Data</p>
+                          <div className="flex justify-between items-center border-b border-slate-50 pb-2"><span className="text-xs font-bold text-slate-400">Geolocation</span><span className="text-xs font-black text-slate-800">{viewing?.district}, {viewing?.sector}</span></div>
+                          <div className="flex justify-between items-center border-b border-slate-50 pb-2"><span className="text-xs font-bold text-slate-400">Diagnosis</span><span className="text-xs font-black text-slate-800 capitalize">{viewing?.disease?.replace(/_/g,' ')}</span></div>
+                          <div className="flex justify-between items-center border-b border-slate-50 pb-2"><span className="text-xs font-bold text-slate-400">Requested Qty</span><span className="text-xs font-black text-slate-800">{viewing?.dosage} Units</span></div>
+                          <div className="flex justify-between items-center border-b border-slate-50 pb-2"><span className="text-xs font-bold text-slate-400">Financial Channel</span><span className="text-xs font-black text-slate-800 capitalize">{(viewing?.payment_method || 'MoMo').toString().replace(/_/g,' ')}</span></div>
                         </div>
                       </div>
+                      
                       {(viewing?.doctor_status === 'approved' || viewing?.doctor_status === 'rejected') && (
-                        <div className="p-3 bg-gray-700/60 rounded border border-gray-600">
-                          <div className="text-sm text-gray-300 mb-2">Doctor guidance</div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                            <div><span className="text-gray-400">Medicine:</span> <span className="font-medium">{viewing?.medicine_name || '-'}</span></div>
-                            <div><span className="text-gray-400">Quantity:</span> <span className="font-medium">{viewing?.prescription_quantity || '-'}</span></div>
-                            <div className="md:col-span-2"><span className="text-gray-400">Instructions:</span>
-                              <div className="font-medium whitespace-pre-line">{viewing?.instructions || viewing?.doctor_instructions || '-'}</div>
+                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-3xl shadow-inner">
+                          <div className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-4 flex items-center gap-2">
+                             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                             Clinical Protocol Issued
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm"><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Medication Name</span> <span className="text-sm font-black text-slate-800">{viewing?.medicine_name || '-'}</span></div>
+                            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm"><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Authenticated Qty</span> <span className="text-sm font-black text-slate-800">{viewing?.prescription_quantity || '-'} Units</span></div>
+                            <div className="md:col-span-2 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Regimen Directions</span>
+                              <div className="text-sm font-bold text-slate-700 italic">“{viewing?.instructions || viewing?.doctor_instructions || '-'}”</div>
                             </div>
-                            {viewing?.advice || viewing?.doctor_advice ? (
-                              <div className="md:col-span-2"><span className="text-gray-400">Advice:</span>
-                                <div className="font-medium whitespace-pre-line">{viewing?.advice || viewing?.doctor_advice}</div>
+                            {(viewing?.advice || viewing?.doctor_advice) && (
+                              <div className="md:col-span-2 bg-blue-50/30 p-4 rounded-2xl border border-blue-100/50">
+                                <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest block mb-1">Physician Guidance</span>
+                                <div className="text-sm font-medium text-blue-800">{viewing?.advice || viewing?.doctor_advice}</div>
                               </div>
-                            ) : null}
-                            {viewing?.adherence_plan ? (
-                              <div className="md:col-span-2"><span className="text-gray-400">Adherence plan:</span>
-                                <div className="font-medium whitespace-pre-line">{viewing?.adherence_plan}</div>
+                            )}
+                            {viewing?.doctor_status === 'rejected' && viewing?.doctor_reject_reason && (
+                              <div className="md:col-span-2 bg-rose-50 p-4 rounded-2xl border border-rose-100">
+                                <span className="text-[9px] font-black text-rose-400 uppercase tracking-widest block mb-1">Clinical Rejection Root</span>
+                                <div className="text-sm font-bold text-rose-700">{viewing?.doctor_reject_reason}</div>
                               </div>
-                            ) : null}
-                            {viewing?.doctor_status === 'rejected' && viewing?.doctor_reject_reason ? (
-                              <div className="md:col-span-2 text-red-300"><span className="text-red-300">Reject reason:</span>
-                                <div className="whitespace-pre-line">{viewing?.doctor_reject_reason}</div>
-                              </div>
-                            ) : null}
+                            )}
                           </div>
                         </div>
                       )}
-                      <div>
-                        <p className="text-sm text-gray-400 mb-2">Statuses</p>
-                        <div className="flex flex-wrap gap-2 text-xs">
-                          <span className="px-2 py-1 rounded bg-gray-700 text-gray-100">Admin: {viewing?.admin_status}</span>
-                          <span className="px-2 py-1 rounded bg-gray-700 text-gray-100">Doctor: {viewing?.doctor_status}</span>
-                          <span className="px-2 py-1 rounded bg-gray-700 text-gray-100">Payment: {viewing?.payment_status}</span>
-                          <span className="px-2 py-1 rounded bg-gray-700 text-gray-100">Pharmacy: {viewing?.pharmacy_status}</span>
+
+                      <div className="space-y-4">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Registry Synchronization Status</p>
+                        <div className="flex flex-wrap gap-3">
+                          {[
+                            { l: 'Admin', s: viewing?.admin_status },
+                            { l: 'Doctor', s: viewing?.doctor_status },
+                            { l: 'Settlement', s: viewing?.payment_status },
+                            { l: 'Dispensation', s: viewing?.pharmacy_status }
+                          ].map((x, i) => (
+                            <div key={i} className="px-4 py-2 bg-white border border-slate-100 rounded-xl shadow-sm text-[10px] font-black uppercase tracking-widest text-slate-500">
+                              {x.l}: <span className="text-primary">{x.s}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                       {viewing?.admin_status === 'rejected' && viewing?.admin_reject_reason && (
@@ -780,8 +789,8 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         </div>
                       )}
                       {viewing?.medical_certificate && (
-                        <div>
-                          <p className="text-sm text-gray-400 mb-2">Medical certificate</p>
+                        <div className="space-y-3">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Attached Verification Evidence</p>
                           {
                             (() => {
                               const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
@@ -792,41 +801,41 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                                 ? viewing.medical_certificate!
                                 : `${base}${path}`;
                               const isPdf = (viewing?.medical_certificate || '').toLowerCase().endsWith('.pdf');
-                              if (isPdf) {
-                                return (
-                                  <>
-                                    <object data={url} type="application/pdf" className="w-full h-96 rounded border border-gray-700">
-                                      <a href={url} target="_blank" rel="noreferrer" className="text-blue-400 underline">Open PDF</a>
-                                    </object>
-                                    <div className="mt-2 flex gap-3 text-sm">
-                                      <a href={url} target="_blank" rel="noreferrer" className="text-blue-400 underline">Open full</a>
-                                      <a href={url} download className="text-blue-400 underline">Download</a>
-                                    </div>
-                                  </>
-                                );
-                              }
                               return (
-                                <>
-                                  <img src={url} alt="Medical certificate" className="max-h-96 rounded border border-gray-700" />
-                                  <div className="mt-2 flex gap-3 text-sm">
-                                    <a href={url} target="_blank" rel="noreferrer" className="text-blue-400 underline">Open full</a>
-                                    <a href={url} download className="text-blue-400 underline">Download</a>
-                                  </div>
-                                </>
+                                <div className="bg-slate-50 border border-slate-100 rounded-3xl p-5 shadow-inner">
+                                  {isPdf ? (
+                                    <div className="text-center py-8">
+                                      <FileText className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+                                      <p className="text-xs font-bold text-slate-500 mb-4 uppercase tracking-widest">Medical Documentation PDF</p>
+                                      <Button variant="outline" className="rounded-xl border-slate-200 font-black uppercase text-[10px] tracking-widest px-6" asChild>
+                                        <a href={url} target="_blank" rel="noreferrer">Open Clinical Reference</a>
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+                                      <img src={url} alt="Medical certificate" className="max-h-80 w-full object-contain grayscale hover:grayscale-0 transition-all duration-500" />
+                                      <div className="absolute top-4 right-4 flex gap-2">
+                                        <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur shadow-xl rounded-xl h-8 px-3 font-black text-[9px] uppercase tracking-widest" asChild>
+                                          <a href={url} target="_blank" rel="noreferrer">Full View</a>
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               );
                             })()
                           }
                         </div>
                       )}
                     </div>
-                    <div className="mt-4 flex justify-end">
+                    <div className="px-8 pb-8 pt-4 flex justify-end gap-3 bg-slate-50/30">
                       <DialogClose asChild>
-                        <Button variant="outline" onClick={() => setViewing(null)}>Close</Button>
+                        <Button variant="ghost" onClick={() => setViewing(null)} className="rounded-xl font-bold text-slate-400 px-8">Dismiss</Button>
                       </DialogClose>
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button className="bg-blue-600 hover:bg-blue-700" size="sm" onClick={()=> { setViewing(o); setActiveSection('chat-doctor'); }}>Open Chat</Button>
+                <Button className="bg-primary hover:bg-primary-hover text-white rounded-xl font-black uppercase text-[10px] tracking-widest px-6 shadow-lg shadow-primary/20 h-9" onClick={()=> { setViewing(o); setActiveSection('chat-doctor'); }}>Sync Chat</Button>
               </div>
             </div>
           ))}
@@ -842,29 +851,35 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
         <CardTitle className="text-slate-800 font-black uppercase tracking-tight">Assigned Patients</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        {patients.length === 0 && <p className="text-gray-400">You haven't been assigned any patients yet.</p>}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {patients.length === 0 && <p className="text-slate-400">You haven't been assigned any patients yet.</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {patients.map(p => (
-            <div key={p.id} className="p-4 bg-gray-700 rounded-lg border border-gray-600 flex flex-col justify-between">
-              <div>
-                <div className="text-lg font-semibold text-white mb-1">
-                  {p.first_name || p.last_name ? `${p.first_name || ''} ${p.last_name || ''}`.trim() : (p.username || p.email)}
+            <div key={p.id} className="p-6 bg-white border border-slate-100 rounded-[32px] flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-300 group">
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="h-14 w-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-primary font-black text-xl shadow-inner group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                    {p.first_name?.[0]}{p.last_name?.[0]}
+                  </div>
+                  <div>
+                    <div className="text-slate-800 font-black tracking-tight text-base leading-tight">{p.first_name} {p.last_name}</div>
+                    <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Registry Citizen</div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-300 space-y-1">
-                  <div>Email: {p.email || '-'}</div>
-                  <div>Phone: {p.phone || '-'}</div>
+                <div className="space-y-2 pt-2 border-t border-slate-50">
+                  <div className="flex items-center gap-3 text-slate-500"><User className="h-3.5 w-3.5 text-slate-300" /><span className="text-xs font-bold">{p.gender}, {p.age} years</span></div>
+                  <div className="flex items-center gap-3 text-slate-500"><MapPin className="h-3.5 w-3.5 text-slate-300" /><span className="text-xs font-bold truncate">{p.district} • {p.sector}</span></div>
                 </div>
               </div>
-              <div className="mt-4 flex gap-2">
+              <div className="mt-6 flex gap-2">
                 <Button 
-                  className="bg-blue-600 hover:bg-blue-700 flex-1" 
+                  className="bg-slate-50 border border-slate-100 text-slate-500 hover:bg-primary hover:text-white hover:border-primary flex-1 rounded-2xl font-black uppercase text-[10px] tracking-widest h-12 transition-all duration-300" 
                   onClick={()=> { 
-                    setViewing({ user_id: p.id }); 
+                    setViewing(p); 
                     setActiveSection('chat-doctor'); 
                   }}
                 >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Chat
+                  <MessageSquare className="h-3.5 w-3.5 mr-2" />
+                  Sync Chat
                 </Button>
               </div>
             </div>
