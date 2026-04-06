@@ -279,8 +279,11 @@ export const AdminOrders = () => {
                             onClick={() => {
                               const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
                               const path = order.medical_certificate.startsWith('/') ? order.medical_certificate : `/${order.medical_certificate}`;
-                              setCertUrl(order.medical_certificate.startsWith('http') ? order.medical_certificate : `${base}${path}`);
-                              setCertFileName(order.medical_certificate);
+                              const url = order.medical_certificate.startsWith('data:')
+                                ? order.medical_certificate
+                                : (order.medical_certificate.startsWith('http') ? order.medical_certificate : `${base}${path}`);
+                              setCertUrl(url);
+                              setCertFileName(order.medical_certificate.startsWith('data:') ? 'Embedded Image' : order.medical_certificate);
                               setCertViewerOpen(true);
                             }}
                           >

@@ -70,7 +70,7 @@ async function ensureSchema() {
         age INT NOT NULL,
         gender VARCHAR(16) NOT NULL,
         payment_method VARCHAR(32) NOT NULL,
-        medical_certificate VARCHAR(255) NULL,
+        medical_certificate LONGTEXT NULL,
         medicine_name VARCHAR(255) NULL,
         prescription_quantity VARCHAR(64) NULL,
         doctor_instructions TEXT NULL,
@@ -131,7 +131,8 @@ async function ensureSchema() {
       { name: 'invoice_delivery_fee', ddl: "ALTER TABLE orders ADD COLUMN invoice_delivery_fee DECIMAL(10,2) NULL AFTER invoice_service_fee" },
       { name: 'invoice_total', ddl: "ALTER TABLE orders ADD COLUMN invoice_total DECIMAL(10,2) NULL AFTER invoice_delivery_fee" },
       { name: 'invoice_sent_at', ddl: "ALTER TABLE orders ADD COLUMN invoice_sent_at DATETIME NULL AFTER invoice_total" },
-      { name: 'invoice_paid_at', ddl: "ALTER TABLE orders ADD COLUMN invoice_paid_at DATETIME NULL AFTER invoice_sent_at" }
+      { name: 'invoice_paid_at', ddl: "ALTER TABLE orders ADD COLUMN invoice_paid_at DATETIME NULL AFTER invoice_sent_at" },
+      { name: 'medical_certificate_longtext', ddl: "ALTER TABLE orders MODIFY COLUMN medical_certificate LONGTEXT NULL" }
     ];
 
     for (const col of ordersCols) {

@@ -522,9 +522,11 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                               <p className="text-sm text-gray-400 mb-2">Medical certificate</p>
                               {
                                 (() => {
-                                  const url = viewing?.medical_certificate?.startsWith('http')
-                                    ? viewing.medical_certificate!
-                                    : `${API_URL}/${viewing?.medical_certificate}`;
+                                  const url = viewing?.medical_certificate?.startsWith('data:')
+                                    ? viewing.medical_certificate
+                                    : (viewing?.medical_certificate?.startsWith('http')
+                                      ? viewing.medical_certificate
+                                      : `${API_URL}/${viewing?.medical_certificate}`);
                                   const isPdf = (viewing?.medical_certificate || '').toLowerCase().endsWith('.pdf');
                                   if (isPdf) {
                                     return (

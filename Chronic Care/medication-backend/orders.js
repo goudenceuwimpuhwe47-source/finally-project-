@@ -65,8 +65,19 @@ router.post('/', auth, upload.single('medicalCertificate'), async (req, res) => 
     }
     if (!/^1\d{15}$/.test(idCard)) return res.status(400).json({ error: 'Invalid ID card' });
 
-    const certPath = req.file ? 'uploads/' + req.file.filename : null;
-
+    let certPath = null;
+    if (req.file) {
+      try {
+        const fileData = fs.readFileSync(req.file.path);
+        const b64 = fileData.toString('base64');
+        certPath = `data:${req.file.mimetype};base64,${b64}`;
+        // cleanup temp file
+        fs.unlinkSync(req.file.path);
+      } catch (fileErr) {
+        console.error('Failed to process certificate:', fileErr);
+      }
+    }
+    
     const [result] = await pool.query(
       `INSERT INTO orders (
         user_id, full_name, id_card, phone, district, sector, cell, village, disease, dosage, age, gender, payment_method, medical_certificate,
