@@ -378,7 +378,6 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                           This order was already approved before. You can update the prescription and resend.
                         </div>
                       )}
-                      <div className="space-y-3">
                       <div className="space-y-4">
                         <div className="bg-blue-900/10 border border-blue-800/30 p-3 rounded flex flex-col gap-2">
                           <div className="flex items-center justify-between">
