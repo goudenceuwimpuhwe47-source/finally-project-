@@ -365,12 +365,21 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
     }
   }, [form.quantity, (form as any).frequency_per_day]);
 
-  // Preselect latest eligible order when dialog opens
+  // Preselect latest eligible order when dialog opens and pre-fill form
   React.useEffect(()=>{
     if (!open) return;
     if (eligible.length>0 && !selectedOrderId) {
       const latest = eligible.slice().sort((a:any,b:any)=> new Date(b.created_at||0).getTime() - new Date(a.created_at||0).getTime())[0];
       setSelectedOrderId(latest?.id || null);
+      
+      // Auto-prefill if doctor provided details
+      setForm({
+        medicine_name: latest.medicine_name || '',
+        quantity: String(latest.prescription_quantity || ''),
+        dosage: (form as any).dosage || '',
+        frequency_per_day: (form as any).frequency_per_day || 1,
+        instructions: latest.doctor_instructions || ''
+      });
     }
   }, [open, data]);
 
