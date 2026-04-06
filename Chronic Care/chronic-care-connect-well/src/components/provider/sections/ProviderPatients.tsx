@@ -16,6 +16,7 @@ import { Eye, FileText, Search, AlarmClock } from "lucide-react";
 import React, { useState } from "react";
 
 import { API_URL } from "@/lib/utils";
+import { getMedType } from "@/lib/med-utils";
 
 export const ProviderPatients = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -320,20 +321,6 @@ function PatientSummary({ patientId, token }: { patientId: number | null; token:
   );
 }
 
-// Helper to detect medicine type and labels
-const getMedType = (label: string) => {
-  const l = (label || '').toLowerCase();
-  if (l.includes('ml') || l.includes('syrup') || l.includes('liquid')) {
-    return { type: 'liquid', totalLabel: 'Total Volume (ml)', dailyLabel: 'Daily Volume (ml)', placeholder: 'e.g. 500', unit: 'ml' };
-  }
-  if (l.includes('iu') || l.includes('unit') || l.includes('injection')) {
-    return { type: 'units', totalLabel: 'Total Units (IU)', dailyLabel: 'Daily Units (IU)', placeholder: 'e.g. 1000', unit: 'units' };
-  }
-  if (l.includes('inhaler') || l.includes('mcg') || l.includes('puff')) {
-    return { type: 'puffs', totalLabel: 'Total Puffs', dailyLabel: 'Daily Puffs', placeholder: 'e.g. 200', unit: 'puff(s)' };
-  }
-  return { type: 'solid', totalLabel: 'Total Pills/Tabs', dailyLabel: 'Pills per Day', placeholder: '30', unit: 'piece(s)' };
-};
 
 function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, selectedOrderId, setSelectedOrderId }: {
   open: boolean;

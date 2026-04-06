@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { availableMedicines } from '@/lib/medicines';
 import { MessageSquare } from 'lucide-react';
 import { API_URL } from '@/lib/utils';
+import { getMedType } from '@/lib/med-utils';
 
 export default function DoctorContent({ activeSection, setActiveSection }: { activeSection: string; setActiveSection: (s: string)=>void; }) {
   const { user } = useAuth();
@@ -540,19 +541,23 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                             </p>
                           )}
                         </div>
-                        <div>
-                          <Label className="text-gray-300">Quantity *</Label>
-                          <Input
-                            type="number"
-                            min="1"
-                            step="1"
-                            placeholder="e.g., 30"
-                            className="bg-gray-700 border-gray-600 text-white"
-                            value={form.prescriptionQuantity}
-                            onChange={e => setForm(f => ({ ...f, prescriptionQuantity: e.target.value }))}
-                          />
-                          <p className="text-xs text-gray-400 mt-1">Number of tablets/doses/units</p>
-                        </div>
+                        {(() => {
+                          const info = getMedType(form.medicineName);
+                          return (
+                            <div className="space-y-2">
+                              <Label className="text-gray-300 font-semibold">{info.totalLabel} *</Label>
+                              <Input
+                                type="number"
+                                min="1"
+                                placeholder={info.placeholder}
+                                className="bg-gray-700 border-gray-600 text-white"
+                                value={form.prescriptionQuantity}
+                                onChange={e => setForm(f => ({ ...f, prescriptionQuantity: e.target.value }))}
+                              />
+                              <p className="text-[10px] text-gray-400 mt-1">Number of {info.unit}</p>
+                            </div>
+                          );
+                        })()}
                         <div>
                           <Label className="text-gray-300">How to take (instructions) *</Label>
                           <textarea className="w-full bg-gray-700 border border-gray-600 text-white rounded p-2" rows={3} value={form.instructions} onChange={e=> setForm(f=> ({...f, instructions: e.target.value}))} placeholder="e.g., Take 1 tablet twice daily after meals" />
