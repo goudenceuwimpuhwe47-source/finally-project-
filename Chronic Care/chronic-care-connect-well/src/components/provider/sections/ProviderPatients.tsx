@@ -360,6 +360,15 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
     });
   }, [form.times_per_day]);
 
+  // Clinical Unified Hook logic relocated to top level (Fix React Hook Rule Violation)
+  React.useEffect(() => {
+    if (!open || !form.medicine_name) return;
+    const info = getMedType(form.medicine_name);
+    if (!form.dose_unit || form.dose_unit === 'piece(s)') {
+       setForm(f=>({...f, dose_unit: info.unit}));
+    }
+  }, [form.medicine_name, open]);
+
   // Auto-calc duration from quantity/freq (Total Clinical Accuracy)
   React.useEffect(() => {
     const qty = Number(form.quantity) || 0;
@@ -419,9 +428,6 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
             </Select>
             {(() => {
               const info = getMedType(form.medicine_name);
-              // ensure units match detection if not set
-              React.useEffect(() => { if (!form.dose_unit || form.dose_unit === 'piece(s)') setForm(f=>({...f, dose_unit: info.unit})); }, [info.unit]);
-
               return (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">

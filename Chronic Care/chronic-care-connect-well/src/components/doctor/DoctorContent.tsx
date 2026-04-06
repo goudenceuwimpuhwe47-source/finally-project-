@@ -32,6 +32,23 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
     adherencePlan: '' 
   });
   const [rejectReason, setRejectReason] = useState('');
+  
+  // Clinical Unified Hook logic relocated to top level (Fix React Hook Rule Violation)
+  useEffect(() => {
+    if (!approving) return;
+    const info = getMedType(form.medicineName);
+    if (!form.dose_unit || form.dose_unit === 'piece(s)') {
+       setForm(f=>({...f, dose_unit: info.unit}));
+    }
+  }, [form.medicineName, approving]);
+
+  useEffect(() => {
+    if (!approving) return;
+    const gen = `${form.dose_amount} ${form.dose_unit} ${form.times_per_day > 1 ? `${form.times_per_day}x` : 'once'} daily`;
+    if (!form.instructions || form.instructions.includes('daily')) {
+       setForm(f=>({...f, instructions: gen}));
+    }
+  }, [form.dose_amount, form.dose_unit, form.times_per_day, approving]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -374,7 +391,10 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                           setApproving(o);
                           setForm({
                             medicineName: o.medicine_name || '',
-                            prescriptionQuantity: o.prescription_quantity || o.quantity || '',
+                            prescriptionQuantity: String(o.prescription_quantity || o.quantity || ''),
+                            dose_amount: '1',
+                            dose_unit: 'piece(s)',
+                            times_per_day: 1,
                             instructions: o.instructions || o.doctor_instructions || '',
                             advice: o.advice || o.doctor_advice || '',
                             adherencePlan: o.adherence_plan || '',
@@ -554,16 +574,6 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         </div>
                         {(() => {
                           const info = getMedType(form.medicineName);
-                          // Sync default units
-                          useEffect(() => { if (!form.dose_unit || form.dose_unit === 'piece(s)') setForm(f=>({...f, dose_unit: info.unit})); }, [info.unit]);
-                          // Auto-generate instructions
-                          useEffect(() => {
-                            const gen = `${form.dose_amount} ${form.dose_unit} ${form.times_per_day > 1 ? `${form.times_per_day}x` : 'once'} daily`;
-                            if (!form.instructions || form.instructions.includes('daily')) {
-                               setForm(f=>({...f, instructions: gen}));
-                            }
-                          }, [form.dose_amount, form.dose_unit, form.times_per_day]);
-
                           return (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-900/40 p-3 rounded-lg border border-gray-700/50">
                               <div className="md:col-span-2">
