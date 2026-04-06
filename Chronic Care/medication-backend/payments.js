@@ -73,8 +73,13 @@ function uuid() {
 router.post('/mtn/request', auth, requireRole('patient'), async (req, res) => {
   const { orderId, msisdn } = req.body || {};
   if (!orderId || !msisdn) return res.status(400).json({ error: 'orderId and msisdn required' });
-  // Basic Rwandan MSISDN format check: 2507XXXXXXXX
-  if (!/^2507\d{7}$/.test(String(msisdn))) return res.status(400).json({ error: 'Invalid phone number. Use format 2507XXXXXXXX' });
+
+  let normalizedMsisdn = String(msisdn).trim();
+  if (normalizedMsisdn.startsWith('0') && normalizedMsisdn.length === 10) {
+    normalizedMsisdn = '250' + normalizedMsisdn.slice(1);
+  }
+  // Standard Rwandan MSISDN format check: 2507XXXXXXXX (12 digits)
+  if (!/^2507\d{8}$/.test(normalizedMsisdn)) return res.status(400).json({ error: 'Invalid phone number. Use format 2507XXXXXXXX' });
   try {
     const [rows] = await pool.query('SELECT id, user_id, invoice_status, invoice_total, payment_status FROM orders WHERE id=? AND user_id=?', [orderId, req.user.id]);
     const order = rows?.[0];
@@ -91,7 +96,7 @@ router.post('/mtn/request', auth, requireRole('patient'), async (req, res) => {
         await pool.query(
           `INSERT INTO momo_payments (order_id, reference_id, msisdn, amount, currency, status, created_at, updated_at)
            VALUES (?,?,?,?,?,'PENDING', NOW(), NOW())`,
-          [orderId, referenceId, String(msisdn), amount, MOMO_CURRENCY]
+          [orderId, referenceId, String(normalizedMsisdn), amount, MOMO_CURRENCY]
         );
         // auto mark as SUCCESSFUL shortly and update the order
         setTimeout(async () => {
@@ -130,7 +135,7 @@ router.post('/mtn/request', auth, requireRole('patient'), async (req, res) => {
         await pool.query(
           `INSERT INTO momo_payments (order_id, reference_id, msisdn, amount, currency, status, created_at, updated_at)
            VALUES (?,?,?,?,?,'PENDING', NOW(), NOW())`,
-          [orderId, referenceId, String(msisdn), amount, MOMO_CURRENCY]
+          [orderId, referenceId, String(normalizedMsisdn), amount, MOMO_CURRENCY]
         );
         setTimeout(async () => {
           try {
@@ -163,7 +168,7 @@ router.post('/mtn/request', auth, requireRole('patient'), async (req, res) => {
       amount: amount.toFixed(2),
       currency: MOMO_CURRENCY,
       externalId: String(orderId),
-      payer: { partyIdType: 'MSISDN', partyId: String(msisdn) },
+      payer: { partyIdType: 'MSISDN', partyId: String(normalizedMsisdn) },
       payerMessage: 'Medication Order Payment',
       payeeNote: `Order #${orderId}`
     };
@@ -187,7 +192,7 @@ router.post('/mtn/request', auth, requireRole('patient'), async (req, res) => {
     await pool.query(
       `INSERT INTO momo_payments (order_id, reference_id, msisdn, amount, currency, status, created_at, updated_at)
        VALUES (?,?,?,?,?,'PENDING', NOW(), NOW())`,
-      [orderId, referenceId, String(msisdn), amount, MOMO_CURRENCY]
+      [orderId, referenceId, String(normalizedMsisdn), amount, MOMO_CURRENCY]
     );
 
     res.json({ ok: true, referenceId, status: 'PENDING' });

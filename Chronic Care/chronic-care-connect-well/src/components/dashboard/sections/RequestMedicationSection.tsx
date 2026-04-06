@@ -829,7 +829,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
 // Inline MoMo payment dialog (mounted at bottom via portal from parent state)
 export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, referenceId, setReferenceId, status, setStatus, token, onPaid }: any) {
   const total = Number((order as any)?.invoice_total || 0);
-  const disabled = !/^2507\d{7}$/.test(msisdn);
+  const disabled = !/^(2507|07)\d{8}$/.test(msisdn);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-md">
@@ -841,8 +841,8 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
           <div className="text-sm text-gray-300">Order #{order?.id}</div>
           <div className="text-sm text-gray-300">Amount to pay: <span className="text-white font-semibold">{total.toFixed(2)}</span></div>
           <div>
-            <Label className="text-gray-300">MTN Number (2507XXXXXXXX)</Label>
-            <Input value={msisdn} onChange={(e:any)=>setMsisdn(e.target.value)} placeholder="2507XXXXXXXX" className="bg-gray-700 border-gray-600 text-white" />
+            <Label className="text-gray-300">MTN Number (2507XXXXXXXX or 07XXXXXXXX)</Label>
+            <Input value={msisdn} onChange={(e:any)=>setMsisdn(e.target.value)} placeholder="07XXXXXXXX or 2507XXXXXXXX" className="bg-gray-700 border-gray-600 text-white" />
           </div>
           {!referenceId ? (
             <Button
@@ -850,9 +850,14 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
               className="bg-yellow-600 hover:bg-yellow-700"
               onClick={async ()=>{
                 try {
+                  let normalizedMsisdn = msisdn.trim();
+                  if (normalizedMsisdn.startsWith('0')) {
+                    normalizedMsisdn = '250' + normalizedMsisdn.slice(1);
+                  }
+
                   const r = await fetch(`${API_URL}/payments/mtn/request`, {
                     method: 'POST', headers: { 'Content-Type':'application/json', Authorization: `Bearer ${token}` },
-                    body: JSON.stringify({ orderId: order?.id, msisdn })
+                    body: JSON.stringify({ orderId: order?.id, msisdn: normalizedMsisdn })
                   });
                   const b = await r.json();
                   if (!r.ok || b?.error) throw new Error(b?.error || 'Failed to start payment');
