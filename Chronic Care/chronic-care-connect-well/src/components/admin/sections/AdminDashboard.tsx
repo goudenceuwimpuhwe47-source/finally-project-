@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, FileText, Activity, TrendingUp, AlertCircle, Stethoscope } from "lucide-react";
+import { Users, FileText, Activity, TrendingUp, AlertCircle, Stethoscope, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { API_URL } from "@/lib/utils";
 
@@ -83,121 +83,97 @@ export const AdminDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Patients</CardTitle>
-            <div className="p-1.5 bg-emerald-50 rounded-lg">
-              <Users className="h-4 w-4 text-emerald-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.totalUsers ?? 0}</div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Total registered</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Pharmacies</CardTitle>
-            <div className="p-1.5 bg-purple-50 rounded-lg">
-              <Activity className="h-4 w-4 text-purple-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.totalProviders ?? 0}</div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Active providers</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Doctors</CardTitle>
-            <div className="p-1.5 bg-cyan-50 rounded-lg">
-              <Stethoscope className="h-4 w-4 text-cyan-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.totalDoctors ?? 0}</div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Medical experts</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Attention</CardTitle>
-            <div className="p-1.5 bg-orange-50 rounded-lg">
-              <AlertCircle className="h-4 w-4 text-orange-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.pendingOrders ?? 0}</div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Awaiting review</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume</CardTitle>
-            <div className="p-1.5 bg-blue-50 rounded-lg">
-              <FileText className="h-4 w-4 text-blue-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.totalOrders ?? 0}</div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Total requests</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        {[
+          { title: 'Patients', icon: Users, val: stats?.totalUsers, color: 'emerald', label: 'Total registered' },
+          { title: 'Pharmacies', icon: Activity, val: stats?.totalProviders, color: 'purple', label: 'Active providers' },
+          { title: 'Doctors', icon: Stethoscope, val: stats?.totalDoctors, color: 'cyan', label: 'Medical experts' },
+          { title: 'Attention', icon: AlertCircle, val: stats?.pendingOrders, color: 'orange', label: 'Awaiting review' },
+          { title: 'Volume', icon: FileText, val: stats?.totalOrders, color: 'blue', label: 'Total requests' },
+        ].map((s, i) => (
+          <Card key={i} className="bg-white border-slate-200 shadow-sm rounded-3xl overflow-hidden hover:shadow-lg transition-all group border-t-2" style={{ borderTopColor: `var(--${s.color}-500)` }}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-slate-400">{s.title}</CardTitle>
+              <div className={`p-2 bg-${s.color}-50 rounded-xl group-hover:scale-110 transition-transform`}>
+                <s.icon className={`h-4 w-4 text-${s.color}-600`} />
+              </div>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <div className="text-3xl font-black text-slate-800 tracking-tighter">{s.val ?? 0}</div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">{s.label}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Recent Orders */}
-      <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden mt-8">
-        <CardHeader className="border-b border-slate-50 py-6">
-          <CardTitle className="text-slate-800 flex items-center gap-3 font-black tracking-tight">
-            <div className="p-2 bg-slate-100 rounded-xl">
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </div>
-            Real-time Clinical Activity
-          </CardTitle>
+      {/* Recent Activity */}
+      <Card className="bg-white border-slate-200 shadow-md rounded-[40px] overflow-hidden border-t-4 border-t-primary">
+        <CardHeader className="border-b border-slate-50 py-8 px-10">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-slate-800 flex items-center gap-4 font-black tracking-tight text-xl">
+              <div className="p-3 bg-primary/10 rounded-2xl">
+                <TrendingUp className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <span>Real-time Manifest</span>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">Live clinical activity stream</p>
+              </div>
+            </CardTitle>
+            <Badge variant="outline" className="bg-slate-50 text-slate-500 border-slate-200 font-black px-4 py-1.5 rounded-full uppercase text-[10px] tracking-widest">
+              Last 8 Packets
+            </Badge>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-10 pt-8">
           {recentError && (
-            <div className="text-sm text-red-400 mb-3">Failed to load recent orders.</div>
+            <div className="text-sm text-red-500 font-bold mb-4 flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Synchronization Error: Failed to load manifest data.
+            </div>
           )}
           {recentLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-20 bg-slate-50 animate-pulse rounded-2xl" />
+                <div key={i} className="h-24 bg-slate-50 animate-pulse rounded-3xl" />
               ))}
             </div>
           ) : recent && recent.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {recent.map((order) => {
-                const patient = order.user_full_name || order.full_name || order.username || order.email || "Unknown";
+                const patient = order.user_full_name || order.full_name || order.username || order.email || "Unknown Entity";
                 const status = order.admin_status;
                 const badgeClass =
                   status === "pending"
-                    ? "bg-amber-50 text-amber-600 border-amber-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full"
+                    ? "bg-amber-50 text-amber-600 border-amber-100 font-extrabold uppercase text-[9px] tracking-widest px-4 py-1.5 rounded-full"
                     : status === "under_review"
-                    ? "bg-blue-50 text-blue-600 border-blue-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full"
+                    ? "bg-blue-50 text-blue-600 border-blue-100 font-extrabold uppercase text-[9px] tracking-widest px-4 py-1.5 rounded-full"
                     : status === "approved"
-                    ? "bg-emerald-50 text-emerald-600 border-emerald-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full"
+                    ? "bg-emerald-50 text-emerald-600 border-emerald-100 font-extrabold uppercase text-[9px] tracking-widest px-4 py-1.5 rounded-full"
                     : status === "rejected"
-                    ? "bg-rose-50 text-rose-600 border-rose-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full"
-                    : "bg-slate-50 text-slate-500 border-slate-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full";
+                    ? "bg-rose-50 text-rose-600 border-rose-100 font-extrabold uppercase text-[9px] tracking-widest px-4 py-1.5 rounded-full"
+                    : "bg-slate-50 text-slate-500 border-slate-100 font-extrabold uppercase text-[9px] tracking-widest px-4 py-1.5 rounded-full";
                 return (
-                  <div key={order.id} className="flex items-center justify-between p-5 rounded-2xl bg-white border border-slate-50 hover:border-primary/20 hover:shadow-md transition-all group">
+                  <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-6 rounded-[28px] bg-white border border-slate-50/80 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all group relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-slate-100 group-hover:bg-primary transition-colors" />
                     <div className="flex-1">
-                      <p className="font-black text-slate-800 tracking-tight text-base group-hover:text-primary transition-colors">{order.disease?.replace(/_/g, ' ') || 'Medical Consultation'}</p>
-                      <div className="flex items-center gap-3 mt-1.5">
-                        <p className="text-xs font-bold text-muted-foreground uppercase opacity-70">Patient: <span className="text-slate-700">{patient}</span></p>
-                        <div className="h-1 w-1 rounded-full bg-slate-300" />
-                        <p className="text-xs font-bold text-slate-400 uppercase">
-                          {new Date(order.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </p>
+                      <div className="flex items-center gap-3">
+                        <p className="font-black text-slate-800 tracking-tight text-lg group-hover:text-primary transition-colors">{order.disease?.replace(/_/g, ' ') || 'Clinical Consultation'}</p>
+                        <span className="text-[10px] font-black px-2 py-0.5 bg-slate-50 rounded text-slate-400 uppercase tracking-tighter">#{order.id}</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-y-2 gap-x-4 mt-2">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-3 w-3 text-slate-300" />
+                          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Patient: <span className="text-slate-700">{patient}</span></p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-3 w-3 text-slate-300" />
+                          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                            Manifested {new Date(order.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right flex flex-col items-end gap-2">
+                    <div className="mt-4 sm:mt-0 text-right flex flex-col items-end gap-3 shrink-0">
                       <Badge className={badgeClass} variant="outline">{status}</Badge>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 py-0.5 bg-slate-50 rounded-full border border-slate-100">Qty: {order.dosage}</p>
                     </div>

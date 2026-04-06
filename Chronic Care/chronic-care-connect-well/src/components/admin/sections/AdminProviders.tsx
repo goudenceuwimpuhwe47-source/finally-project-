@@ -90,63 +90,78 @@ export const AdminProviders = () => {
             </TableHeader>
             <TableBody>
               {providers && providers.length > 0 ? (
-                providers.map((provider:any) => (
-                  <TableRow key={provider.id} className="border-border hover:bg-slate-50/50 transition-colors group">
-                    <TableCell className="px-8 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black text-sm">
-                          {(provider.full_name || provider.name || provider.username || '?').charAt(0).toUpperCase()}
+                providers
+                  .filter((p: any) => {
+                    const name = (p.full_name || p.name || p.username || '').toLowerCase();
+                    const isPharmacy = name.includes('pharmacy') || name.includes('clinic') && !name.includes('dr.');
+                    // In a real scenario, we'd use p.role === 'doctor' or similar metadata
+                    return !isPharmacy;
+                  })
+                  .map((provider: any) => (
+                    <TableRow key={provider.id} className="border-border hover:bg-slate-50/50 transition-colors group">
+                      <TableCell className="px-8 py-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black text-sm shadow-sm border border-primary/5">
+                            {(provider.full_name || provider.name || provider.username || '?').charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-slate-800 leading-tight">{provider.full_name || provider.name || `${provider.first_name ?? ''} ${provider.last_name ?? ''}`.trim() || provider.username || 'N/A'}</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-0.5">Clinical Practitioner</span>
+                          </div>
                         </div>
-                        <span className="font-bold text-slate-800">{provider.full_name || provider.name || `${provider.first_name ?? ''} ${provider.last_name ?? ''}`.trim() || provider.username || 'N/A'}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-slate-500 font-medium">
-                      {provider.email || 'N/A'}
-                    </TableCell>
-                    <TableCell className="text-slate-500 font-black text-[10px] tracking-tight">{provider.license_number || provider.license || '—'}</TableCell>
-                    <TableCell className="text-slate-500 font-bold">{provider.specialty || 'General Practice'}</TableCell>
-                    <TableCell className="text-slate-500 font-medium">{provider.hospital_affiliation || provider.hospital || 'Private Hub'}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={`font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full ${
-                        (provider.verification_status || provider.status) === 'verified' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                        (provider.verification_status || provider.status) === 'rejected' ? 'bg-rose-50 text-rose-600 border-rose-100' :
-                        'bg-amber-50 text-amber-600 border-amber-100'
-                      }`}>
-                        {provider.verification_status || provider.status || 'pending'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-slate-400 font-bold text-xs">
-                      {provider.created_at ? format(new Date(provider.created_at), 'MMM dd, yyyy') : '—'}
-                    </TableCell>
-                    <TableCell className="text-right pr-8">
-                      {(provider.verification_status || provider.status || 'pending') === 'pending' && (
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[9px] tracking-widest h-9 rounded-xl shadow-lg shadow-emerald-200 transition-all active:scale-95"
-                            onClick={() => verifyProviderMutation.mutate({ 
-                              providerId: provider.id, 
-                              status: 'verified' 
-                            })}
-                          >
-                            Verify Hub
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="border-rose-200 text-rose-600 hover:bg-rose-50 font-black uppercase text-[9px] tracking-widest h-9 rounded-xl transition-all"
-                            onClick={() => verifyProviderMutation.mutate({ 
-                              providerId: provider.id, 
-                              status: 'rejected' 
-                            })}
-                          >
-                            Decline
-                          </Button>
+                      </TableCell>
+                      <TableCell className="text-slate-500 font-bold text-xs">
+                        {provider.email || 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-slate-400 font-black text-[10px] tracking-tight uppercase">{provider.license_number || provider.license || '—'}</TableCell>
+                      <TableCell className="text-slate-600 font-bold text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                          {provider.specialty || 'General Practice'}
                         </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
+                      </TableCell>
+                      <TableCell className="text-slate-500 font-bold text-xs">{provider.hospital_affiliation || provider.hospital || 'Private Hub'}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={`font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full shadow-sm ${
+                          (provider.verification_status || provider.status) === 'verified' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                          (provider.verification_status || provider.status) === 'rejected' ? 'bg-rose-50 text-rose-600 border-rose-100' :
+                          'bg-amber-50 text-amber-600 border-amber-100'
+                        }`}>
+                          {provider.verification_status || provider.status || 'pending'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-slate-400 font-bold text-[10px] uppercase tracking-widest leading-none">
+                        {provider.created_at ? format(new Date(provider.created_at), 'MMM dd, yyyy') : '—'}
+                      </TableCell>
+                      <TableCell className="text-right pr-8">
+                        {(provider.verification_status || provider.status || 'pending') === 'pending' && (
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[9px] tracking-widest h-10 px-4 rounded-xl shadow-lg shadow-emerald-200 transition-all active:scale-95"
+                              onClick={() => verifyProviderMutation.mutate({ 
+                                providerId: provider.id, 
+                                status: 'verified' 
+                              })}
+                            >
+                              Verify Node
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-slate-200 text-slate-500 hover:bg-slate-50 font-black uppercase text-[9px] tracking-widest h-10 px-4 rounded-xl transition-all"
+                              onClick={() => verifyProviderMutation.mutate({ 
+                                providerId: provider.id, 
+                                status: 'rejected' 
+                              })}
+                            >
+                              Decline
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
               ) : (
                 <TableRow>
                   <TableCell colSpan={8} className="py-20 text-center">

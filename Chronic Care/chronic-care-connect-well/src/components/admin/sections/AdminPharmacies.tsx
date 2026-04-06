@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Plus, Search, MapPin, Phone, Mail, MessageSquare } from "lucide-react";
+import { Building2, Plus, Search, MapPin, Phone, Mail, MessageSquare, Activity, Clock, AlertCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { PharmacyRegistrationForm } from "./pharmacy/PharmacyRegistrationForm";
 import { PharmacyCommunication } from "./pharmacy/PharmacyCommunication";
@@ -139,90 +139,66 @@ export const AdminPharmacies = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-shadow group">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-3xl font-black text-slate-800 tracking-tight">{pharmacies?.length || 0}</div>
-              <div className="p-2 bg-slate-50 rounded-xl group-hover:bg-primary/10 transition-colors">
-                <Building2 className="h-5 w-5 text-slate-400 group-hover:text-primary" />
+        {[
+          { label: 'Total Partners', val: pharmacies?.length, icon: Building2, color: 'slate' },
+          { label: 'Operational', val: pharmacies?.filter(p => p.status === 'active').length, icon: Activity, color: 'emerald', active: true },
+          { label: 'Standby', val: pharmacies?.filter(p => p.status === 'inactive').length, icon: Clock, color: 'slate' },
+          { label: 'Restricted', val: pharmacies?.filter(p => p.status === 'suspended').length, icon: AlertCircle, color: 'rose' },
+        ].map((s, i) => (
+          <Card key={i} className="bg-white border-slate-200 shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-shadow group border-t-2" style={{ borderTopColor: s.color === 'slate' ? '#e2e8f0' : s.color === 'emerald' ? '#10b981' : '#f43f5e' }}>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-2">
+                <div className={`text-3xl font-black tracking-tight ${s.color === 'emerald' ? 'text-emerald-600' : s.color === 'rose' ? 'text-rose-600' : 'text-slate-800'}`}>
+                  {s.val || 0}
+                </div>
+                <div className={`p-2 rounded-xl transition-colors ${s.color === 'emerald' ? 'bg-emerald-50' : s.color === 'rose' ? 'bg-rose-50' : 'bg-slate-50'}`}>
+                  {s.active ? (
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50" />
+                  ) : (
+                    <s.icon className={`h-5 w-5 ${s.color === 'emerald' ? 'text-emerald-500' : s.color === 'rose' ? 'text-rose-500' : 'text-slate-400'}`} />
+                  )}
+                </div>
               </div>
-            </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Partners</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-shadow group">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-3xl font-black text-emerald-600 tracking-tight">
-                {pharmacies?.filter(p => p.status === 'active').length || 0}
-              </div>
-              <div className="p-2 bg-emerald-50 rounded-xl">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-              </div>
-            </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Operational</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-shadow group">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-3xl font-black text-slate-400 tracking-tight">
-                {pharmacies?.filter(p => p.status === 'inactive').length || 0}
-              </div>
-              <div className="p-2 bg-slate-50 rounded-xl">
-                <div className="w-2 h-2 bg-slate-300 rounded-full" />
-              </div>
-            </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Standby</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-shadow group">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-3xl font-black text-rose-600 tracking-tight">
-                {pharmacies?.filter(p => p.status === 'suspended').length || 0}
-              </div>
-              <div className="p-2 bg-rose-50 rounded-xl">
-                <div className="w-2 h-2 bg-rose-500 rounded-full" />
-              </div>
-            </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Restricted</p>
-          </CardContent>
-        </Card>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{s.label}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {filteredPharmacies && filteredPharmacies.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredPharmacies.map((pharmacy:any, idx:number) => (
-            <Card key={pharmacy.id ?? idx} className="bg-white border-border shadow-sm rounded-[32px] overflow-hidden group hover:shadow-xl transition-all relative">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-100 group-hover:bg-primary transition-colors" />
+            <Card key={pharmacy.id ?? idx} className="bg-white border-slate-200 shadow-md rounded-[32px] overflow-hidden group hover:shadow-2xl hover:-translate-y-1 transition-all relative border-t-4 border-t-slate-100 hover:border-t-primary">
               <CardHeader className="p-8 pb-4">
                 <div className="flex items-start justify-between gap-4">
-                  <CardTitle className="text-xl font-black text-slate-800 tracking-tight leading-tight">{pharmacy.name}</CardTitle>
+                  <div>
+                    <CardTitle className="text-xl font-black text-slate-800 tracking-tight leading-tight group-hover:text-primary transition-colors">{pharmacy.name}</CardTitle>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Authorized Distribution Node</p>
+                  </div>
                   <Badge variant="outline" className={getStatusColor(pharmacy.status)}>
                     {pharmacy.status}
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="px-8 pb-8 space-y-5">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-slate-500 font-bold text-sm">
-                    <div className="p-2 bg-slate-50 rounded-lg">
+              <CardContent className="px-8 pb-8 space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4 text-slate-600 font-bold text-sm">
+                    <div className="p-2.5 bg-slate-50 rounded-xl mt-0.5">
                       <MapPin className="h-4 w-4 text-slate-400" />
                     </div>
-                    <span className="leading-tight">{pharmacy.address}</span>
+                    <span className="leading-relaxed">{pharmacy.address}</span>
                   </div>
                   
-                  <div className="flex items-center gap-3 text-slate-500 font-bold text-sm">
-                    <div className="p-2 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-4 text-slate-600 font-bold text-sm">
+                    <div className="p-2.5 bg-slate-50 rounded-xl">
                       <Phone className="h-4 w-4 text-slate-400" />
                     </div>
                     <span>{pharmacy.phone}</span>
                   </div>
                   
                   {pharmacy.email && (
-                    <div className="flex items-center gap-3 text-slate-500 font-bold text-sm">
-                      <div className="p-2 bg-slate-50 rounded-lg">
+                    <div className="flex items-center gap-4 text-slate-600 font-bold text-sm">
+                      <div className="p-2.5 bg-slate-50 rounded-xl">
                         <Mail className="h-4 w-4 text-slate-400" />
                       </div>
                       <span className="truncate">{pharmacy.email}</span>
@@ -230,14 +206,14 @@ export const AdminPharmacies = () => {
                   )}
                 </div>
                 
-                <div className="pt-4 border-t border-slate-50 flex flex-wrap gap-4">
+                <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
                   <div className="flex flex-col">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">License Cert</span>
-                    <span className="text-xs font-black text-slate-700">{pharmacy.license_number}</span>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol ID</span>
+                    <span className="text-xs font-black text-slate-800 mt-0.5">{pharmacy.license_number}</span>
                   </div>
-                  <div className="flex flex-col ml-auto text-right">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Radius</span>
-                    <span className="text-xs font-black text-primary">{pharmacy.delivery_radius} KM</span>
+                  <div className="flex flex-col text-right">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Radius</span>
+                    <span className="text-xs font-black text-primary mt-0.5">{pharmacy.delivery_radius} KM</span>
                   </div>
                 </div>
                 
@@ -248,10 +224,10 @@ export const AdminPharmacies = () => {
                     setSelectedPharmacy(pharmacy);
                     setShowCommunication(true);
                   }}
-                  className="w-full bg-slate-50 hover:bg-primary hover:text-white text-slate-600 font-black uppercase text-[10px] tracking-widest h-12 rounded-2xl transition-all shadow-sm border border-slate-100"
+                  className="w-full bg-slate-50 hover:bg-primary hover:text-white text-slate-600 font-black uppercase text-[10px] tracking-widest h-14 rounded-2xl transition-all shadow-sm border border-slate-200/50 mt-2"
                 >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Secure Comms Cable
+                  <MessageSquare className="h-4 w-4 mr-3" />
+                  Establish Comms Link
                 </Button>
               </CardContent>
             </Card>
