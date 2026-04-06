@@ -21,7 +21,16 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
   const [viewing, setViewing] = useState<any | null>(null);
   const [approving, setApproving] = useState<any | null>(null);
   const [rejecting, setRejecting] = useState<any | null>(null);
-  const [form, setForm] = useState({ medicineName: '', prescriptionQuantity: '', instructions: '', advice: '', adherencePlan: '' });
+  const [form, setForm] = useState({ 
+    medicineName: '', 
+    prescriptionQuantity: '', 
+    dose_amount: '1', 
+    dose_unit: 'piece(s)', 
+    times_per_day: 1, 
+    instructions: '', 
+    advice: '', 
+    adherencePlan: '' 
+  });
   const [rejectReason, setRejectReason] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
@@ -150,6 +159,8 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
           doctor_status: 'approved',
           medicine_name: form.medicineName,
           prescription_quantity: form.prescriptionQuantity,
+          dosage: `${form.dose_amount}${form.dose_unit}`,
+          frequency_per_day: form.times_per_day,
           instructions: form.instructions,
           advice: form.advice,
           adherence_plan: form.adherencePlan,
@@ -158,7 +169,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
         return next;
       });
       setApproving(null);
-      setForm({ medicineName: '', prescriptionQuantity: '', instructions: '', advice: '', adherencePlan: '' });
+      setForm({ medicineName: '', prescriptionQuantity: '', dose_amount: '1', dose_unit: 'piece(s)', times_per_day: 1, instructions: '', advice: '', adherencePlan: '' });
   // avoid immediate refetch that could clobber optimistic state; backend sync happens later
   setActiveSection('history');
     } catch (e: any) {
@@ -392,7 +403,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                                Patient Medical Certificate
                              </Label>
                              <a 
-                               href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
+                               href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
                                target="_blank" 
                                rel="noreferrer" 
                                className="text-xs text-blue-400 hover:text-blue-300 underline"
@@ -405,17 +416,17 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                               <div className="bg-gray-800 rounded p-4 text-center border border-dashed border-gray-600">
                                 <p className="text-sm text-gray-400">PDF Document attached</p>
                                 <Button variant="link" className="text-blue-400 text-xs" asChild>
-                                  <a href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} target="_blank" rel="noreferrer">
+                                  <a href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} target="_blank" rel="noreferrer">
                                     Click to preview PDF
                                   </a>
                                 </Button>
                               </div>
                             ) : (
-                              <img 
-                                src={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
-                                alt="Certificate Preview" 
-                                className="max-h-40 w-full object-contain rounded bg-gray-950/50 border border-gray-800"
-                              />
+                               <img 
+                                 src={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
+                                 alt="Certificate Preview" 
+                                 className="max-h-40 w-full object-contain rounded bg-gray-950/50 border border-gray-800"
+                               />
                             )}
                           </div>
                         </div>
@@ -543,25 +554,56 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         </div>
                         {(() => {
                           const info = getMedType(form.medicineName);
+                          // Sync default units
+                          useEffect(() => { if (!form.dose_unit || form.dose_unit === 'piece(s)') setForm(f=>({...f, dose_unit: info.unit})); }, [info.unit]);
+                          // Auto-generate instructions
+                          useEffect(() => {
+                            const gen = `${form.dose_amount} ${form.dose_unit} ${form.times_per_day > 1 ? `${form.times_per_day}x` : 'once'} daily`;
+                            if (!form.instructions || form.instructions.includes('daily')) {
+                               setForm(f=>({...f, instructions: gen}));
+                            }
+                          }, [form.dose_amount, form.dose_unit, form.times_per_day]);
+
                           return (
-                            <div className="space-y-2">
-                              <Label className="text-gray-300 font-semibold">{info.totalLabel} *</Label>
-                              <Input
-                                type="number"
-                                min="1"
-                                placeholder={info.placeholder}
-                                className="bg-gray-700 border-gray-600 text-white"
-                                value={form.prescriptionQuantity}
-                                onChange={e => setForm(f => ({ ...f, prescriptionQuantity: e.target.value }))}
-                              />
-                              <p className="text-[10px] text-gray-400 mt-1">Number of {info.unit}</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-900/40 p-3 rounded-lg border border-gray-700/50">
+                              <div className="md:col-span-2">
+                                <Label className="text-gray-300 font-semibold">{info.totalLabel} *</Label>
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  placeholder={info.placeholder}
+                                  className="bg-gray-700 border-gray-600 text-white"
+                                  value={form.prescriptionQuantity}
+                                  onChange={e => setForm(f => ({ ...f, prescriptionQuantity: e.target.value }))}
+                                />
+                                <p className="text-[10px] text-gray-500 mt-1">Total quantity to be dispensed (in {info.unit})</p>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <Label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Dose Amount</Label>
+                                  <Input type="number" step="0.5" className="bg-gray-700 border-gray-600 text-white h-8" value={form.dose_amount} onChange={e=> setForm(f=>({...f, dose_amount: e.target.value}))} />
+                                </div>
+                                <div>
+                                  <Label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Unit</Label>
+                                  <Input className="bg-gray-700 border-gray-600 text-white h-8" value={form.dose_unit} onChange={e=> setForm(f=>({...f, dose_unit: e.target.value}))} />
+                                </div>
+                              </div>
+                              <div>
+                                <Label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Times per Day</Label>
+                                <Input type="number" min="1" className="bg-gray-700 border-gray-600 text-white h-8" value={form.times_per_day} onChange={e=> setForm(f=>({...f, times_per_day: Number(e.target.value)||1}))} />
+                              </div>
+                              <div className="md:col-span-2">
+                                <Label className="text-gray-300 font-semibold">Regimen Instructions *</Label>
+                                <textarea className="w-full bg-gray-700 border border-gray-600 text-white rounded p-2 text-sm italic" rows={2} value={form.instructions} onChange={e=> setForm(f=> ({...f, instructions: e.target.value}))} placeholder="e.g. Take after meals" />
+                                {Number(form.times_per_day) > 0 && Number(form.prescriptionQuantity) > 0 && (
+                                  <p className="text-[10px] text-emerald-400 mt-1 font-medium bg-emerald-950/20 p-1 rounded inline-block">
+                                    Planned Duration: {Math.ceil(Number(form.prescriptionQuantity) / (Number(form.dose_amount) * Number(form.times_per_day)))} days
+                                  </p>
+                                )}
+                              </div>
                             </div>
                           );
                         })()}
-                        <div>
-                          <Label className="text-gray-300">How to take (instructions) *</Label>
-                          <textarea className="w-full bg-gray-700 border border-gray-600 text-white rounded p-2" rows={3} value={form.instructions} onChange={e=> setForm(f=> ({...f, instructions: e.target.value}))} placeholder="e.g., Take 1 tablet twice daily after meals" />
-                        </div>
                         <div>
                           <Label className="text-gray-300">Advice</Label>
                           <textarea className="w-full bg-gray-700 border border-gray-600 text-white rounded p-2" rows={3} value={form.advice} onChange={e=> setForm(f=> ({...f, advice: e.target.value}))} placeholder="Additional medical advice for the patient" />
