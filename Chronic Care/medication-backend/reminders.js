@@ -156,7 +156,7 @@ router.get('/my/next', auth(['patient']), async (req, res) => {
 				 LEFT JOIN prescriptions p ON p.id = e.prescription_id
 				WHERE e.patient_id=?
 					AND e.status IN ('pending','sent')
-					AND e.when_at <= DATE_ADD(NOW(), INTERVAL 2 MINUTE)
+					AND e.when_at >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)
 				ORDER BY (e.status='sent') DESC, e.when_at ASC
 				LIMIT 1`,
 			[patientId]
@@ -165,6 +165,28 @@ router.get('/my/next', auth(['patient']), async (req, res) => {
 		res.json({ alert });
 	} catch (e) {
 		console.error('GET /alerts/my/next error', e.message);
+		res.status(500).json({ error: 'Server error' });
+	}
+});
+
+// Patient medication history (last 5 status-changed events)
+router.get('/my/history', auth(['patient']), async (req, res) => {
+	try {
+		const patientId = req.user.id;
+		const [rows] = await pool.query(
+			`SELECT e.id, e.when_at, e.status, e.order_id, e.prescription_id,
+							p.medicine_name, p.dosage, p.frequency_per_day
+				 FROM medication_reminder_events e
+				 LEFT JOIN prescriptions p ON p.id = e.prescription_id
+				WHERE e.patient_id=?
+					AND e.status IN ('taken', 'missed', 'skipped')
+				ORDER BY e.when_at DESC
+				LIMIT 5`,
+			[patientId]
+		);
+		res.json({ history: rows });
+	} catch (e) {
+		console.error('GET /alerts/my/history error', e.message);
 		res.status(500).json({ error: 'Server error' });
 	}
 });

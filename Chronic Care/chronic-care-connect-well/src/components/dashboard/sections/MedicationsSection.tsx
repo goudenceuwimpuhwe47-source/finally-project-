@@ -88,6 +88,18 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
     staleTime: 30_000,
   });
 
+  // Load medication history (last 5 taken/missed/skipped)
+  const { data: historyData } = useQuery({
+    queryKey: ['patientMedHistory'],
+    enabled: !!token,
+    queryFn: async () => {
+      const b = await apiGetJson(`/alerts/my/history`, token);
+      if (!b) return [] as any[];
+      return Array.isArray(b?.history) ? b.history : [];
+    },
+    staleTime: 60_000,
+  });
+
   // Mark alert as taken
   const markTaken = useMutation({
     mutationFn: async (id: number) => {
@@ -102,7 +114,8 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['patientNextAlert'] });
-  qc.invalidateQueries({ queryKey: ['patientTodayEvents'] });
+      qc.invalidateQueries({ queryKey: ['patientTodayEvents'] });
+      qc.invalidateQueries({ queryKey: ['patientMedHistory'] });
     }
   });
 
@@ -128,7 +141,11 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
           </CardHeader>
           <CardContent className="space-y-4">
             {!nextAlert && (
-              <div className="text-gray-400 text-sm">No upcoming alerts in the next 2 minutes.</div>
+              <div className="text-gray-400 text-sm py-4 italic">
+                {prescriptions.length > 0 
+                  ? "No upcoming alerts for today. Your medicine is active." 
+                  : "No alerts scheduled. Please check your active prescriptions."}
+              </div>
             )}
             {nextAlert && (
               <div className="flex items-center justify-between p-3 bg-gray-700/60 rounded-lg border border-gray-600">
@@ -277,13 +294,30 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
         </CardContent>
       </Card>
 
-      <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
           <CardTitle className="text-white">Medication History (recent)</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3 text-gray-300 text-sm">
-            <div className="opacity-70">History view can be expanded to show past alerts taken; currently use the Alerts page for full details.</div>
+          <div className="space-y-3">
+            {(!historyData || historyData.length === 0) && (
+              <div className="text-gray-400 text-sm italic">No recent activity recorded.</div>
+            )}
+            {historyData && historyData.map((e: any) => (
+              <div key={e.id} className="flex items-center justify-between p-2 border-b border-gray-700/50 last:border-0">
+                <div className="flex items-center gap-3">
+                  <div className={`p-1.5 rounded-full ${String(e.status).toLowerCase()==='taken' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {String(e.status).toLowerCase()==='taken' ? <CheckCircle className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">{e.medicine_name}</p>
+                    <p className="text-[10px] text-gray-400">{e.when_at ? format(new Date(e.when_at), 'PP p') : ''}</p>
+                  </div>
+                </div>
+                <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${String(e.status).toLowerCase()==='taken' ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {e.status}
+                </span>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
