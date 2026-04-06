@@ -173,8 +173,8 @@ export const ProviderPatients = () => {
                   <TableCell className="text-gray-300">
                     {patient.date_of_birth ? format(new Date(patient.date_of_birth), 'MMM dd, yyyy') : 'N/A'}
                   </TableCell>
-                  <TableCell className="text-gray-300">
-                    {patient.medical_conditions?.join(', ') || 'None listed'}
+                  <TableCell className="text-gray-300 capitalize">
+                    {patient.medical_conditions?.map((c: string) => c.replace(/_/g, ' ')).join(', ') || 'None listed'}
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">

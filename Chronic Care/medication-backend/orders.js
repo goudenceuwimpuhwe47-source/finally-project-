@@ -778,18 +778,28 @@ router.get('/provider/prescriptions', auth, requireRole('provider'), async (req,
 router.get('/provider/patients', auth, requireRole('provider'), async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT DISTINCT
+      `SELECT
          u.id,
          TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) AS full_name,
          u.email,
-         u.phone
+         u.phone,
+         u.date_of_birth,
+         GROUP_CONCAT(DISTINCT o.disease) AS medical_conditions_str
        FROM orders o
        JOIN users u ON u.id = o.user_id
        WHERE o.provider_id = ?
-       ORDER BY full_name ASC, email ASC` ,
+       GROUP BY u.id
+       ORDER BY full_name ASC, email ASC`,
       [req.user.id]
     );
-    res.json({ patients: rows });
+
+    // Turn comma-separated string into array for frontend
+    const patients = rows.map((r) => ({
+      ...r,
+      medical_conditions: r.medical_conditions_str ? r.medical_conditions_str.split(',') : []
+    }));
+
+    res.json({ patients });
   } catch (e) {
     console.error('ERROR [GET /provider/patients]:', e.message);
     res.status(500).json({ error: 'Server error', details: e.message });
