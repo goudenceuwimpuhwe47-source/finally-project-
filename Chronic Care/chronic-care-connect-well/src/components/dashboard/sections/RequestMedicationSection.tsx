@@ -830,6 +830,36 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
 export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, referenceId, setReferenceId, status, setStatus, token, onPaid }: any) {
   const total = Number((order as any)?.invoice_total || 0);
   const disabled = !/^(2507|07)\d{8}$/.test(msisdn);
+
+  // Auto-polling for status when pending
+  useEffect(() => {
+    let interval: any;
+    if (open && referenceId && (status === 'PENDING' || !status)) {
+      interval = setInterval(async () => {
+        try {
+          const r = await fetch(`${API_URL}/payments/mtn/status/${referenceId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const b = await r.json();
+          if (r.ok && b?.status) {
+            const newStatus = String(b.status).toUpperCase();
+            setStatus(newStatus);
+            if (newStatus === 'SUCCESSFUL') {
+              clearInterval(interval);
+              setTimeout(() => {
+                onPaid && onPaid();
+                onOpenChange(false);
+              }, 1200); // Small delay to let user see "SUCCESSFUL"
+            }
+          }
+        } catch (e) {
+          console.error('Polling failed:', e);
+        }
+      }, 2500); // Poll every 2.5 seconds
+    }
+    return () => { if (interval) clearInterval(interval); };
+  }, [open, referenceId, status, setStatus, token, onPaid, onOpenChange]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-md">
@@ -873,10 +903,12 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
           ) : (
             <div className="space-y-2">
               <div className="text-sm">Reference: <span className="font-mono">{referenceId}</span></div>
-              <div className="text-sm">Status: <span className="font-semibold">{status || 'PENDING'}</span></div>
+              <div className="text-sm">Status: <span className={`font-semibold ${status === 'SUCCESSFUL' ? 'text-green-400' : 'text-yellow-400'}`}>{status || 'PENDING'}</span></div>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
+                  className="w-full"
+                  disabled={status === 'SUCCESSFUL'}
                   onClick={async ()=>{
                     try {
                       const r = await fetch(`${API_URL}/payments/mtn/status/${referenceId}`, { headers: { Authorization: `Bearer ${token}` } });
@@ -892,15 +924,19 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
                     }
                   }}
                 >
-                  Refresh Status
+                  {status === 'SUCCESSFUL' ? 'Confirmed' : 'Checking...'}
                 </Button>
-                <Button
-                  className="bg-green-600 hover:bg-green-700"
-                  disabled={String(status||'').toUpperCase() !== 'SUCCESSFUL'}
-                  onClick={()=>{ onPaid && onPaid(); onOpenChange(false); }}
-                >
-                  Done
-                </Button>
+                {status === 'SUCCESSFUL' && (
+                  <Button
+                    className="bg-green-600 hover:bg-green-700 w-full"
+                    onClick={()=>{ onPaid && onPaid(); onOpenChange(false); }}
+                  >
+                    Done
+                  </Button>
+                )}
+              </div>
+              <div className="text-xs text-gray-400 italic text-center mt-2">
+                Waiting for payment confirmation... (Auto-polling)
               </div>
             </div>
           )}

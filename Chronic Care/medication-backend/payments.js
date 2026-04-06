@@ -33,7 +33,7 @@ const MOMO_ENV = process.env.MOMO_TARGET_ENV || 'sandbox';
 const MOMO_CURRENCY = process.env.MOMO_CURRENCY || 'EUR';
 const MOMO_ENABLE_MOCK = String(process.env.MOMO_ENABLE_MOCK || '').toLowerCase() === 'true';
 const MOMO_MISSING_CREDS = !MOMO_SUB_KEY || !MOMO_API_USER || !MOMO_API_KEY;
-const MOMO_SHOULD_MOCK = MOMO_ENABLE_MOCK || MOMO_MISSING_CREDS;
+const MOMO_SHOULD_MOCK = true; // Forcing simulation mode as requested
 
 function b64(str) {
   return Buffer.from(str).toString('base64');
