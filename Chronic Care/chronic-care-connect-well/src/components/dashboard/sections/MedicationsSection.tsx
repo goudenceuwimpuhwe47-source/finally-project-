@@ -187,6 +187,7 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
         </Card>
       </div>
 
+      <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
           <CardTitle className="text-white">Active Treatment Plan</CardTitle>
         </CardHeader>
@@ -251,6 +252,7 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
             );
           })}
         </CardContent>
+      </Card>
 
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
@@ -294,6 +296,7 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
         </CardContent>
       </Card>
 
+      <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
           <CardTitle className="text-white">Medication History (recent)</CardTitle>
         </CardHeader>
