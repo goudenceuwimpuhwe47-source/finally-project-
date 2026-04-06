@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Package, MapPin, Calendar } from "lucide-react";
+import { Package, MapPin, Calendar, Activity, CheckCircle2, AlertCircle, FilePlus2, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -101,11 +101,12 @@ export const ProviderAssigned = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-700 rounded w-48"></div>
-          <div className="h-10 bg-gray-700 rounded"></div>
-          <div className="h-40 bg-gray-700 rounded"></div>
+      <div className="space-y-8 animate-in fade-in duration-700">
+        <div className="h-10 bg-slate-100 rounded-2xl w-64 animate-pulse"></div>
+        <div className="grid grid-cols-1 gap-6">
+          {[1,2,3].map(i => (
+            <div key={i} className="h-24 bg-white border border-slate-100 rounded-3xl animate-pulse shadow-sm"></div>
+          ))}
         </div>
       </div>
     );
@@ -113,237 +114,269 @@ export const ProviderAssigned = () => {
 
   if (error) {
     return (
-      <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-6 text-red-400">Failed to load assigned orders.</CardContent>
+      <Card className="bg-white border-rose-100 rounded-3xl shadow-xl overflow-hidden">
+        <CardContent className="p-10 text-center">
+          <div className="bg-rose-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-rose-100">
+             <Activity className="h-8 w-8 text-rose-500" />
+          </div>
+          <h3 className="text-slate-800 font-black uppercase tracking-tight text-lg">Registry Connection Failure</h3>
+          <p className="text-slate-400 font-bold mb-6 italic">Unable to synchronize with the distribution ledger.</p>
+          <Button variant="outline" className="rounded-xl font-bold border-slate-200" onClick={() => refetch()}>Retransfer Manifest</Button>
+        </CardContent>
       </Card>
     );
   }
 
   const orders = data || [];
 
-  // hooks defined above to keep order stable across renders
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Package className="h-6 w-6" />
-          Assigned Orders
-        </h1>
-        <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">{orders.length} Orders</Badge>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex items-center justify-between bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
+        <div className="flex items-center gap-5">
+          <div className="h-12 w-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white">
+            <Package className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Assigned Manifests</h1>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5 italic">Clinical Fulfillment Registry</p>
+          </div>
+        </div>
+        <div className="bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-100">
+           <span className="text-xs font-black text-slate-800">{orders.length}</span>
+           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-2">Total Manifests</span>
+        </div>
       </div>
 
       {orders.length === 0 ? (
-        <Card className="bg-gray-800 border-gray-700">
-          <CardContent className="p-8 text-center text-gray-300">No orders assigned yet.</CardContent>
+        <Card className="bg-white border-slate-100 shadow-xl rounded-[40px] overflow-hidden border-t-8 border-t-emerald-500">
+          <CardContent className="p-20 text-center">
+            <div className="h-24 w-24 bg-slate-50 rounded-[40px] flex items-center justify-center mx-auto mb-6 border border-slate-100 shadow-inner">
+               <Package className="h-10 w-10 text-slate-300" />
+            </div>
+            <h3 className="text-slate-800 font-black uppercase tracking-tight text-xl">Registry Clear</h3>
+            <p className="text-slate-400 font-bold italic mt-2">All clinical distribution cycles currently synchronized.</p>
+          </CardContent>
         </Card>
       ) : (
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-gray-300">Order</TableHead>
-                <TableHead className="text-gray-300">Patient</TableHead>
-                <TableHead className="text-gray-300">Medicine</TableHead>
-                <TableHead className="text-gray-300">Quantity</TableHead>
-                <TableHead className="text-gray-300">Instructions</TableHead>
-                <TableHead className="text-gray-300">Location</TableHead>
-                <TableHead className="text-gray-300">Status</TableHead>
-                <TableHead className="text-gray-300">Created</TableHead>
-                <TableHead className="text-gray-300">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-          {orders.map((o: any) => (
-                <TableRow key={o.id} className="hover:bg-gray-800/60">
-                  <TableCell className="text-white font-medium">#{o.id}</TableCell>
-                  <TableCell className="text-gray-200">{o.full_name || 'Patient'}</TableCell>
-                  <TableCell className="text-gray-200">{o.medicine_name || '-'}</TableCell>
-                  <TableCell className="text-gray-300">{o.prescription_quantity || '-'}</TableCell>
-                  <TableCell className="text-gray-400 max-w-xs truncate" title={o.doctor_instructions || ''}>
-                    {o.doctor_instructions || '-'}
-                  </TableCell>
-                  <TableCell className="text-gray-300">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span>{o.district}, {o.sector}, {o.cell}, {o.village}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
-                      {o.provider_status || 'assigned'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-gray-300">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>{new Date(o.created_at).toLocaleDateString()}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="space-x-2">
-                    {/* If already confirmed, block further actions */}
-                    {o.provider_confirmed ? (
-                      <>
-                        {String(o.payment_status).toLowerCase() !== 'confirmed' && (
-                          <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/20">Awaiting Admin Payment</Badge>
-                        )}
-                        {String(o.payment_status).toLowerCase() === 'confirmed' && String(o.admin_status).toLowerCase() !== 'approved' && (
-                          <Badge variant="outline" className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20">Awaiting Admin Approval</Badge>
-                        )}
-                        {String(o.admin_status).toLowerCase() === 'approved' && (
-                          <div className="flex gap-2 items-center">
-                            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Approved — Prepare Prescription</Badge>
-                            <Button
-                              size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700"
-                              onClick={() => {
-                                setPrescOrder(o);
-                                setPrescForm({
-                                  patient_id: Number(o.user_id || 0) || "",
-                                  medicine_name: o.medicine_name || "",
-                                  quantity: o.prescription_quantity || "",
-                                  instructions: o.doctor_instructions || "",
-                                });
-                              }}
-                            >
-                              New Prescription
-                            </Button>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-500"
-                          onClick={() => {
-                            setConfirmOrder(o);
-                            setSelectedStockId(null);
-                            setSelectedQty(pickDefaultQtyFromPrescription(o.prescription_quantity));
-                          }}
-                        >
-                          Confirm Availability
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
-                          onClick={() => { setUnavailOrder(o); setUnavailReason(""); }}
-                        >
-                          Not Available
-                        </Button>
-                      </div>
-                    )}
-                  </TableCell>
+        <div className="bg-white border border-slate-100 rounded-[40px] shadow-2xl overflow-hidden border-t-8 border-t-emerald-500">
+          <div className="overflow-x-auto custom-scrollbar">
+            <Table>
+              <TableHeader className="bg-slate-50/80 backdrop-blur">
+                <TableRow className="hover:bg-transparent border-b border-slate-100">
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Manifest ID</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Patient Telemetry</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Dist. Medication</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Qty / Unit</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Clinical Logic</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Distribution Node</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16 text-center">Status</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {orders.map((o: any) => (
+                  <TableRow key={o.id} className="hover:bg-slate-50/50 border-b border-slate-50 transition-colors group">
+                    <TableCell className="px-6 py-6">
+                      <div className="flex flex-col">
+                        <span className="text-slate-800 font-black text-sm tracking-tight">#{o.id}</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{new Date(o.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-[10px] font-black text-slate-400 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+                          {o.full_name?.[0] || 'P'}
+                        </div>
+                        <span className="text-slate-800 font-bold text-sm tracking-tight">{o.full_name || 'Manifest Patient'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                       <span className="text-slate-800 font-black text-xs uppercase tracking-tight block max-w-[200px] leading-tight line-clamp-2">{o.medicine_name || '-'}</span>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                       <div className="flex items-baseline gap-1">
+                          <span className="text-slate-800 font-black text-sm">{o.prescription_quantity || '-'}</span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Units</span>
+                       </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                      <div className="max-w-[250px]">
+                        <p className="text-[11px] font-bold text-slate-500 italic drop-shadow-sm leading-relaxed line-clamp-2" title={o.doctor_instructions || ''}>
+                          “{o.doctor_instructions || 'No clinical strategy provided'}”
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                      <div className="flex items-center gap-2 text-slate-500 bg-slate-50/50 p-2 rounded-xl border border-slate-100/50 group-hover:bg-white transition-all">
+                        <MapPin className="h-3.5 w-3.5 text-emerald-600" />
+                        <span className="text-[10px] font-bold truncate max-w-[150px] uppercase tracking-tighter">{o.district}, {o.sector}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6 text-center">
+                      <Badge variant="outline" className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border-2 shadow-sm ${o.provider_status === 'paid' ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}>
+                        {o.provider_status || 'authorized'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                      {o.provider_confirmed ? (
+                        <div className="flex flex-col gap-2 min-w-[200px]">
+                          {String(o.payment_status).toLowerCase() !== 'confirmed' && (
+                            <div className="flex items-center gap-2 text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100 shadow-sm animate-pulse">
+                              <Activity className="h-3 w-3" />
+                              <span className="text-[9px] font-black uppercase tracking-widest">Awaiting Settlement</span>
+                            </div>
+                          )}
+                          {String(o.payment_status).toLowerCase() === 'confirmed' && String(o.admin_status).toLowerCase() !== 'approved' && (
+                            <div className="flex items-center gap-2 text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100 shadow-sm animate-pulse">
+                              <Activity className="h-3 w-3" />
+                              <span className="text-[9px] font-black uppercase tracking-widest">Awaiting Verification</span>
+                            </div>
+                          )}
+                          {String(o.admin_status).toLowerCase() === 'approved' && (
+                            <div className="flex flex-col gap-3">
+                              <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 shadow-sm">
+                                <Activity className="h-3 w-3" />
+                                <span className="text-[9px] font-black uppercase tracking-widest">Protocol Approved</span>
+                              </div>
+                              <Button
+                                size="sm"
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl h-11 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-500/20 w-full"
+                                onClick={() => {
+                                  setPrescOrder(o);
+                                  setPrescForm({
+                                    patient_id: Number(o.user_id || 0) || "",
+                                    medicine_name: o.medicine_name || "",
+                                    quantity: o.prescription_quantity || "",
+                                    instructions: o.doctor_instructions || "",
+                                  });
+                                }}
+                              >
+                                Finalize Label
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex gap-2 min-w-[320px]">
+                          <Button
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1 rounded-2xl h-12 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+                            onClick={() => {
+                              setConfirmOrder(o);
+                              setSelectedStockId(null);
+                              setSelectedQty(pickDefaultQtyFromPrescription(o.prescription_quantity));
+                            }}
+                          >
+                            Confirm Distribution
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            className="text-rose-500 hover:bg-rose-50 hover:text-rose-600 h-12 px-6 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all"
+                            onClick={() => { setUnavailOrder(o); setUnavailReason(""); }}
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       )}
 
       {/* Confirm Availability Dialog */}
       <Dialog open={!!confirmOrder} onOpenChange={(v)=>{ if(!v){ setConfirmOrder(null); setSelectedStockId(null); } }}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-2xl">
+        <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-2xl rounded-[40px] shadow-2xl p-10 overflow-hidden ring-1 ring-black/[0.05]">
           <DialogHeader>
-            <DialogTitle>Confirm Availability for Order #{confirmOrder?.id}</DialogTitle>
-            <DialogDescription className="sr-only">Confirm if the requested medication is available in your current stock and provide a quote.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="text-sm text-gray-300">
-              Doctor requested: <span className="font-medium text-white">{confirmOrder?.medicine_name || '-'}</span>
+            <div className="h-14 w-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4 border border-emerald-100">
+               <CheckCircle2 className="h-7 w-7 text-emerald-600" />
             </div>
-            <div className="max-h-64 overflow-y-auto border border-gray-700 rounded">
+            <DialogTitle className="text-2xl font-black uppercase tracking-tight text-slate-800">Distribution Sync</DialogTitle>
+            <DialogDescription className="text-slate-400 font-bold italic">Verify registry availability for Clinical Manifest #{confirmOrder?.id}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-6">
+            <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Clinical Protocol Requested</span>
+              <span className="text-sm font-black text-slate-800">{confirmOrder?.medicine_name || '-'}</span>
+            </div>
+            <div className="max-h-64 overflow-y-auto border border-slate-100 rounded-3xl bg-slate-50/30 custom-scrollbar p-1 shadow-sm">
               <Table>
                 <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-gray-300">Select</TableHead>
-                    <TableHead className="text-gray-300">Name</TableHead>
-                    <TableHead className="text-gray-300">Qty</TableHead>
-                    <TableHead className="text-gray-300">Unit Price</TableHead>
+                  <TableRow className="hover:bg-transparent border-b border-slate-100">
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400 h-12 w-16 text-center">Entry</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400 h-12">Registry Item</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400 h-12">Stock Qty</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400 h-12">Unit Cost</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(stockData || [])
-                    .filter((it:any)=>{
-                      const q = (confirmOrder?.medicine_name || '').toString().toLowerCase().trim();
-                      if (!q) return true; // no name -> show all
-                      const match = (it.name || '').toString().toLowerCase().includes(q);
-                      // if any matches exist in the dataset, we will filter to matches only; else show all (handled below)
-                      return match;
-                    })
-                    .concat(
-                      // Fallback: if no match rows computed, show all items
-                      (()=>{
-                        const q = (confirmOrder?.medicine_name || '').toString().toLowerCase().trim();
-                        const matches = (stockData || []).some((it:any)=> (it.name||'').toString().toLowerCase().includes(q));
-                        return matches ? [] : (stockData || []);
-                      })()
-                    )
-                    .map((it:any)=> (
-                      <TableRow key={it.id} className="hover:bg-gray-800/60">
-                        <TableCell className="text-gray-200">
-                          <input type="radio" name="stockPick" checked={selectedStockId===it.id} onChange={()=>setSelectedStockId(it.id)} />
-                        </TableCell>
-                        <TableCell className="text-white">{it.name}</TableCell>
-                        <TableCell className="text-gray-300">{it.quantity}</TableCell>
-                        <TableCell className="text-gray-300">{Number(it.unit_price||0).toFixed(2)}</TableCell>
-                      </TableRow>
+                  {(stockData || []).map((it:any)=> (
+                    <TableRow key={it.id} className={`hover:bg-white transition-all cursor-pointer group ${selectedStockId===it.id ? 'bg-white shadow-md ring-2 ring-emerald-500/20' : ''}`} onClick={()=>setSelectedStockId(it.id)}>
+                      <TableCell className="py-4">
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mx-auto transition-all ${selectedStockId===it.id ? 'border-emerald-600 bg-emerald-600 scale-110 shadow-lg shadow-emerald-500/30' : 'border-slate-200 bg-white group-hover:border-emerald-200'}`}>
+                           {selectedStockId===it.id && <div className="w-2 h-2 rounded-full bg-white animate-in zoom-in duration-300" />}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 font-black text-slate-800 text-xs">{it.name}</TableCell>
+                      <TableCell className="py-4 font-bold text-slate-400 text-[10px] uppercase">{it.quantity} units</TableCell>
+                      <TableCell className="py-4 font-black text-emerald-600 text-[10px]">{Number(it.unit_price||0).toLocaleString()} Frw</TableCell>
+                    </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-emerald-50/50 p-6 rounded-[32px] border border-emerald-100">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Quantity</label>
-                <Input type="number" value={selectedQty} onChange={(e)=>setSelectedQty(Number(e.target.value))} className="bg-gray-800 border-gray-700 text-white" />
+                <label className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block mb-1 px-1">Allocation Volume</label>
+                <Input type="number" value={selectedQty} onChange={(e)=>setSelectedQty(Number(e.target.value))} className="bg-white border-emerald-100 text-slate-800 h-14 rounded-2xl shadow-sm text-xl font-black ring-0 focus-visible:ring-emerald-500/20" />
               </div>
-              <div className="md:col-span-2 text-sm text-gray-300">
+              <div className="text-right">
                 {(()=>{
                   const item = (stockData||[]).find((x:any)=>x.id===selectedStockId);
                   const total = item ? Number(item.unit_price||0) * (Number(selectedQty)||0) : 0;
                   return item ? (
-                    <div>
-                      Unit: <span className="text-white font-medium">{Number(item.unit_price||0).toFixed(2)}</span>
-                      {' '}• Total: <span className="text-white font-medium">{total.toFixed(2)}</span>
+                    <div className="space-y-1 animate-in slide-in-from-right-4">
+                      <div className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Aggregate Cost Estimate</div>
+                      <div className="text-3xl font-black text-slate-800 tracking-tighter">{total.toLocaleString()} <span className="text-xs uppercase ml-1 text-emerald-600">Frw</span></div>
                     </div>
-                  ) : <span>Select a stock item to compute price</span>;
+                  ) : <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic animate-pulse">Syncing registry...</span>;
                 })()}
               </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-8">
             <Button
               onClick={()=>{
                 if (!confirmOrder) return;
-                if (!selectedStockId || !selectedQty || selectedQty<=0) { toast({ title:'Missing info', description:'Select an item and quantity', variant:'destructive' }); return; }
+                if (!selectedStockId || !selectedQty || selectedQty<=0) { toast({ title:'Protocol Error', description:'Ensure stock entry and volume are finalized', variant:'destructive' }); return; }
                 confirmAvail.mutate({ id: confirmOrder.id, stock_id: selectedStockId, qty: selectedQty });
                 setConfirmOrder(null);
                 setSelectedStockId(null);
               }}
-              className="bg-green-600 hover:bg-green-500"
-            >Confirm</Button>
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-[20px] h-16 px-12 font-black uppercase text-xs tracking-[0.15em] shadow-2xl shadow-emerald-500/30 active:scale-95 transition-all w-full"
+            >Authorize Clinical Distribution</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Not Available Dialog */}
       <Dialog open={!!unavailOrder} onOpenChange={(v)=>{ if(!v){ setUnavailOrder(null); setUnavailReason(""); } }}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white">
+        <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-md rounded-[40px] shadow-2xl p-10 ring-1 ring-black/[0.05]">
           <DialogHeader>
-            <DialogTitle>Not Available for Order #{unavailOrder?.id}</DialogTitle>
-            <DialogDescription className="sr-only">Notify the system that this medication is currently out of stock to allow for reassignment.</DialogDescription>
+            <div className="h-14 w-14 bg-rose-50 rounded-2xl flex items-center justify-center mb-4 border border-rose-100">
+               <AlertCircle className="h-7 w-7 text-rose-500" />
+            </div>
+            <DialogTitle className="text-2xl font-black uppercase tracking-tight text-rose-500">Distribution Reject</DialogTitle>
+            <DialogDescription className="text-slate-400 font-bold italic">Notify registry of fulfillment failure for Order #{unavailOrder?.id}.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
-            <div className="text-sm text-gray-300">Optional reason to help admin reassign faster:</div>
-            <Textarea value={unavailReason} onChange={(e)=>setUnavailReason(e.target.value)} className="bg-gray-800 border-gray-700 text-white" />
+          <div className="space-y-4 pt-4">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Reason for Rejection</label>
+            <Textarea value={unavailReason} onChange={(e)=>setUnavailReason(e.target.value)} className="bg-slate-50 border-slate-100 text-slate-800 rounded-2xl p-4 font-bold italic shadow-inner h-32 focus:ring-rose-500/20" placeholder="e.g. Stock levels critical / Node offline..." />
           </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={()=>{ setUnavailOrder(null); setUnavailReason(""); }}
-              className="border-gray-700 text-gray-200"
-            >Cancel</Button>
+          <DialogFooter className="mt-8 gap-3">
+            <Button variant="ghost" onClick={()=>{ setUnavailOrder(null); setUnavailReason(""); }} className="rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-400 flex-1">Cancel</Button>
             <Button
               onClick={()=>{
                 if (!unavailOrder) return;
@@ -351,65 +384,61 @@ export const ProviderAssigned = () => {
                 setUnavailOrder(null);
                 setUnavailReason("");
               }}
-              className="bg-red-600 hover:bg-red-500"
-            >Notify Admin</Button>
+              className="bg-rose-500 hover:bg-rose-600 text-white rounded-2xl h-14 font-black uppercase text-[10px] tracking-widest shadow-xl shadow-rose-500/20 flex-1"
+            >Confirm Rejection</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* New Prescription Dialog */}
-  <Dialog open={!!prescOrder} onOpenChange={(v)=> { if (!v) { setPrescOrder(null); setPrescForm({ patient_id: "", medicine_name: "", quantity: "", instructions: "", dosage: "", frequency_per_day: "" as any }); } }}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-lg">
+      {/* New Prescription Dialog (Finalize Label) */}
+      <Dialog open={!!prescOrder} onOpenChange={(v)=> { if (!v) { setPrescOrder(null); setPrescForm({ patient_id: "", medicine_name: "", quantity: "", instructions: "", dosage: "", frequency_per_day: "" as any }); } }}>
+        <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-xl rounded-[40px] shadow-2xl p-10 ring-1 ring-black/[0.05] overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar">
           <DialogHeader>
-            <DialogTitle>New Prescription for Order #{prescOrder?.id}</DialogTitle>
-            <DialogDescription className="sr-only">Fill out the final prescription details for the patient after administrative approval.</DialogDescription>
+            <div className="h-14 w-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4 border border-emerald-100">
+               <FilePlus2 className="h-7 w-7 text-emerald-600" />
+            </div>
+            <DialogTitle className="text-2xl font-black uppercase tracking-tight text-slate-800">Fulfillment Label</DialogTitle>
+            <DialogDescription className="text-slate-400 font-bold italic">Generate final clinical documentation for Order #{prescOrder?.id}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Patient</label>
-              <Input
-                placeholder="Patient ID"
-                className="bg-gray-800 border-gray-700 text-white"
-                type="number"
-                value={prescForm.patient_id as any}
-                onChange={(e)=> setPrescForm(f => ({ ...f, patient_id: Number(e.target.value) || "" }))}
-              />
-              <p className="text-xs text-gray-400 mt-1">Pre-filled from order. You may adjust.</p>
+          <div className="space-y-6 pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+            <div className="md:col-span-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Patient Digital ID</label>
+              <Input type="number" className="bg-slate-50 border-slate-100 text-slate-800 h-14 rounded-2xl font-black text-lg" value={prescForm.patient_id as any} onChange={(e)=> setPrescForm(f => ({ ...f, patient_id: Number(e.target.value) || "" }))} />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Medication Matrix</label>
+              <Input className="bg-slate-50 border-slate-100 text-slate-800 h-12 rounded-2xl font-bold" value={prescForm.medicine_name} onChange={(e)=> setPrescForm(f => ({ ...f, medicine_name: e.target.value }))} />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Medicine</label>
-              <Input className="bg-gray-800 border-gray-700 text-white" value={prescForm.medicine_name} onChange={(e)=> setPrescForm(f => ({ ...f, medicine_name: e.target.value }))} />
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Total Volume</label>
+              <Input className="bg-slate-50 border-slate-100 text-slate-800 h-12 rounded-2xl font-bold" value={prescForm.quantity} onChange={(e)=> setPrescForm(f => ({ ...f, quantity: e.target.value }))} />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Quantity</label>
-              <Input className="bg-gray-800 border-gray-700 text-white" value={prescForm.quantity} onChange={(e)=> setPrescForm(f => ({ ...f, quantity: e.target.value }))} />
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Dosage Unit</label>
+              <Input className="bg-slate-50 border-slate-100 text-slate-800 h-12 rounded-2xl font-bold" value={(prescForm as any).dosage || ''} onChange={(e)=> setPrescForm(f => ({ ...f, dosage: e.target.value }))} placeholder="e.g. 500mg" />
             </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Dosage (e.g., 500mg)</label>
-              <Input className="bg-gray-800 border-gray-700 text-white" value={(prescForm as any).dosage || ''} onChange={(e)=> setPrescForm(f => ({ ...f, dosage: e.target.value }))} />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Frequency (pieces per day)</label>
-              <Input type="number" min={0} className="bg-gray-800 border-gray-700 text-white" value={(prescForm as any).frequency_per_day || ''} onChange={(e)=> setPrescForm(f => ({ ...f, frequency_per_day: Number(e.target.value) || '' }))} />
+            <div className="md:col-span-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Daily Flux (Units/Day)</label>
+              <Input type="number" min={0} className="bg-slate-50 border-slate-100 text-slate-800 h-12 rounded-2xl font-bold" value={(prescForm as any).frequency_per_day || ''} onChange={(e)=> setPrescForm(f => ({ ...f, frequency_per_day: Number(e.target.value) || '' }))} />
               {(Number((prescForm as any).frequency_per_day)||0) > 0 && Number(prescForm.quantity) > 0 && (
-                <p className="text-xs text-gray-400 mt-1">Duration: {Math.ceil(Number(prescForm.quantity) / Number((prescForm as any).frequency_per_day))} day(s)</p>
+                <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mt-2 ml-1">Est. Duration: {Math.ceil(Number(prescForm.quantity) / Number((prescForm as any).frequency_per_day))} Distribution Cycles</p>
               )}
             </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Instructions</label>
-              <Textarea className="bg-gray-800 border-gray-700 text-white" rows={3} value={prescForm.instructions} onChange={(e)=> setPrescForm(f => ({ ...f, instructions: e.target.value }))} />
+            <div className="md:col-span-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Clinical Instructions</label>
+              <Textarea className="bg-slate-50 border-slate-100 text-slate-800 rounded-2xl p-4 font-bold italic shadow-inner h-24" value={prescForm.instructions} onChange={(e)=> setPrescForm(f => ({ ...f, instructions: e.target.value }))} />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => { setPrescOrder(null); }}>Cancel</Button>
+          <DialogFooter className="mt-10 border-t border-slate-50 pt-8 gap-4">
+            <Button variant="ghost" onClick={() => { setPrescOrder(null); }} className="rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-400">Cancel</Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl h-16 flex-1 font-black uppercase text-[10px] tracking-widest shadow-2xl shadow-emerald-500/30 transition-all active:scale-95"
               onClick={async () => {
                 if (!prescOrder) return;
                 try {
                   const pid = Number(prescForm.patient_id);
                   if (!pid || !prescForm.medicine_name.trim() || !prescForm.quantity.trim()) {
-                    toast({ title: 'Missing fields', description: 'Patient, medicine and quantity are required', variant: 'destructive' });
+                    toast({ title: 'Validation Error', description: 'Patient ID, medication name and volume are mandatory', variant: 'destructive' });
                     return;
                   }
                   const res = await fetch(`${API_URL}/orders/${prescOrder.id}/prescriptions`, {
@@ -425,17 +454,17 @@ export const ProviderAssigned = () => {
                     })
                   });
                   const body = await res.json();
-                  if (!res.ok || body?.error) throw new Error(body?.error || 'Failed to create prescription');
-                  toast({ title: 'Prescription created', description: `Prescription sent to patient for order #${prescOrder.id}` });
+                  if (!res.ok || body?.error) throw new Error(body?.error || 'Failed to generate record');
+                  toast({ title: 'Record Synchronized', description: `Prescription label generated for order #${prescOrder.id}` });
                   setPrescOrder(null);
                   setPrescForm({ patient_id: "", medicine_name: "", quantity: "", instructions: "", dosage: "", frequency_per_day: "" as any });
                   qc.invalidateQueries({ queryKey: ["providerAssigned"] });
                 } catch (e: any) {
-                  toast({ title: 'Error', description: e?.message || 'Could not create prescription', variant: 'destructive' });
+                  toast({ title: 'Sync Error', description: e?.message || 'Could not commit distribution record', variant: 'destructive' });
                 }
               }}
             >
-              Create Prescription
+              Commit Distribution Label
             </Button>
           </DialogFooter>
         </DialogContent>

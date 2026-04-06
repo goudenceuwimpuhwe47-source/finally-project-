@@ -8,7 +8,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 export default function DashboardProvider() {
 	const [activeSection, setActiveSection] = useState<string>('patients');
 	return (
-		<>
+		<div className="min-h-screen bg-slate-50/50">
 			<ProviderHeader />
 			<main className="p-0">
 				<SidebarProvider>
@@ -21,6 +21,6 @@ export default function DashboardProvider() {
 				</SidebarProvider>
 			</main>
 			<ProviderFooter />
-		</>
+		</div>
 	);
 }

@@ -12,7 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { format } from "date-fns";
-import { Eye, FileText, Search, AlarmClock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Eye, FileText, Search, AlarmClock, Users, RefreshCw, Calendar } from "lucide-react";
 import React, { useState } from "react";
 
 import { API_URL } from "@/lib/utils";
@@ -59,37 +60,56 @@ export const ProviderPatients = () => {
   });
 
   if (isLoading) {
-    return <div className="text-white">Loading patients...</div>;
+    return (
+      <div className="space-y-8 animate-in fade-in duration-700">
+        <div className="h-10 bg-slate-100 rounded-2xl w-64 animate-pulse"></div>
+        <div className="grid grid-cols-1 gap-6">
+          {[1,2,3].map(i => (
+            <div key={i} className="h-32 bg-white border border-slate-100 rounded-[32px] animate-pulse shadow-sm"></div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">Patient Management</h1>
-        <div className="flex gap-2 items-center">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search name, email, phone" className="pl-9 bg-gray-800 border-gray-700 text-white" />
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex items-center justify-between bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
+        <div className="flex items-center gap-5">
+          <div className="h-12 w-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white">
+            <Users className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Clinical Registry</h1>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5 italic">Patient Population Nexus</p>
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-hover:text-emerald-500 transition-colors" />
+            <Input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search subjects..." className="pl-11 bg-slate-50 border-slate-100 text-slate-800 placeholder:text-slate-400 w-72 rounded-2xl h-12 focus:ring-emerald-500/10 shadow-inner font-bold" />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="bg-gray-800 border-gray-700 text-white w-36">
-              <SelectValue placeholder="Filter" />
+            <SelectTrigger className="bg-slate-50 border-slate-100 text-slate-800 w-44 rounded-2xl h-12 font-bold focus:ring-emerald-500/10 transition-all">
+              <SelectValue placeholder="Protocol Filter" />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-700">
-              <SelectItem value="all">All</SelectItem>
+            <SelectContent className="bg-white border-slate-100 rounded-2xl shadow-2xl">
+              <SelectItem value="all" className="font-bold text-slate-800">All Subjects</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      {/* Orders Journey Chart */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Orders between Provider and Patient</CardTitle>
+      <Card className="bg-white border border-slate-100 rounded-[40px] shadow-2xl overflow-hidden">
+        <CardHeader className="border-b border-slate-50 p-8">
+          <CardTitle className="text-xl font-black text-slate-800 uppercase tracking-tight">Distribution Telemetry</CardTitle>
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Active patient journey monitoring</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-8 pt-4">
           {loadingAssigned ? (
-            <div className="h-52 bg-gray-700/50 rounded animate-pulse" />
+            <div className="h-64 bg-slate-50 rounded-[32px] animate-pulse flex items-center justify-center">
+               <RefreshCw className="h-8 w-8 text-slate-100 animate-spin" />
+            </div>
           ) : (
             (() => {
               const ords = assignedOrders || [];
@@ -108,7 +128,7 @@ export const ProviderPatients = () => {
               }
 
               const data = [{
-                name: 'Orders',
+                name: 'Distribution Flow',
                 awaiting_provider: counts.awaiting_provider,
                 awaiting_payment: counts.awaiting_payment,
                 awaiting_admin: counts.awaiting_admin,
@@ -117,27 +137,26 @@ export const ProviderPatients = () => {
               }];
 
               const config = {
-                awaiting_provider: { label: 'Awaiting Provider', color: '#60a5fa' },
-                awaiting_payment: { label: 'Awaiting Payment', color: '#f59e0b' },
-                awaiting_admin: { label: 'Awaiting Admin', color: '#f97316' },
-                in_progress: { label: 'Prescribing / In Progress', color: '#10b981' },
-                delivered: { label: 'Delivered', color: '#8b5cf6' },
+                awaiting_provider: { label: 'Auth Pending', color: '#60a5fa' },
+                awaiting_payment: { label: 'Pmt Pending', color: '#f59e0b' },
+                awaiting_admin: { label: 'Admin Review', color: '#f97316' },
+                in_progress: { label: 'Distribution', color: '#10b981' },
+                delivered: { label: 'Fulfilled', color: '#8b5cf6' },
               } as const;
 
               return (
-                <ChartContainer config={config as any} className="h-64">
+                <ChartContainer config={config as any} className="h-64 mt-4">
                   <BarChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
-                    <XAxis dataKey="name" tickLine={false} axisLine={false} stroke="#9ca3af" />
-                    <YAxis allowDecimals={false} stroke="#9ca3af" />
-                    <ChartTooltip cursor={{ fill: 'rgba(255,255,255,0.04)' }} content={<ChartTooltipContent />} />
-                    {/* Legend */}
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} stroke="#64748b" fontSize={10} fontStyle="bold" />
+                    <YAxis allowDecimals={false} stroke="#64748b" fontSize={10} />
+                    <ChartTooltip cursor={{ fill: '#f8fafc' }} content={<ChartTooltipContent />} />
                     <ChartLegend content={<ChartLegendContent />} />
-                    <Bar dataKey="awaiting_provider" stackId="a" fill="var(--color-awaiting_provider)" radius={[4,4,0,0]} />
-                    <Bar dataKey="awaiting_payment" stackId="a" fill="var(--color-awaiting_payment)" />
-                    <Bar dataKey="awaiting_admin" stackId="a" fill="var(--color-awaiting_admin)" />
-                    <Bar dataKey="in_progress" stackId="a" fill="var(--color-in_progress)" />
-                    <Bar dataKey="delivered" stackId="a" fill="var(--color-delivered)" />
+                    <Bar dataKey="awaiting_provider" stackId="a" fill="#60a5fa" radius={[12,12,0,0]} />
+                    <Bar dataKey="awaiting_payment" stackId="a" fill="#f59e0b" />
+                    <Bar dataKey="awaiting_admin" stackId="a" fill="#f97316" />
+                    <Bar dataKey="in_progress" stackId="a" fill="#10b981" />
+                    <Bar dataKey="delivered" stackId="a" fill="#8b5cf6" />
                   </BarChart>
                 </ChartContainer>
               );
@@ -146,59 +165,78 @@ export const ProviderPatients = () => {
         </CardContent>
       </Card>
       
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Patient Health Profiles</CardTitle>
+      <Card className="bg-white border border-slate-100 rounded-[40px] shadow-2xl overflow-hidden border-t-8 border-t-emerald-500">
+        <CardHeader className="border-b border-slate-50 p-8">
+          <CardTitle className="text-xl font-black text-slate-800 uppercase tracking-tight">Active Population Profiles</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-gray-700">
-                <TableHead className="text-gray-300">Name</TableHead>
-                <TableHead className="text-gray-300">Email</TableHead>
-                <TableHead className="text-gray-300">Phone</TableHead>
-                <TableHead className="text-gray-300">Date of Birth</TableHead>
-                <TableHead className="text-gray-300">Medical Conditions</TableHead>
-                <TableHead className="text-gray-300">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-gray-400">No patients yet.</TableCell>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto custom-scrollbar">
+            <Table>
+              <TableHeader className="bg-slate-50/80 backdrop-blur">
+                <TableRow className="hover:bg-transparent border-b border-slate-100">
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Subject Telemetry</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Birth Data</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Clinical Conditions</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-6 h-16">Engagement Nexus</TableHead>
                 </TableRow>
-              )}
-              {filtered.map((patient:any) => (
-                <TableRow key={patient.id} className="border-gray-700">
-                  <TableCell className="text-white">{patient.full_name || 'N/A'}</TableCell>
-                  <TableCell className="text-gray-300">{patient.email || 'N/A'}</TableCell>
-                  <TableCell className="text-gray-300">{patient.phone || 'N/A'}</TableCell>
-                  <TableCell className="text-gray-300">
-                    {patient.date_of_birth ? format(new Date(patient.date_of_birth), 'MMM dd, yyyy') : 'N/A'}
-                  </TableCell>
-                  <TableCell className="text-gray-300 capitalize">
-                    {patient.medical_conditions?.map((c: string) => c.replace(/_/g, ' ')).join(', ') || 'None listed'}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" className="border-blue-600 text-blue-400" onClick={()=>setOpenId(patient.id)}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                      <Button size="sm" variant="outline" className="border-green-600 text-green-400" onClick={()=>{ setPrescPatient(patient); setPrescForm({ medicine_name: "", quantity: "", dose_amount: "1", dose_unit: "piece(s)", times_per_day: 1, instructions: "" }); setPrescOrderId(null); }}>
-                        <FileText className="h-4 w-4 mr-1" />
-                        Prescribe
-                      </Button>
-                      <Button size="sm" variant="outline" className="border-purple-600 text-purple-400" onClick={()=>{ setRemPatient(patient); }}>
-                        <AlarmClock className="h-4 w-4 mr-1" />
-                        Set Reminder
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filtered.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={4} className="p-20 text-center text-slate-300 font-bold uppercase tracking-widest italic leading-loose">
+                      <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                      Registry Synchronization Pending...
+                    </TableCell>
+                  </TableRow>
+                )}
+                {filtered.map((patient:any) => (
+                  <TableRow key={patient.id} className="hover:bg-slate-50/50 border-b border-slate-50 transition-colors group">
+                    <TableCell className="px-6 py-6 border-transparent">
+                       <div className="flex items-center gap-4">
+                          <div className="h-11 w-11 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-sm uppercase">
+                            {patient.full_name?.[0] || 'P'}
+                          </div>
+                          <div className="flex flex-col">
+                             <span className="text-slate-800 font-black text-sm tracking-tight">{patient.full_name || 'Anonymous Subject'}</span>
+                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{patient.email || 'No email linked'}</span>
+                          </div>
+                       </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6 border-transparent">
+                       <div className="flex items-center gap-2 text-slate-500 font-bold text-[11px] uppercase tracking-tighter">
+                          <Calendar className="h-3.5 w-3.5 text-emerald-600" />
+                          {patient.date_of_birth ? format(new Date(patient.date_of_birth), 'MMM dd, yyyy') : 'Registry Missing'}
+                       </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6 border-transparent">
+                       <div className="flex flex-wrap gap-1.5 max-w-[250px]">
+                          {patient.medical_conditions?.length > 0 ? patient.medical_conditions.map((c: string) => (
+                             <Badge key={c} variant="outline" className="bg-slate-50 text-slate-600 border-slate-100 rounded-lg px-2 py-0.5 text-[9px] font-black uppercase tracking-widest group-hover:bg-white transition-colors">
+                                {c.replace(/_/g, ' ')}
+                             </Badge>
+                          )) : <span className="text-[10px] font-bold text-slate-300 italic uppercase">Observation Pending</span>}
+                       </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6 border-transparent">
+                      <div className="flex gap-2 min-w-[340px]">
+                        <Button size="sm" variant="ghost" className="text-emerald-600 hover:bg-emerald-50 rounded-2xl h-12 px-6 font-black uppercase text-[10px] tracking-widest transition-all" onClick={()=>setOpenId(patient.id)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Metrics
+                        </Button>
+                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl h-12 px-6 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-500/20 transition-all active:scale-95" onClick={()=>{ setPrescPatient(patient); setPrescForm({ medicine_name: "", quantity: "", dose_amount: "1", dose_unit: "piece(s)", times_per_day: 1, instructions: "" }); setPrescOrderId(null); }}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Prescribe
+                        </Button>
+                        <Button size="sm" variant="ghost" className="text-indigo-600 hover:bg-indigo-50 rounded-2xl h-12 px-2 transition-all" onClick={()=>{ setRemPatient(patient); }}>
+                          <AlarmClock className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
