@@ -377,8 +377,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         <div className="mb-3 text-sm p-2 rounded border border-yellow-500/30 bg-yellow-500/10 text-yellow-200">
                           This order was already approved before. You can update the prescription and resend.
                         </div>
-                      )}
-                      <div className="space-y-4">
+                      )}                       <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-4">
                         <div className="bg-blue-900/10 border border-blue-800/30 p-3 rounded flex flex-col gap-2">
                           <div className="flex items-center justify-between">
                             <Label className="text-blue-300 font-semibold">Medicine selection</Label>
@@ -524,6 +523,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                           <textarea className="w-full bg-gray-700 border border-gray-600 text-white rounded p-2" rows={2} value={form.adherencePlan} onChange={e=> setForm(f=> ({...f, adherencePlan: e.target.value}))} placeholder="Follow-up schedule and monitoring plan" />
                         </div>
                       </div>
+
                       <div className="mt-4 flex justify-end gap-2">
                         <DialogClose asChild>
                           <Button variant="outline" onClick={()=> setApproving(null)}>Cancel</Button>
