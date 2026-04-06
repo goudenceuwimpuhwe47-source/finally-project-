@@ -471,7 +471,7 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         </div>
                       )}
 
-                      <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-5 custom-scrollbar">
+                      <div className="max-h-[70vh] overflow-y-auto pr-4 -mr-4 px-1 custom-scrollbar space-y-8">
                         <div className="bg-slate-50 border border-slate-100 p-5 rounded-3xl shadow-inner space-y-4">
                           <div className="flex items-center justify-between">
                             <Label className="text-slate-800 font-black uppercase text-[10px] tracking-widest">Clinical Search Engine</Label>
@@ -562,11 +562,11 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                                   if (!aRec && bRec) return 1;
                                   return a[0].localeCompare(b[0]);
                                 }).map(([cat, meds]) => (
-                                  <div key={cat} className="mb-2 last:mb-0">
-                                    <div className="px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.1em] text-slate-400 bg-slate-50/80 flex justify-between items-center border-y border-slate-100/50 mb-1">
-                                      <span>{cat}</span>
-                                      {recommendedCategories.includes(cat) && <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full lowercase text-[8px] font-black tracking-widest border border-primary/10">recommended</span>}
-                                    </div>
+                                    <div key={cat} className="mb-3 last:mb-0">
+                                      <div className="px-3 py-2 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 bg-slate-50/80 flex justify-between items-center border-y border-slate-100/50 mb-2">
+                                        <span>{cat}</span>
+                                        {recommendedCategories.includes(cat) && <span className="bg-primary/10 text-primary px-2.5 py-1 rounded-full lowercase text-[8px] font-black tracking-widest border border-primary/10">clinical match</span>}
+                                      </div>
                                     {meds.map((med) => (
                                       <SelectItem
                                         key={med.value}
@@ -593,8 +593,8 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         {(() => {
                           const info = getMedType(form.medicineName);
                           return (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 p-6 rounded-[28px] border border-slate-100 shadow-inner">
-                              <div className="md:col-span-2">
+                            <div className="space-y-6 bg-slate-50/50 p-6 rounded-[28px] border border-slate-100 shadow-inner">
+                              <div>
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Clinical Quantity *</Label>
                                 <Input
                                   type="number"
@@ -606,21 +606,21 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                                 />
                                 <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-wide">Volume to be dispensed in {info.unit}</p>
                               </div>
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
                                   <div>
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Dose Amount</Label>
-                                    <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-10 rounded-xl shadow-sm font-bold" value={form.dose_amount} onChange={e=> setForm(f=>({...f, dose_amount: e.target.value}))} />
+                                    <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm font-black text-sm" value={form.dose_amount} onChange={e=> setForm(f=>({...f, dose_amount: e.target.value}))} />
                                   </div>
                                   <div>
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
-                                    <Input className="bg-white border-slate-100 text-slate-800 h-10 rounded-xl shadow-sm font-bold" value={form.dose_unit} onChange={e=> setForm(f=>({...f, dose_unit: e.target.value}))} />
+                                    <Input className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm font-black text-sm" value={form.dose_unit} onChange={e=> setForm(f=>({...f, dose_unit: e.target.value}))} />
+                                  </div>
+                                  <div>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Day Frequency</Label>
+                                    <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm font-black text-sm" value={form.times_per_day} onChange={e=> setForm(f=>({...f, times_per_day: Number(e.target.value)||1}))} />
                                   </div>
                                 </div>
-                                <div>
-                                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Day Frequency</Label>
-                                  <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-10 rounded-xl shadow-sm font-bold" value={form.times_per_day} onChange={e=> setForm(f=>({...f, times_per_day: Number(e.target.value)||1}))} />
-                                </div>
-                              <div className="md:col-span-2">
+                              <div>
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Regimen Instructions *</Label>
                                 <textarea className="w-full bg-white border border-slate-100 text-slate-800 rounded-2xl p-4 text-sm font-bold italic shadow-sm focus:ring-primary/10 transition-all placeholder:text-slate-300" rows={3} value={form.instructions} onChange={e=> setForm(f=> ({...f, instructions: e.target.value}))} placeholder="e.g. Sync-take after 20:00 clinical cycles" />
                                 {Number(form.times_per_day) > 0 && Number(form.prescriptionQuantity) > 0 && (
