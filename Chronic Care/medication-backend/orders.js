@@ -193,19 +193,28 @@ router.post('/:id/provider-availability', auth, requireRole('provider'), async (
     const item = items[0];
     if (Number(item.quantity) < qty) return res.status(400).json({ error: 'Insufficient stock for requested quantity' });
 
-    const price = Number(item.unit_price) * qty;
+    const unitPrice = parseFloat(item.unit_price || 0);
+    if (isNaN(unitPrice)) return res.status(400).json({ error: 'Invalid unit price in stock' });
+    const price = unitPrice * qty;
+    
+    if (isNaN(price)) {
+      console.error('ERROR [POST /provider-availability]: Price calculation failed (NaN)', { unitPrice, qty });
+      return res.status(500).json({ error: 'Internal server error during price calculation' });
+    }
+
     await pool.query(
       'UPDATE orders SET provider_confirmed=1, provider_confirmed_qty=?, provider_confirmed_price=?, provider_stock_id=?, provider_note=?, provider_status="assigned" WHERE id=?',
       [qty, price, stock_id, (note || null), orderId]
     );
 
     // Notify admins with quote
-    try { const io = req.app.get('io'); io && io.emit('order:provider_confirmed', { orderId: Number(orderId), qty, unit_price: Number(item.unit_price), total: price }); } catch {}
+    try { const io = req.app.get('io'); io && io.emit('order:provider_confirmed', { orderId: Number(orderId), qty, unit_price: unitPrice, total: price }); } catch {}
 
     const [updated] = await pool.query('SELECT * FROM orders WHERE id=?', [orderId]);
     res.json(updated[0] || {});
   } catch (e) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('ERROR [POST /provider-availability]:', e.message, e.stack);
+    res.status(500).json({ error: 'Server error', details: e.message });
   }
 });
 
@@ -766,7 +775,7 @@ router.get('/provider/patients', auth, requireRole('provider'), async (req, res)
        FROM orders o
        JOIN users u ON u.id = o.user_id
        WHERE o.provider_id = ?
-       ORDER BY u.first_name ASC, u.last_name ASC, u.email ASC` ,
+       ORDER BY full_name ASC, email ASC` ,
       [req.user.id]
     );
     res.json({ patients: rows });

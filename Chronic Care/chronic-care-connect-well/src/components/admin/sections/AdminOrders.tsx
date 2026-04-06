@@ -43,9 +43,13 @@ export const AdminOrders = () => {
   const [deliveryFee, setDeliveryFee] = useState<string>('0');
   const [notes, setNotes] = useState<string>('');
   const [submittingInvoice, setSubmittingInvoice] = useState(false);
-  // Cancel invoice state
   const [cancelInvoiceOpen, setCancelInvoiceOpen] = useState(false);
   const [cancelInvoiceOrderId, setCancelInvoiceOrderId] = useState<number | null>(null);
+
+  // Certificate dialog state
+  const [certViewerOpen, setCertViewerOpen] = useState(false);
+  const [certUrl, setCertUrl] = useState<string | null>(null);
+  const [certFileName, setCertFileName] = useState<string | null>(null);
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["adminOrders", statusFilter, searchTerm],
@@ -263,6 +267,26 @@ export const AdminOrders = () => {
                         <div className="flex items-center gap-2 text-gray-400 md:col-span-2">
                           <MapPin className="h-4 w-4" />
                           <span className="text-sm">{order.district}, {order.sector}, {order.cell}, {order.village}</span>
+                        </div>
+                      )}
+
+                      {order.medical_certificate && (
+                        <div className="md:col-span-3">
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="p-0 h-auto text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                            onClick={() => {
+                              const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+                              const path = order.medical_certificate.startsWith('/') ? order.medical_certificate : `/${order.medical_certificate}`;
+                              setCertUrl(order.medical_certificate.startsWith('http') ? order.medical_certificate : `${base}${path}`);
+                              setCertFileName(order.medical_certificate);
+                              setCertViewerOpen(true);
+                            }}
+                          >
+                            <FileText className="h-4 w-4" />
+                            View Attached Medical Certificate
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -723,6 +747,34 @@ export const AdminOrders = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Certificate Viewer dialog */}
+      <Dialog open={certViewerOpen} onOpenChange={setCertViewerOpen}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Medical Certificate Preview</DialogTitle>
+            <DialogDescription className="text-gray-400 truncate">{certFileName}</DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex flex-col items-center justify-center overflow-auto max-h-[70vh]">
+            {certUrl?.toLowerCase().endsWith('.pdf') ? (
+              <object data={certUrl} type="application/pdf" className="w-full h-[60vh] rounded border border-gray-700">
+                <div className="p-12 text-center">
+                  <p className="mb-4">PDF cannot be previewed in browser.</p>
+                  <Button asChild><a href={certUrl} target="_blank" rel="noreferrer">Open PDF in New Tab</a></Button>
+                </div>
+              </object>
+            ) : (
+              <img src={certUrl || ''} alt="Medical Certificate" className="max-w-full max-h-full object-contain rounded border border-gray-700 shadow-xl" />
+            )}
+          </div>
+          <div className="mt-6 flex justify-end gap-3">
+            <Button variant="outline" asChild>
+              <a href={certUrl || ''} target="_blank" rel="noreferrer">Open Full View</a>
+            </Button>
+            <Button variant="outline" onClick={() => setCertViewerOpen(false)}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

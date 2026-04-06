@@ -309,9 +309,13 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                           <p className="text-sm text-gray-400 mb-2">Medical certificate</p>
                           {
                             (() => {
+                              const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+                              const path = (viewing?.medical_certificate || '').startsWith('/') 
+                                ? viewing.medical_certificate 
+                                : `/${viewing?.medical_certificate}`;
                               const url = viewing?.medical_certificate?.startsWith('http')
                                 ? viewing.medical_certificate!
-                                : `${API_URL}/${viewing?.medical_certificate}`;
+                                : `${base}${path}`;
                               const isPdf = (viewing?.medical_certificate || '').toLowerCase().endsWith('.pdf');
                               if (isPdf) {
                                 return (
@@ -377,7 +381,46 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         <div className="mb-3 text-sm p-2 rounded border border-yellow-500/30 bg-yellow-500/10 text-yellow-200">
                           This order was already approved before. You can update the prescription and resend.
                         </div>
-                      )}                       <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-4">
+                      )}
+                      
+                      {approving?.medical_certificate && (
+                        <div className="mb-4 p-3 bg-gray-900/50 border border-gray-700 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                             <Label className="text-blue-300 font-semibold flex items-center gap-2">
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                               Patient Medical Certificate
+                             </Label>
+                             <a 
+                               href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
+                               target="_blank" 
+                               rel="noreferrer" 
+                               className="text-xs text-blue-400 hover:text-blue-300 underline"
+                             >
+                               Open Full View
+                             </a>
+                          </div>
+                          <div className="relative group">
+                            {approving.medical_certificate.toLowerCase().endsWith('.pdf') ? (
+                              <div className="bg-gray-800 rounded p-4 text-center border border-dashed border-gray-600">
+                                <p className="text-sm text-gray-400">PDF Document attached</p>
+                                <Button variant="link" className="text-blue-400 text-xs" asChild>
+                                  <a href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} target="_blank" rel="noreferrer">
+                                    Click to preview PDF
+                                  </a>
+                                </Button>
+                              </div>
+                            ) : (
+                              <img 
+                                src={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
+                                alt="Certificate Preview" 
+                                className="max-h-40 w-full object-contain rounded bg-gray-950/50 border border-gray-800"
+                              />
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-4">
                         <div className="bg-blue-900/10 border border-blue-800/30 p-3 rounded flex flex-col gap-2">
                           <div className="flex items-center justify-between">
                             <Label className="text-blue-300 font-semibold">Medicine selection</Label>
@@ -654,9 +697,13 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                           <p className="text-sm text-gray-400 mb-2">Medical certificate</p>
                           {
                             (() => {
+                              const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+                              const path = (viewing?.medical_certificate || '').startsWith('/') 
+                                ? viewing.medical_certificate 
+                                : `/${viewing?.medical_certificate}`;
                               const url = viewing?.medical_certificate?.startsWith('http')
                                 ? viewing.medical_certificate!
-                                : `${API_URL}/${viewing?.medical_certificate}`;
+                                : `${base}${path}`;
                               const isPdf = (viewing?.medical_certificate || '').toLowerCase().endsWith('.pdf');
                               if (isPdf) {
                                 return (
