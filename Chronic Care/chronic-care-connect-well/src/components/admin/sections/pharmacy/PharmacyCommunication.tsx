@@ -174,71 +174,76 @@ export const PharmacyCommunication = ({ pharmacy, onBack }: PharmacyCommunicatio
   const getMessageTypeColor = (type: string) => {
     switch (type) {
       case 'order_request':
-        return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+        return 'bg-primary/10 text-primary border-primary/20 font-black uppercase text-[9px] tracking-widest px-2 py-0.5 rounded-full';
       case 'order_confirmation':
-        return 'bg-green-500/10 text-green-400 border-green-500/20';
+        return 'bg-emerald-50 text-emerald-600 border-emerald-100 font-black uppercase text-[9px] tracking-widest px-2 py-0.5 rounded-full';
       case 'delivery_update':
-        return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+        return 'bg-amber-50 text-amber-600 border-amber-100 font-black uppercase text-[9px] tracking-widest px-2 py-0.5 rounded-full';
       default:
-        return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
+        return 'bg-slate-100 text-slate-500 border-slate-200 font-black uppercase text-[9px] tracking-widest px-2 py-0.5 rounded-full';
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onBack}
-          className="text-gray-400 hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-        <Building2 className="h-8 w-8 text-blue-500" />
-        <div>
-          <h1 className="text-3xl font-bold text-white">Communication</h1>
-          <p className="text-gray-400">with {pharmacy.name}</p>
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl h-12 w-12 p-0 transition-all border border-slate-100"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Building2 className="h-6 w-6 text-primary" />
+              </div>
+              <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-none truncate max-w-sm">Communication Hub</h1>
+            </div>
+            <p className="text-slate-400 font-bold text-xs mt-2 uppercase tracking-widest">Active session with {pharmacy.name}</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Pharmacy Info */}
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              Pharmacy Details
+        <Card className="bg-white border-border shadow-sm rounded-[32px] overflow-hidden self-start">
+          <CardHeader className="p-8 pb-4">
+            <CardTitle className="text-slate-800 font-black text-lg tracking-tight flex items-center gap-3">
+              <Building2 className="h-5 w-5 text-primary" />
+              Node Credentials
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <p className="text-sm text-gray-400">Name</p>
-              <p className="text-white">{pharmacy.name}</p>
+          <CardContent className="p-8 pt-0 space-y-6">
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Institutional ID</p>
+              <p className="text-slate-700 font-black text-sm">{pharmacy.name}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-400">Address</p>
-              <p className="text-white">{pharmacy.address}</p>
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Physical Registry</p>
+              <p className="text-slate-600 font-bold text-sm leading-relaxed">{pharmacy.address}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-400">Phone</p>
-              <p className="text-white">{pharmacy.phone}</p>
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Voice Uplink</p>
+              <p className="text-slate-600 font-bold text-sm">{pharmacy.phone}</p>
             </div>
             {pharmacy.email && (
-              <div>
-                <p className="text-sm text-gray-400">Email</p>
-                <p className="text-white">{pharmacy.email}</p>
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Digital Comms</p>
+                <p className="text-slate-600 font-bold text-sm truncate">{pharmacy.email}</p>
               </div>
             )}
-            <div>
-              <p className="text-sm text-gray-400">Status</p>
-              <Badge className={
+            <div className="pt-4 border-t border-slate-50">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Operational Status</p>
+              <Badge variant="outline" className={
                 pharmacy.status === 'active' 
-                  ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100 font-black uppercase text-[10px] rounded-full px-3 py-1'
                   : pharmacy.status === 'inactive'
-                  ? 'bg-gray-500/10 text-gray-400 border-gray-500/20'
-                  : 'bg-red-500/10 text-red-400 border-red-500/20'
+                  ? 'bg-slate-100 text-slate-500 border-slate-200 font-black uppercase text-[10px] rounded-full px-3 py-1'
+                  : 'bg-rose-50 text-rose-600 border-rose-100 font-black uppercase text-[10px] rounded-full px-3 py-1'
               }>
                 {pharmacy.status}
               </Badge>
@@ -247,46 +252,61 @@ export const PharmacyCommunication = ({ pharmacy, onBack }: PharmacyCommunicatio
         </Card>
 
         {/* Messages */}
-        <div className="lg:col-span-2 space-y-4">
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
-                Messages
+        <div className="lg:col-span-2 space-y-8">
+          <Card className="bg-white border-border shadow-sm rounded-[32px] overflow-hidden flex flex-col h-[500px]">
+            <CardHeader className="p-8 border-b border-slate-50 flex flex-row items-center justify-between shrink-0">
+              <CardTitle className="text-slate-800 font-black text-lg tracking-tight flex items-center gap-3">
+                <MessageSquare className="h-6 w-6 text-primary" />
+                Packet Stream
               </CardTitle>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Secure Line Active</span>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4 max-h-96 overflow-y-auto">
+            <CardContent className="p-0 overflow-hidden flex-1 flex flex-col bg-slate-50/30">
+              <div className="flex-1 overflow-y-auto p-8 space-y-6">
                 {isLoading ? (
-                  <div className="text-center text-gray-400">Loading messages...</div>
+                  <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-300">
+                    <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                    <p className="text-[10px] font-black uppercase tracking-widest">Synchronizing Encrypted Buffer...</p>
+                  </div>
                 ) : messages && messages.length > 0 ? (
                   messages.map((message) => (
-                    <div key={message.id} className="p-4 rounded-lg bg-gray-700/50">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Badge className={getMessageTypeColor(message.message_type)}>
+                    <div key={message.id} className={`flex flex-col ${message.sender_type === 'admin' ? 'items-end' : 'items-start'}`}>
+                      <div className={`max-w-[85%] p-5 rounded-[24px] shadow-sm transform transition-all group ${
+                        message.sender_type === 'admin'
+                          ? 'bg-primary text-white rounded-tr-none'
+                          : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none'
+                      }`}>
+                        <div className="flex items-center gap-3 mb-2 opacity-80">
+                          <Badge variant="outline" className={`${getMessageTypeColor(message.message_type)} border-white/20 bg-transparent text-[8px] px-1.5`}>
                             {message.message_type.replace('_', ' ')}
                           </Badge>
-                          <span className="text-sm text-gray-400">
-                            {message.sender_type === 'admin' ? 'Admin' : 'Pharmacy'}
+                          <span className="text-[10px] font-black uppercase tracking-widest">
+                            {message.sender_type === 'admin' ? 'Nexus' : 'Remote Node'}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <Clock className="h-3 w-3" />
+                        <p className="text-sm font-bold leading-relaxed">{message.message}</p>
+                        {message.order_id && (
+                          <div className="mt-3 pt-2 border-t border-white/10 flex items-center gap-2">
+                            <Clock className="h-3 w-3 opacity-60" />
+                            <p className="text-[9px] font-black uppercase tracking-widest opacity-60">
+                              Order Reference: #{message.order_id}
+                            </p>
+                          </div>
+                        )}
+                        <div className="mt-2 text-[8px] font-black uppercase tracking-tighter opacity-40 text-right">
                           {new Date(message.created_at).toLocaleString()}
                         </div>
                       </div>
-                      <p className="text-white">{message.message}</p>
-                      {message.order_id && (
-                        <p className="text-xs text-gray-400 mt-2">
-                          Related to order: {message.order_id}
-                        </p>
-                      )}
                     </div>
                   ))
                 ) : (
-                  <div className="text-center text-gray-400 py-8">
-                    No messages yet. Start a conversation!
+                  <div className="flex flex-col items-center justify-center h-full text-slate-300 opacity-60">
+                    <MessageSquare className="h-16 w-16 mb-4 opacity-20" />
+                    <h3 className="text-sm font-black uppercase tracking-widest">Quiet Frequency</h3>
+                    <p className="text-[10px] font-bold mt-1">Initiate transmission to synchronize data.</p>
                   </div>
                 )}
               </div>
@@ -294,50 +314,53 @@ export const PharmacyCommunication = ({ pharmacy, onBack }: PharmacyCommunicatio
           </Card>
 
           {/* Send Message */}
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Send Message</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Select value={messageType} onValueChange={setMessageType}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
-                    <SelectValue placeholder="Message type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600">
-                    <SelectItem value="general">General Message</SelectItem>
-                    <SelectItem value="order_request">Order Request</SelectItem>
-                    <SelectItem value="order_confirmation">Order Confirmation</SelectItem>
-                    <SelectItem value="delivery_update">Delivery Update</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {messageType === 'order_request' && (
-                  <Select value={selectedOrder} onValueChange={setSelectedOrder}>
-                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
-                      <SelectValue placeholder="Select order" />
+          <Card className="bg-white border-border shadow-sm rounded-[32px] overflow-hidden">
+            <CardContent className="p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Protocol Type</p>
+                  <Select value={messageType} onValueChange={setMessageType}>
+                    <SelectTrigger className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl shadow-inner focus:ring-primary/40">
+                      <SelectValue placeholder="Protocol" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-700 border-gray-600">
-                      {pendingOrders?.map((order:any) => {
-                        const label = order?.medication_name || order?.medicine_name || order?.disease || `Order #${order?.id}`;
-                        const dt = order?.created_at ? new Date(order.created_at).toLocaleDateString() : '';
-                        return (
-                          <SelectItem key={order.id} value={String(order.id)}>
-                            {label}{dt ? ` - ${dt}` : ''}
-                          </SelectItem>
-                        );
-                      })}
+                    <SelectContent className="bg-white border-slate-100 rounded-2xl shadow-xl">
+                      <SelectItem value="general" className="font-bold focus:bg-slate-50">General Protocol</SelectItem>
+                      <SelectItem value="order_request" className="font-bold focus:bg-primary/5">Order Dispatch</SelectItem>
+                      <SelectItem value="order_confirmation" className="font-bold focus:bg-emerald-50">Order Verification</SelectItem>
+                      <SelectItem value="delivery_update" className="font-bold focus:bg-amber-50">Logistics Update</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                {messageType === 'order_request' && (
+                  <div className="space-y-2">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Target Package</p>
+                    <Select value={selectedOrder} onValueChange={setSelectedOrder}>
+                      <SelectTrigger className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl shadow-inner focus:ring-primary/40">
+                        <SelectValue placeholder="Manifest Selection" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border-slate-100 rounded-2xl shadow-xl">
+                        {pendingOrders?.map((order:any) => {
+                          const label = order?.medication_name || order?.medicine_name || order?.disease || `Order #${order?.id}`;
+                          const dt = order?.created_at ? new Date(order.created_at).toLocaleDateString() : '';
+                          return (
+                            <SelectItem key={order.id} value={String(order.id)} className="font-bold">
+                              {label}{dt ? ` - [${dt}]` : ''}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 )}
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-4">
                 <Input
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  className="bg-gray-700 border-gray-600 text-white"
+                  placeholder="Manifest secure encryption packet..."
+                  className="flex-1 h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl shadow-inner focus:ring-primary/40 placeholder:text-[10px] placeholder:font-black placeholder:uppercase placeholder:tracking-widest"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -348,9 +371,9 @@ export const PharmacyCommunication = ({ pharmacy, onBack }: PharmacyCommunicatio
                 <Button
                   onClick={handleSendMessage}
                   disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="h-14 w-14 bg-primary hover:bg-primary-hover text-white rounded-2xl shadow-xl shadow-primary/20 active:scale-95 group transition-all shrink-0"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-5 w-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </Button>
               </div>
             </CardContent>

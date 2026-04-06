@@ -34,32 +34,32 @@ export default function DashboardAdmin() {
 	const navigate = useNavigate();
 	const dashPath = role.toLowerCase() === 'provider' ? '/provider' : role.toLowerCase() === 'doctor' ? '/doctor' : role.toLowerCase() === 'admin' ? '/admin' : '/dashboard';
 	return (
-		<div className="min-h-screen bg-gray-900 flex flex-col">
+		<div className="min-h-screen bg-slate-50 flex flex-col font-sans">
 			{/* Admin Header */}
-			<header className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-xl sticky top-0 z-30 px-4 py-3">
+			<header className="border-b border-border bg-white/80 backdrop-blur-xl sticky top-0 z-30 px-4 py-4 shadow-sm">
 				<div className="max-w-[1600px] mx-auto flex items-center justify-between">
 					<div className="flex items-center gap-4">
-						<div className="bg-blue-600 p-2 rounded-lg">
+						<div className="bg-primary p-2.5 rounded-2xl shadow-lg shadow-primary/20">
 							<LayoutDashboard className="h-5 w-5 text-white" />
 						</div>
 						<div>
-							<h1 className="text-xl font-bold text-white hidden sm:block">Admin Dashboard</h1>
-							<div className="flex items-center gap-2">
-								<span className="text-xs text-blue-400 font-medium px-2 py-0.5 bg-blue-500/10 rounded-full border border-blue-500/20">
+							<h1 className="text-xl font-black text-foreground hidden sm:block tracking-tight uppercase text-xs opacity-40">Command Center</h1>
+							<div className="flex items-center gap-3">
+								<span className="text-[10px] font-black text-primary px-3 py-1 bg-primary/10 rounded-full uppercase tracking-widest">
 									{username}
 								</span>
-								<span className="text-[10px] text-gray-500 uppercase tracking-wider">{role}</span>
+								<span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">{role}</span>
 							</div>
 						</div>
 					</div>
 
 					<div className="flex items-center gap-2">
-						<div className="hidden md:flex items-center gap-2 mr-4 pr-4 border-r border-gray-800">
-							<Button variant="ghost" size="sm" onClick={() => navigate('/')} className="text-gray-400 hover:text-white">
+						<div className="hidden md:flex items-center gap-2 mr-4 pr-4 border-r border-border">
+							<Button variant="ghost" size="sm" onClick={() => navigate('/')} className="text-muted-foreground hover:text-foreground">
 								<Home className="h-4 w-4 mr-2" />
 								Home
 							</Button>
-							<Button variant="ghost" size="sm" onClick={() => navigate(dashPath)} className="text-gray-400 hover:text-white">
+							<Button variant="ghost" size="sm" onClick={() => navigate(dashPath)} className="text-muted-foreground hover:text-foreground">
 								<LayoutDashboard className="h-4 w-4 mr-2" />
 								Portal
 							</Button>
@@ -67,20 +67,20 @@ export default function DashboardAdmin() {
 
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" size="icon" className="rounded-full bg-gray-800 border border-gray-700">
-									<UserIcon className="h-5 w-5 text-gray-400" />
+								<Button variant="ghost" size="icon" className="rounded-2xl bg-slate-100 border border-border shadow-sm hover:bg-slate-200 transition-all">
+									<UserIcon className="h-5 w-5 text-slate-600" />
 								</Button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-56 bg-gray-800 border-gray-700 text-white">
-								<DropdownMenuLabel>Account Settings Settings</DropdownMenuLabel>
-								<DropdownMenuSeparator className="bg-gray-700" />
-								<DropdownMenuItem onClick={() => navigate('/')} className="hover:bg-gray-700 cursor-pointer">
-									<Home className="h-4 w-4 mr-2" /> Home
+							<DropdownMenuContent align="end" className="w-64 bg-white border-border text-foreground shadow-2xl rounded-2xl p-2 ring-1 ring-black/[0.05]">
+								<DropdownMenuLabel className="font-black text-[10px] uppercase tracking-widest text-muted-foreground px-3 py-2">Administrator Session</DropdownMenuLabel>
+								<DropdownMenuSeparator className="bg-slate-100 my-2" />
+								<DropdownMenuItem onClick={() => navigate('/')} className="rounded-xl font-bold text-sm h-11 px-3 hover:bg-slate-50 cursor-pointer transition-colors">
+									<Home className="h-4 w-4 mr-3 text-slate-400" /> Landing Page
 								</DropdownMenuItem>
-								<DropdownMenuItem onClick={() => navigate(dashPath)} className="hover:bg-gray-700 cursor-pointer">
-									<LayoutDashboard className="h-4 w-4 mr-2" /> Dashboard
+								<DropdownMenuItem onClick={() => navigate(dashPath)} className="rounded-xl font-bold text-sm h-11 px-3 hover:bg-slate-50 cursor-pointer transition-colors">
+									<LayoutDashboard className="h-4 w-4 mr-3 text-slate-400" /> Control Panel
 								</DropdownMenuItem>
-								<DropdownMenuSeparator className="bg-gray-700" />
+								<DropdownMenuSeparator className="bg-slate-100 my-2" />
 								<div className="px-2 py-1.5 flex items-center">
 									<LogoutConfirm />
 								</div>
@@ -90,26 +90,33 @@ export default function DashboardAdmin() {
 				</div>
 			</header>
 
-			<main className="flex-1 p-2 sm:p-4 md:p-6 max-w-[1600px] mx-auto w-full">
-				<div className="mb-6">
-					<p className="text-gray-400 text-sm">Welcome back, {username}. Managed clinical data and platform settings.</p>
+			<main className="flex-1 p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto w-full">
+				<div className="mb-8 p-6 bg-white border border-border shadow-sm rounded-3xl flex items-center justify-between">
+					<div>
+						<h2 className="text-2xl font-black text-slate-800 tracking-tight">System Overview</h2>
+						<p className="text-muted-foreground text-sm font-medium mt-1">Operational status: <span className="text-emerald-600 font-bold">OPTIMAL</span> • Welcome back, {username}.</p>
+					</div>
+					<div className="hidden lg:flex items-center gap-3">
+						<div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+						<span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mainframe Synchronized</span>
+					</div>
 				</div>
 
-				<div className="mt-6">
-					<Tabs value={tab} onValueChange={setTab} className="w-full space-y-6">
-						<div className="relative border-b border-gray-800">
+				<div className="mt-8">
+					<Tabs value={tab} onValueChange={setTab} className="w-full space-y-8">
+						<div className="relative">
 							<ScrollArea className="w-full">
-								<TabsList className="bg-transparent border-none h-auto p-0 flex justify-start gap-1 pb-2">
-									<TabsTrigger value="overview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Overview</TabsTrigger>
-									<TabsTrigger value="orders" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Orders</TabsTrigger>
-									<TabsTrigger value="patients" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Patients</TabsTrigger>
-									<TabsTrigger value="providers" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Doctors</TabsTrigger>
-									<TabsTrigger value="pharmacies" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Pharmacies</TabsTrigger>
-									<TabsTrigger value="inventory" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Inventory</TabsTrigger>
-									<TabsTrigger value="reports" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Reports</TabsTrigger>
-									<TabsTrigger value="notifications" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Notifications</TabsTrigger>
-									<TabsTrigger value="settings" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Settings</TabsTrigger>
-									<TabsTrigger value="chat" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-400 px-4 py-2 rounded-md transition-all whitespace-nowrap">Chat</TabsTrigger>
+								<TabsList className="bg-slate-100/50 border border-border/50 h-auto p-1.5 flex justify-start gap-1 rounded-2xl">
+									<TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Overview</TabsTrigger>
+									<TabsTrigger value="orders" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Orders</TabsTrigger>
+									<TabsTrigger value="patients" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Patients</TabsTrigger>
+									<TabsTrigger value="providers" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Doctors</TabsTrigger>
+									<TabsTrigger value="pharmacies" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Pharmacies</TabsTrigger>
+									<TabsTrigger value="inventory" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Inventory</TabsTrigger>
+									<TabsTrigger value="reports" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Reports</TabsTrigger>
+									<TabsTrigger value="notifications" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Alerts</TabsTrigger>
+									<TabsTrigger value="settings" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Config</TabsTrigger>
+									<TabsTrigger value="chat" className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg shadow-black/[0.05] text-[11px] font-black uppercase tracking-widest text-muted-foreground px-5 py-3 rounded-xl transition-all whitespace-nowrap">Chat</TabsTrigger>
 								</TabsList>
 								<ScrollBar orientation="horizontal" className="invisible" />
 							</ScrollArea>

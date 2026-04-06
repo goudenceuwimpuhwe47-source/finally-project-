@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -102,142 +103,174 @@ export const AdminSettings = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Admin Settings</h1>
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+        <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+          <div className="p-2 bg-primary rounded-2xl shadow-lg shadow-primary/20">
+            <Settings className="h-6 w-6 text-white" />
+          </div>
+          Executive Control
+        </h1>
+        <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black uppercase tracking-widest px-4 py-1.5 rounded-full text-[10px]">
+          Global Configuration
+        </Badge>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <User className="h-5 w-5 mr-2" />
-              Account Information
+        <Card className="bg-white border-border shadow-sm rounded-[32px] overflow-hidden">
+          <CardHeader className="px-8 pt-8 pb-4 border-b border-slate-50">
+            <CardTitle className="text-xl font-black text-slate-800 tracking-tight flex items-center">
+              <User className="h-5 w-5 mr-3 text-primary" />
+              Identity Management
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Email
+          <CardContent className="p-8 space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                Authorized Email
               </label>
               <Input
                 value={user?.email || ""}
                 disabled
-                className="bg-gray-700 border-gray-600 text-gray-400"
+                className="bg-slate-50 border-border text-slate-500 h-12 rounded-xl font-bold shadow-inner opacity-70"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Role
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                Clinical Rank
               </label>
               <Input
-                value="Administrator"
+                value="System Administrator"
                 disabled
-                className="bg-gray-700 border-gray-600 text-gray-400"
+                className="bg-slate-50 border-border text-slate-500 h-12 rounded-xl font-bold shadow-inner opacity-70"
               />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <Key className="h-5 w-5 mr-2" />
-              Change Password
+        <Card className="bg-white border-border shadow-sm rounded-[32px] overflow-hidden">
+          <CardHeader className="px-8 pt-8 pb-4 border-b border-slate-50">
+            <CardTitle className="text-xl font-black text-slate-800 tracking-tight flex items-center">
+              <Key className="h-5 w-5 mr-3 text-primary" />
+              Secure Authentication
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordChange} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Current Password
+          <CardContent className="p-8">
+            <form onSubmit={handlePasswordChange} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                  Current Shield
                 </label>
                 <Input
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
+                  className="bg-slate-50 border-border text-foreground h-12 rounded-xl font-bold shadow-inner focus:ring-primary/40 focus:border-primary"
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  New Password
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                  New Credential
                 </label>
                 <Input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
+                  className="bg-slate-50 border-border text-foreground h-12 rounded-xl font-bold shadow-inner focus:ring-primary/40 focus:border-primary"
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Confirm Password
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                  Re-Verify New Credential
                 </label>
                 <Input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
+                  className="bg-slate-50 border-border text-foreground h-12 rounded-xl font-bold shadow-inner focus:ring-primary/40 focus:border-primary"
                   required
                 />
               </div>
               <Button
                 type="submit"
                 disabled={updating}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-primary hover:bg-primary-hover text-white font-black uppercase text-[10px] tracking-widest h-14 rounded-2xl shadow-xl shadow-primary/25 transition-all active:scale-95"
               >
-                {updating ? "Updating..." : "Update Password"}
+                {updating ? "Re-Encrypting..." : "Commit Credential Change"}
               </Button>
             </form>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <Settings className="h-5 w-5 mr-2" />
-              System Settings
+        <Card className="bg-white border-border shadow-sm rounded-[32px] overflow-hidden lg:col-span-2">
+          <CardHeader className="px-8 pt-8 pb-4 border-b border-slate-50">
+            <CardTitle className="text-xl font-black text-slate-800 tracking-tight flex items-center">
+              <Settings className="h-5 w-5 mr-3 text-primary" />
+              Machine Preferences
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-8 space-y-8">
             {loadingSettings ? (
-              <div className="text-gray-400">Loading settings...</div>
+              <div className="flex flex-col items-center justify-center py-12 text-slate-300 animate-pulse">
+                <Settings className="h-12 w-12 mb-4" />
+                <p className="font-black uppercase text-[10px] tracking-widest">Querying System States...</p>
+              </div>
             ) : (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Email Notifications</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSettings(s => ({ ...s, email_notifications_enabled: !s.email_notifications_enabled }))}
-                  >
-                    {settings.email_notifications_enabled ? 'On' : 'Off'}
-                  </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div className="flex flex-col">
+                      <span className="text-slate-800 font-bold text-sm">SMTP Dispatch</span>
+                      <span className="text-[10px] text-slate-400 font-bold">Email notification triggers</span>
+                    </div>
+                    <Button
+                      variant={settings.email_notifications_enabled ? "default" : "outline"}
+                      size="sm"
+                      className={`font-black uppercase text-[10px] tracking-widest h-10 px-6 rounded-xl transition-all ${settings.email_notifications_enabled ? 'bg-primary shadow-lg shadow-primary/20' : 'border-slate-200 text-slate-400'}`}
+                      onClick={() => setSettings(s => ({ ...s, email_notifications_enabled: !s.email_notifications_enabled }))}
+                    >
+                      {settings.email_notifications_enabled ? 'Active' : 'Muted'}
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div className="flex flex-col">
+                      <span className="text-slate-800 font-bold text-sm">Biometric 2FA</span>
+                      <span className="text-[10px] text-slate-400 font-bold">Enhanced security manifest</span>
+                    </div>
+                    <Button
+                      variant={settings.require_2fa ? "default" : "outline"}
+                      size="sm"
+                      className={`font-black uppercase text-[10px] tracking-widest h-10 px-6 rounded-xl transition-all ${settings.require_2fa ? 'bg-emerald-600 shadow-lg shadow-emerald-200' : 'border-slate-200 text-slate-400'}`}
+                      onClick={() => setSettings(s => ({ ...s, require_2fa: !s.require_2fa }))}
+                    >
+                      {settings.require_2fa ? 'Locked' : 'Standard'}
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Require 2FA</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSettings(s => ({ ...s, require_2fa: !s.require_2fa }))}
-                  >
-                    {settings.require_2fa ? 'Enabled' : 'Disabled'}
-                  </Button>
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Data Backup Cycle (CRON)</label>
+                    <Input
+                      value={settings.backup_schedule_cron || ''}
+                      onChange={(e) => setSettings(s => ({ ...s, backup_schedule_cron: e.target.value }))}
+                      className="bg-slate-50 border-border text-foreground h-12 rounded-xl font-bold shadow-inner focus:ring-primary/40 focus:border-primary"
+                      placeholder="e.g. 0 2 * * *"
+                    />
+                    <p className="text-[9px] text-slate-400 font-bold px-1 italic">Reference standards: Precision scheduling for cloud persistence.</p>
+                  </div>
+                  <div className="pt-2">
+                    <Button 
+                      onClick={saveSettings} 
+                      disabled={saving} 
+                      className="w-full bg-primary hover:bg-primary-hover text-white font-black uppercase text-[10px] tracking-widest h-14 rounded-2xl shadow-xl shadow-primary/25 transition-all hover:scale-[1.02]"
+                    >
+                      {saving ? 'Synchronizing...' : 'Saves Consensus Settings'}
+                    </Button>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Backup Schedule (CRON)</label>
-                  <Input
-                    value={settings.backup_schedule_cron || ''}
-                    onChange={(e) => setSettings(s => ({ ...s, backup_schedule_cron: e.target.value }))}
-                    className="bg-gray-700 border-gray-600 text-white"
-                    placeholder="e.g. 0 2 * * *"
-                  />
-                </div>
-                <div className="pt-2">
-                  <Button onClick={saveSettings} disabled={saving} className="bg-blue-600 hover:bg-blue-700">{saving ? 'Saving…' : 'Save Settings'}</Button>
-                </div>
-              </>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -36,34 +36,34 @@ const Header = () => {
   const dashPath = role === 'provider' ? '/provider' : role === 'doctor' ? '/doctor' : role === 'admin' ? '/admin' : '/dashboard';
 
   return (
-    <header className="bg-gray-900/95 backdrop-blur-sm shadow-sm sticky top-0 z-50 border-b border-gray-700">
+    <header className="bg-background/95 backdrop-blur-sm shadow-sm sticky top-0 z-50 border-b border-border">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="bg-blue-600 p-2 rounded-lg">
-              <Pill className="h-6 w-6 text-white" />
+            <div className="bg-primary p-2 rounded-lg">
+              <Pill className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-lg sm:text-xl font-bold text-white">Chronic Care Connect Well</span>
+            <span className="text-lg sm:text-xl font-bold text-foreground">Chronic Care Connect Well</span>
           </div>
           
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <a href="#features" className="text-gray-300 hover:text-blue-400 transition-colors">Features</a>
-            <a href="#services" className="text-gray-300 hover:text-blue-400 transition-colors">Services</a>
-            <a href="#about" className="text-gray-300 hover:text-blue-400 transition-colors">About Project</a>
-            <a href="#contact" className="text-gray-300 hover:text-blue-400 transition-colors">Contact</a>
+            <a href="#features" className="text-muted-foreground hover:text-primary transition-colors font-medium">Features</a>
+            <a href="#services" className="text-muted-foreground hover:text-primary transition-colors font-medium">Services</a>
+            <a href="#about" className="text-muted-foreground hover:text-primary transition-colors font-medium">About Project</a>
+            <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors font-medium">Contact</a>
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-gray-300">Welcome, {user.email}</span>
+                <span className="text-muted-foreground text-sm">Welcome, <span className="text-foreground font-semibold">{user.email}</span></span>
                 
                 {/* Role-based navigation buttons */}
                 {userRoles?.isAdmin && (
                   <Button 
                     variant="outline" 
-                    className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+                    className="border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
                     onClick={() => navigate('/admin')}
                   >
                     <Shield className="h-4 w-4 mr-2" />
@@ -74,7 +74,7 @@ const Header = () => {
                 {userRoles?.isProvider && (
                   <Button 
                     variant="outline" 
-                    className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white"
+                    className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
                     onClick={() => navigate('/provider')}
                   >
                     <Stethoscope className="h-4 w-4 mr-2" />
@@ -84,7 +84,7 @@ const Header = () => {
                 
                 <Button 
                   variant="outline" 
-                  className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                   className="border-primary text-primary hover:bg-primary/5"
                   onClick={() => navigate(dashPath)}
                 >
                   Dashboard
@@ -94,20 +94,20 @@ const Header = () => {
                   size="sm"
                   label="Sign Out"
                   icon={<LogOut className="h-4 w-4" />}
-                  triggerClassName="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+                  triggerClassName="border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
                 />
               </div>
             ) : (
               <>
                 <Button 
                   variant="outline" 
-                  className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                  className="border-primary text-primary hover:bg-primary/5"
                   onClick={() => navigate('/auth')}
                 >
                   Login
                 </Button>
                 <Button 
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-primary hover:bg-primary/90 text-white"
                   onClick={() => navigate('/auth')}
                 >
                   Register
@@ -118,7 +118,7 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden text-white"
+            className="lg:hidden text-foreground"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -127,22 +127,22 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden mt-4 py-4 border-t border-gray-700">
+          <div className="lg:hidden mt-4 py-4 border-t border-border">
             <nav className="flex flex-col space-y-4">
-              <a href="#features" className="text-gray-300 hover:text-blue-400 transition-colors px-2 py-1">Features</a>
-              <a href="#services" className="text-gray-300 hover:text-blue-400 transition-colors px-2 py-1">Services</a>
-              <a href="#about" className="text-gray-300 hover:text-blue-400 transition-colors px-2 py-1">About Project</a>
-              <a href="#contact" className="text-gray-300 hover:text-blue-400 transition-colors px-2 py-1">Contact</a>
+              <a href="#features" className="text-muted-foreground hover:text-primary transition-colors px-2 py-1">Features</a>
+              <a href="#services" className="text-muted-foreground hover:text-primary transition-colors px-2 py-1">Services</a>
+              <a href="#about" className="text-muted-foreground hover:text-primary transition-colors px-2 py-1">About Project</a>
+              <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors px-2 py-1">Contact</a>
               <div className="flex flex-col space-y-2 pt-4 px-2">
                 {user ? (
                   <>
-                    <span className="text-gray-300 mb-2">Welcome, {user.email}</span>
+                    <span className="text-muted-foreground mb-2 text-sm italic">Logged in as {user.email}</span>
                     
                     {/* Role-based navigation for mobile */}
                     {userRoles?.isAdmin && (
                       <Button 
                         variant="outline" 
-                        className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white w-full"
+                        className="border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 w-full"
                         onClick={() => navigate('/admin')}
                       >
                         <Shield className="h-4 w-4 mr-2" />
@@ -153,7 +153,7 @@ const Header = () => {
                     {userRoles?.isProvider && (
                       <Button 
                         variant="outline" 
-                        className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white w-full"
+                         className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700 w-full"
                         onClick={() => navigate('/provider')}
                       >
                         <Stethoscope className="h-4 w-4 mr-2" />
@@ -163,7 +163,7 @@ const Header = () => {
                     
                     <Button 
                       variant="outline" 
-                      className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white w-full"
+                      className="border-primary text-primary hover:bg-primary/5 w-full"
                       onClick={() => navigate(dashPath)}
                     >
                       Dashboard
@@ -173,7 +173,7 @@ const Header = () => {
                       size="sm"
                       label="Sign Out"
                       icon={<LogOut className="h-4 w-4" />}
-                      triggerClassName="border-red-600 text-red-400 hover:bg-red-600 hover:text-white w-full"
+                      triggerClassName="border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 w-full"
                       fullWidth
                     />
                   </>
@@ -181,13 +181,13 @@ const Header = () => {
                   <>
                     <Button 
                       variant="outline" 
-                      className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white w-full"
+                      className="border-primary text-primary hover:bg-primary/5 w-full"
                       onClick={() => navigate('/auth')}
                     >
                       Login
                     </Button>
                     <Button 
-                      className="bg-blue-600 hover:bg-blue-700 w-full"
+                      className="bg-primary hover:bg-primary/90 text-white w-full"
                       onClick={() => navigate('/auth')}
                     >
                       Register

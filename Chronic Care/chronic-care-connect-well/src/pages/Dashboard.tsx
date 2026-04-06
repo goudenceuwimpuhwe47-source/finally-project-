@@ -8,7 +8,7 @@ const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("health");
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-background">
       <SidebarProvider>
         <div className="flex w-full min-h-screen">
           <DashboardSidebar 

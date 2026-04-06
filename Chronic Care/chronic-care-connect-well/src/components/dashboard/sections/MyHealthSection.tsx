@@ -80,21 +80,21 @@ export function MyHealthSection() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Health Dashboard</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto" onClick={() => createLog.mutate()} disabled={isLogging}>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">My Health Dashboard</h1>
+        <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto" onClick={() => createLog.mutate()} disabled={isLogging}>
           <Plus className="h-4 w-4 mr-2" />
           {isLogging ? 'Logging…' : 'Log Symptoms'}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+        <Card className="shadow-sm border-border hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pain Level Today</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Pain Level Today</CardTitle>
+            <Activity className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(() => {
+            <div className="text-3xl font-black text-foreground">{(() => {
               if (typeof summary?.latest?.pain_level === 'number') return `${summary.latest.pain_level}/10`;
               const total = todayAlerts?.length || 0;
               if (total > 0) {
@@ -104,33 +104,37 @@ export function MyHealthSection() {
               }
               return '5/10';
             })()}</div>
-            <p className="text-xs text-muted-foreground">{summary?.latest ? `Last update: ${format(new Date(summary.latest.created_at), 'PP p')}` : (todayAlerts?.length ? 'Derived from medication activity' : 'Default baseline')}</p>
+            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mt-1">
+              {summary?.latest ? `Updated: ${format(new Date(summary.latest.created_at), 'p')}` : (todayAlerts?.length ? 'Estimated from activity' : 'Baseline level')}
+            </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm border-border hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Medications Taken</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Medications Taken</CardTitle>
+            <TrendingUp className="h-4 w-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(() => {
+            <div className="text-3xl font-black text-foreground">{(() => {
               const total = todayAlerts?.length || 0;
               const taken = todayAlerts ? todayAlerts.filter((e:any)=> String(e.status).toLowerCase()==='taken').length : 0;
               return `${taken}/${total || '0'}`;
             })()}</div>
-            <p className="text-xs text-muted-foreground">From today's medication alerts</p>
+            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mt-1">Completion for today</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm border-border hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Next Appointment</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Next Event</CardTitle>
+            <Calendar className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{nextAlert?.alert?.when_at ? format(new Date(nextAlert.alert.when_at), 'PP p') : '—'}</div>
-            <p className="text-xs text-muted-foreground">{nextAlert?.alert ? (nextAlert.alert.medicine_name || 'Medication scheduled') : 'No upcoming event'}</p>
+            <div className="text-3xl font-black text-foreground">{nextAlert?.alert?.when_at ? format(new Date(nextAlert.alert.when_at), 'p') : '—'}</div>
+            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mt-1 truncate">
+              {nextAlert?.alert ? (nextAlert.alert.medicine_name || 'Scheduled dose') : 'No upcoming events'}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -142,24 +146,27 @@ export function MyHealthSection() {
         <CardContent>
           <div className="space-y-4">
             {(today?.logs?.length ? today.logs : (todayAlerts || [])).slice(0, 4).map((l:any, idx:number) => (
-              <div key={idx} className="flex flex-col xs:flex-row items-start xs:items-center justify-between p-3 md:p-4 bg-gray-50 rounded-lg gap-2">
+              <div key={idx} className="flex flex-col xs:flex-row items-start xs:items-center justify-between p-4 bg-secondary/50 border border-border/50 rounded-xl gap-2 hover:bg-secondary transition-colors shadow-sm">
                 <div className="w-full xs:w-auto">
                   {today?.logs?.length ? (
                     <>
-                      <p className="font-medium text-sm md:text-base">Pain: {l.pain_level ?? '—'}/10 {Number.isFinite(l.fatigue_level) ? `• Fatigue: ${l.fatigue_level}/10` : ''}</p>
-                      {l.notes && <p className="text-xs md:text-sm text-gray-600 line-clamp-2">{l.notes}</p>}
-                      <p className="text-[10px] md:text-xs text-gray-500">{format(new Date(l.created_at), 'p')}</p>
+                      <p className="font-bold text-foreground text-sm md:text-base">Pain: {l.pain_level ?? '—'}/10 {Number.isFinite(l.fatigue_level) ? `• Fatigue: ${l.fatigue_level}/10` : ''}</p>
+                      {l.notes && <p className="text-xs md:text-sm text-muted-foreground font-medium italic mt-0.5">“{l.notes}”</p>}
+                      <p className="text-[10px] md:text-xs text-muted-foreground/60 mt-1 font-bold">{format(new Date(l.created_at), 'p')}</p>
                     </>
                   ) : (
                     <>
-                      <p className="font-medium text-sm md:text-base">{l.medicine_name || 'Medication'}</p>
-                      <p className="text-xs md:text-sm text-gray-600">{l.dosage || ''} {l.frequency_per_day ? `• ${l.frequency_per_day}x/day` : ''}</p>
-                      <p className="text-[10px] md:text-xs text-gray-500">{l.when_at ? format(new Date(l.when_at), 'p') : ''}</p>
+                      <p className="font-bold text-foreground text-sm md:text-base flex items-center capitalize">
+                        <Activity className="h-3 w-3 mr-2 text-primary" />
+                        {l.medicine_name || 'Medication'}
+                      </p>
+                      <p className="text-xs md:text-sm text-muted-foreground font-medium">{l.dosage || ''} {l.frequency_per_day ? `• ${l.frequency_per_day}x/day` : ''}</p>
+                      <p className="text-[10px] md:text-xs text-muted-foreground/60 mt-1 font-bold">{l.when_at ? format(new Date(l.when_at), 'p') : ''}</p>
                     </>
                   )}
                 </div>
                 <div className="text-left xs:text-right w-full xs:w-auto">
-                  <span className={`text-xs md:text-sm font-medium ${today?.logs?.length ? 'text-orange-600' : (String(l.status || '').toLowerCase()==='taken' ? 'text-green-600' : 'text-amber-600')}`}>
+                  <span className={`text-[10px] md:text-xs font-black uppercase tracking-widest px-2 py-1 rounded-full shadow-sm ${today?.logs?.length ? 'bg-orange-100 text-orange-700' : (String(l.status || '').toLowerCase()==='taken' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700')}`}>
                     {today?.logs?.length ? 'Logged' : (String(l.status || '').toLowerCase()==='taken' ? 'Taken' : 'Pending')}
                   </span>
                 </div>

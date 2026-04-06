@@ -130,15 +130,15 @@ export const AdminSidebar = ({ activeSection, setActiveSection }: AdminSidebarPr
   };
 
   return (
-    <Sidebar className="w-64 bg-gray-800 border-r border-gray-700">
-      <SidebarHeader className="p-6 border-b border-gray-700">
+    <Sidebar className="w-64 bg-sidebar border-r border-sidebar-border">
+      <SidebarHeader className="p-6 border-b border-sidebar-border">
         <div className="flex items-center space-x-2">
           <div className="bg-blue-600 p-2 rounded-lg">
             <Shield className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Admin Panel</h2>
-            <p className="text-sm text-gray-400">ChronicCare</p>
+            <h2 className="text-xl font-bold text-sidebar-foreground">Admin Panel</h2>
+            <p className="text-sm text-muted-foreground">ChronicCare</p>
           </div>
         </div>
       </SidebarHeader>
@@ -151,8 +151,8 @@ export const AdminSidebar = ({ activeSection, setActiveSection }: AdminSidebarPr
                 onClick={() => setActiveSection(item.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                   activeSection === item.id
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 }`}
               >
                 <div className="relative">

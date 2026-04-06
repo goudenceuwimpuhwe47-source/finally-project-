@@ -228,25 +228,33 @@ export const AdminChat = () => {
   }, [isTyping, selectedPatient]);
 
   return (
-    <div className="space-y-4 sm:space-y-6 flex flex-col h-full max-h-[calc(100vh-200px)]">
-      <h1 className="text-2xl sm:text-3xl font-bold text-white px-1">Patient Communication</h1>
+    <div className="space-y-8 flex flex-col h-full max-h-[calc(100vh-140px)]">
+      <div className="flex items-center gap-4 px-1">
+        <div className="p-2.5 bg-primary rounded-2xl shadow-lg shadow-primary/20">
+          <MessageSquare className="h-6 w-6 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-none">Telemetry Uplink</h1>
+          <p className="text-slate-400 font-bold text-xs mt-1.5 uppercase tracking-widest">Real-time patient communication terminal</p>
+        </div>
+      </div>
       
       <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Patient List - Hidden on mobile if a patient is selected */}
         <Card className={`bg-gray-800 border-gray-700 flex flex-col min-h-0 ${selectedPatient ? 'hidden lg:flex' : 'flex'}`}>
           <CardHeader className="py-3 px-4 sm:py-4 sm:px-6">
-            <CardTitle className="text-white text-lg flex items-center">
-              <MessageSquare className="h-5 w-5 mr-2 text-blue-500" />
-              Patients
+            <CardTitle className="text-slate-800 text-xl font-black tracking-tight flex items-center">
+              <MessageSquare className="h-6 w-6 mr-3 text-primary" />
+              Satellite Nodes
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 flex-1 flex flex-col min-h-0">
-            <div className="px-4 pb-2">
+            <div className="px-5 pb-4">
               <Input 
-                placeholder="Search patients…" 
+                placeholder="Search registries…" 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)}
-                className="bg-gray-900/50 border-gray-700 focus:border-blue-500 transition-colors"
+                className="bg-slate-50 border-slate-100 focus:ring-primary/40 focus:border-primary transition-all h-12 rounded-xl font-bold placeholder:font-black placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
               />
             </div>
             <ScrollArea className="flex-1 p-2">
@@ -255,12 +263,25 @@ export const AdminChat = () => {
                   p.name.toLowerCase().includes(search.toLowerCase()) || 
                   String(p.id).includes(search)
                 ).map((patient) => (
-                  <PatientListItem
+                  <div
                     key={patient.id}
-                    patient={patient}
-                    isSelected={selectedPatient?.id === patient.id}
                     onClick={() => handlePatientSelect(patient)}
-                  />
+                    className={`p-4 rounded-2xl cursor-pointer transition-all duration-200 border ${
+                      selectedPatient?.id === patient.id 
+                        ? 'bg-primary/5 border-primary/20 shadow-sm ring-1 ring-primary/5' 
+                        : 'bg-white border-transparent hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <p className={`font-black tracking-tight truncate ${selectedPatient?.id === patient.id ? 'text-primary' : 'text-slate-800'}`}>{patient.name}</p>
+                      {patient.unreadCount > 0 && (
+                        <span className="bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-full px-2 py-0.5 shadow-lg shadow-primary/20">
+                          {patient.unreadCount} NEW
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-400 font-bold truncate leading-none">{patient.lastMessage}</p>
+                  </div>
                 ))}
               </div>
             </ScrollArea>
@@ -270,15 +291,26 @@ export const AdminChat = () => {
         {/* Chat Area - Full width on mobile if a patient is selected */}
         <div className={`lg:col-span-2 min-h-0 ${!selectedPatient ? 'hidden lg:block' : 'block'}`}>
           {selectedPatient ? (
-            <Card className="bg-gray-800 border-gray-700 h-full flex flex-col min-h-0 shadow-2xl relative overflow-hidden">
+            <Card className="bg-white border-slate-100 shadow-sm h-full flex flex-col min-h-0 rounded-[32px] relative overflow-hidden">
               {/* Chat Header */}
-              <CardHeader className="border-b border-gray-700 py-3 px-4 sm:py-4 sm:px-6 bg-gray-800/80 backdrop-blur-sm sticky top-0 z-10">
-                <ChatHeader
-                  patient={selectedPatient}
-                  onBack={() => setSelectedPatient(null)}
-                  typing={counterpartyTyping}
-                  online={adminOnline}
-                />
+              <CardHeader className="border-b border-slate-50 py-5 px-8 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+                <div>
+                  <h3 className="font-black text-slate-800 tracking-tight leading-none">{selectedPatient.name}</h3>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1.5 flex items-center gap-2">
+                    {counterpartyTyping ? (
+                      <>
+                        <div className="flex gap-0.5 items-center">
+                          <div className="w-1 h-1 bg-primary rounded-full animate-bounce" />
+                          <div className="w-1 h-1 bg-primary rounded-full animate-bounce delay-75" />
+                          <div className="w-1 h-1 bg-primary rounded-full animate-bounce delay-150" />
+                        </div>
+                        Typing Signal
+                      </>
+                    ) : (
+                      selectedPatient.status === 'online' ? 'Active Connection' : 'Station Offline'
+                    )}
+                  </p>
+                </div>
               </CardHeader>
 
               {/* Messages Area */}
@@ -290,9 +322,9 @@ export const AdminChat = () => {
                         <ChatMessage key={message.id} message={message} />
                       ))
                     ) : (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-500 py-20">
+                      <div className="flex flex-col items-center justify-center h-full text-slate-400 py-20">
                         <MessageSquare className="h-12 w-12 mb-2 opacity-20" />
-                        <p>No messages yet. Start the conversation!</p>
+                        <p className="font-bold text-xs uppercase tracking-widest">No messages yet. Start the conversation!</p>
                       </div>
                     )}
                   </div>
@@ -300,17 +332,18 @@ export const AdminChat = () => {
               </CardContent>
 
               {/* Load More Button */}
-              <div className="px-4 py-1 border-t border-gray-700/50 bg-gray-900/10">
+              <div className="px-8 py-2 border-t border-slate-50 bg-slate-50/50">
                 <button 
-                  className="text-[10px] uppercase tracking-wider font-semibold text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-1" 
+                  className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-all flex items-center gap-2" 
                   onClick={() => setPage(p => p + 1)}
                 >
-                  Load older messages
+                  <div className="w-1 h-1 bg-slate-300 rounded-full" />
+                  Request Historic Packets
                 </button>
               </div>
 
               {/* Message Input */}
-              <div className="p-3 sm:p-4 border-t border-gray-700 bg-gray-800/80 backdrop-blur-sm">
+              <div className="p-6 border-t border-slate-50 bg-white">
                 <MessageInput
                   value={newMessage}
                   onChange={setNewMessage}
@@ -319,7 +352,7 @@ export const AdminChat = () => {
               </div>
             </Card>
           ) : (
-            <Card className="bg-gray-800 border-gray-700 h-full flex items-center justify-center border-dashed border-2 opacity-50">
+            <Card className="bg-slate-50/50 border-2 border-dashed border-slate-100 h-full flex items-center justify-center rounded-[40px] opacity-70">
               <EmptyChat />
             </Card>
           )}

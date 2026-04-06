@@ -11,6 +11,7 @@ import { chronicDiseasesRW, dosageFrequencies, genders, paymentMethods } from '@
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL } from '@/lib/utils';
+import { CheckCircle, LogOut, Activity, ArrowRight, Pill, Phone, Mail, MapPin, Heart, Plus, Clock, TrendingUp, Calendar, MessageSquare, User, Bell, AlarmClock } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose, DialogDescription } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -286,21 +287,22 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
   };
 
   if (!user) {
-    return <div className="text-gray-300">Loading...</div>;
+    return <div className="text-muted-foreground italic">Loading user data...</div>;
   }
 
   return (
     <div className="space-y-6">
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-white">Request Medication</CardTitle>
+          <CardTitle className="text-foreground">Request Medication</CardTitle>
           {profileLoaded && (
-            <div className="mt-2 p-3 bg-green-900/20 border border-green-700/30 rounded-md">
-              <p className="text-sm text-green-400">
-                ✓ Your saved profile information has been auto-filled. This saves you time on future requests!
+            <div className="mt-2 p-3 bg-emerald-50 border border-emerald-100 rounded-md shadow-sm">
+              <p className="text-sm text-emerald-700 font-bold flex items-center">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Your profile information has been auto-filled.
               </p>
-              <p className="text-xs text-gray-400 mt-1">
-                Your personal details (name, ID, phone, address) are securely stored in your account and will be automatically filled for your next order.
+              <p className="text-xs text-emerald-600/80 mt-1 font-medium italic">
+                Your personal details (name, ID, phone, address) are securely retrieved and pre-filled to save you time.
               </p>
             </div>
           )}
@@ -309,109 +311,109 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="text-gray-300">Full Name</Label>
-                <Input className="bg-gray-700 border-gray-600 text-white" {...register('fullName')} />
-                {errors.fullName && <p className="text-red-400 text-sm mt-1">{errors.fullName.message}</p>}
+                <Label className="text-foreground">Full Name</Label>
+                <Input className="bg-background border-border text-foreground focus:ring-primary" {...register('fullName')} />
+                {errors.fullName && <p className="text-destructive text-xs font-bold mt-1 italic">{errors.fullName.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">ID Card</Label>
-                <Input className="bg-gray-700 border-gray-600 text-white" {...register('idCard')} placeholder="16 digits starting with 1" />
-                {errors.idCard && <p className="text-red-400 text-sm mt-1">{errors.idCard.message}</p>}
+                <Label className="text-foreground">ID Card</Label>
+                <Input className="bg-background border-border text-foreground focus:ring-primary" {...register('idCard')} placeholder="16 digits starting with 1" />
+                {errors.idCard && <p className="text-destructive text-xs font-bold mt-1 italic">{errors.idCard.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">Phone</Label>
-                <Input className="bg-gray-700 border-gray-600 text-white" {...register('phone')} />
-                {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone.message}</p>}
+                <Label className="text-foreground">Phone</Label>
+                <Input className="bg-background border-border text-foreground focus:ring-primary" {...register('phone')} />
+                {errors.phone && <p className="text-destructive text-xs font-bold mt-1 italic">{errors.phone.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">District</Label>
-                <Input className="bg-gray-700 border-gray-600 text-white" {...register('district')} />
-                {errors.district && <p className="text-red-400 text-sm mt-1">{errors.district.message}</p>}
+                <Label className="text-foreground">District</Label>
+                <Input className="bg-background border-border text-foreground" {...register('district')} />
+                {errors.district && <p className="text-red-500 text-sm mt-1">{errors.district.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">Sector</Label>
-                <Input className="bg-gray-700 border-gray-600 text-white" {...register('sector')} />
-                {errors.sector && <p className="text-red-400 text-sm mt-1">{errors.sector.message}</p>}
+                <Label className="text-foreground">Sector</Label>
+                <Input className="bg-background border-border text-foreground" {...register('sector')} />
+                {errors.sector && <p className="text-red-500 text-sm mt-1">{errors.sector.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">Cell</Label>
-                <Input className="bg-gray-700 border-gray-600 text-white" {...register('cell')} />
-                {errors.cell && <p className="text-red-400 text-sm mt-1">{errors.cell.message}</p>}
+                <Label className="text-foreground">Cell</Label>
+                <Input className="bg-background border-border text-foreground" {...register('cell')} />
+                {errors.cell && <p className="text-red-500 text-sm mt-1">{errors.cell.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">Village</Label>
-                <Input className="bg-gray-700 border-gray-600 text-white" {...register('village')} />
-                {errors.village && <p className="text-red-400 text-sm mt-1">{errors.village.message}</p>}
+                <Label className="text-foreground">Village</Label>
+                <Input className="bg-background border-border text-foreground" {...register('village')} />
+                {errors.village && <p className="text-red-500 text-sm mt-1">{errors.village.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">Chronic Disease</Label>
+                <Label className="text-foreground">Chronic Disease</Label>
                 <Select onValueChange={(v) => setValue('disease', v)}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                  <SelectTrigger className="bg-background border-border text-foreground">
                     <SelectValue placeholder="Select disease" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
+                  <SelectContent className="bg-card border-border text-foreground">
                     {chronicDiseasesRW.map((d) => (
                       <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.disease && <p className="text-red-400 text-sm mt-1">{errors.disease.message}</p>}
+                {errors.disease && <p className="text-red-500 text-sm mt-1">{errors.disease.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">Quantity</Label>
+                <Label className="text-foreground">Quantity</Label>
                 <Select onValueChange={(v) => setValue('dosage', v)}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                  <SelectTrigger className="bg-background border-border text-foreground">
                     <SelectValue placeholder="Select dose" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
+                  <SelectContent className="bg-card border-border text-foreground">
                     {dosageFrequencies.map((d) => (
                       <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.dosage && <p className="text-red-400 text-sm mt-1">{errors.dosage.message}</p>}
+                {errors.dosage && <p className="text-red-500 text-sm mt-1">{errors.dosage.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">Age</Label>
-                <Input type="number" className="bg-gray-700 border-gray-600 text-white" {...register('age', { valueAsNumber: true })} />
-                {errors.age && <p className="text-red-400 text-sm mt-1">{errors.age.message as string}</p>}
+                <Label className="text-foreground">Age</Label>
+                <Input type="number" className="bg-background border-border text-foreground" {...register('age', { valueAsNumber: true })} />
+                {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age.message as string}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">Gender</Label>
+                <Label className="text-foreground">Gender</Label>
                 <Select onValueChange={(v) => setValue('gender', v)}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                  <SelectTrigger className="bg-background border-border text-foreground">
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
+                  <SelectContent className="bg-card border-border text-foreground">
                     {genders.map((g) => (
                       <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.gender && <p className="text-red-400 text-sm mt-1">{errors.gender.message}</p>}
+                {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>}
               </div>
               <div>
-                <Label className="text-gray-300">Payment Method</Label>
+                <Label className="text-foreground">Payment Method</Label>
                 <Select onValueChange={(v) => setValue('paymentMethod', v)} defaultValue={'pay_online'}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                  <SelectTrigger className="bg-background border-border text-foreground">
                     <SelectValue placeholder="Select payment method" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
+                  <SelectContent className="bg-card border-border text-foreground">
                     {paymentMethods.map((p) => (
                       <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.paymentMethod && <p className="text-red-400 text-sm mt-1">{errors.paymentMethod.message}</p>}
+                {errors.paymentMethod && <p className="text-red-500 text-sm mt-1">{errors.paymentMethod.message}</p>}
               </div>
               <div className="md:col-span-2">
-                <Label className="text-gray-300">Medical Certificate (PDF/JPG/PNG)</Label>
-                <Input type="file" accept=".pdf,image/*" className="bg-gray-700 border-gray-600 text-white" {...register('medicalCertificate')} />
+                <Label className="text-foreground">Medical Certificate (PDF/JPG/PNG)</Label>
+                <Input type="file" accept=".pdf,image/*" className="bg-background border-border text-foreground" {...register('medicalCertificate')} />
               </div>
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700">
+              <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90 text-white">
                 {isSubmitting ? 'Submitting...' : 'Submit Request'}
               </Button>
             </div>
@@ -419,9 +421,9 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
         </CardContent>
       </Card>
 
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-white">My Requests</CardTitle>
+          <CardTitle className="text-foreground">My Requests</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -442,24 +444,24 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                 else setActiveSection('chat-admin');
               };
               return (
-                <div key={o.id} className="p-3 bg-gray-700 rounded-lg">
+                <div key={o.id} className="p-3 bg-secondary rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-white font-medium capitalize">{o.disease.replace(/_/g,' ')}</p>
-                      <p className="text-xs text-gray-300">{new Date(o.created_at).toLocaleString()}</p>
+                      <p className="text-foreground font-medium capitalize">{o.disease.replace(/_/g,' ')}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</p>
                     </div>
                     <div className="flex flex-wrap gap-2 text-[10px] sm:text-xs">
-                      <span className="px-2 py-0.5 sm:py-1 rounded bg-gray-600 text-gray-100">Adm: {o.admin_status}</span>
-                      <span className="px-2 py-0.5 sm:py-1 rounded bg-gray-600 text-gray-100">Doc: {o.doctor_status}</span>
-                      <span className="px-2 py-0.5 sm:py-1 rounded bg-gray-600 text-gray-100">Pay: {o.payment_status}</span>
-                      <span className="px-2 py-0.5 sm:py-1 rounded bg-gray-600 text-gray-100">Phar: {o.pharmacy_status}</span>
+                      <span className="px-2 py-0.5 sm:py-1 rounded bg-background border border-border text-foreground">Adm: {o.admin_status}</span>
+                      <span className="px-2 py-0.5 sm:py-1 rounded bg-background border border-border text-foreground">Doc: {o.doctor_status}</span>
+                      <span className="px-2 py-0.5 sm:py-1 rounded bg-background border border-border text-foreground">Pay: {o.payment_status}</span>
+                      <span className="px-2 py-0.5 sm:py-1 rounded bg-background border border-border text-foreground">Phar: {o.pharmacy_status}</span>
                     </div>
                   </div>
                   {/* stage indicator */}
-                  <div className="mt-2 text-xs text-gray-300">
+                  <div className="mt-2 text-xs text-muted-foreground">
                     {(() => {
                       const s = stage;
-                      const cls = (x: string) => x === s ? 'text-blue-400 underline' : 'text-gray-300';
+                      const cls = (x: string) => x === s ? 'text-primary font-bold underline' : 'text-muted-foreground';
                       return (
                         <div className="flex items-center gap-2">
                           <span className={cls('admin')}>Admin</span>
@@ -474,11 +476,11 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <Dialog onOpenChange={(open) => { if (!open) setViewing(null); }}>
                       <DialogTrigger asChild>
-                        <Button variant="outline" className="text-gray-300 border-gray-400 hover:bg-gray-600/20" onClick={() => setViewing(o)}>
+                        <Button variant="outline" className="text-foreground border-border hover:bg-accent" onClick={() => setViewing(o)}>
                           View details
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-4xl max-h-[80vh]">
+                      <DialogContent className="bg-card border-border text-foreground max-w-4xl max-h-[80vh]">
                         <DialogHeader>
                           <DialogTitle>Request details</DialogTitle>
                           <DialogDescription className="sr-only">Detailed health information and tracking status for your medication request.</DialogDescription>
@@ -486,40 +488,43 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                         <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <div className="flex justify-between"><span className="text-gray-400">Full name</span><span className="font-medium">{viewing?.full_name || '-'}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">ID card</span><span className="font-medium">{viewing?.id_card || '-'}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">Phone</span><span className="font-medium">{viewing?.phone || '-'}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">Age</span><span className="font-medium">{viewing?.age ?? '-'}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">Gender</span><span className="font-medium capitalize">{(viewing?.gender || '-').toString().replace(/_/g,' ')}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">Payment</span><span className="font-medium capitalize">{(viewing?.payment_method || '-').toString().replace(/_/g,' ')}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Full name</span><span className="font-medium">{viewing?.full_name || '-'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">ID card</span><span className="font-medium">{viewing?.id_card || '-'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Phone</span><span className="font-medium">{viewing?.phone || '-'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Age</span><span className="font-medium">{viewing?.age ?? '-'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Gender</span><span className="font-medium capitalize">{(viewing?.gender || '-').toString().replace(/_/g,' ')}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Payment</span><span className="font-medium capitalize">{(viewing?.payment_method || '-').toString().replace(/_/g,' ')}</span></div>
                             </div>
                             <div className="space-y-2">
-                              <div className="flex justify-between"><span className="text-gray-400">District</span><span className="font-medium">{viewing?.district || '-'}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">Sector</span><span className="font-medium">{viewing?.sector || '-'}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">Cell</span><span className="font-medium">{viewing?.cell || '-'}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">Village</span><span className="font-medium">{viewing?.village || '-'}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">Disease</span><span className="font-medium capitalize">{viewing?.disease?.replace(/_/g,' ')}</span></div>
-                              <div className="flex justify-between"><span className="text-gray-400">Quantity</span><span className="font-medium capitalize">{viewing?.dosage?.replace(/_/g,' ')}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">District</span><span className="font-medium">{viewing?.district || '-'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Sector</span><span className="font-medium">{viewing?.sector || '-'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Cell</span><span className="font-medium">{viewing?.cell || '-'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Village</span><span className="font-medium">{viewing?.village || '-'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Disease</span><span className="font-medium capitalize">{viewing?.disease?.replace(/_/g,' ')}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Quantity</span><span className="font-medium capitalize">{viewing?.dosage?.replace(/_/g,' ')}</span></div>
                             </div>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-400 mb-2">Statuses</p>
+                            <p className="text-sm text-muted-foreground mb-2">Statuses</p>
                             <div className="flex flex-wrap gap-2 text-xs">
-                              <span className="px-2 py-1 rounded bg-gray-700 text-gray-100">Admin: {viewing?.admin_status}</span>
-                              <span className="px-2 py-1 rounded bg-gray-700 text-gray-100">Doctor: {viewing?.doctor_status}</span>
-                            	  <span className="px-2 py-1 rounded bg-gray-700 text-gray-100">Payment: {viewing?.payment_status}</span>
-                              <span className="px-2 py-1 rounded bg-gray-700 text-gray-100">Pharmacy: {viewing?.pharmacy_status}</span>
+                              <span className="px-2 py-1 rounded bg-secondary border border-border text-foreground">Admin: {viewing?.admin_status}</span>
+                              <span className="px-2 py-1 rounded bg-secondary border border-border text-foreground">Doctor: {viewing?.doctor_status}</span>
+                            	  <span className="px-2 py-1 rounded bg-secondary border border-border text-foreground">Payment: {viewing?.payment_status}</span>
+                              <span className="px-2 py-1 rounded bg-secondary border border-border text-foreground">Pharmacy: {viewing?.pharmacy_status}</span>
                             </div>
                           </div>
                           {viewing?.admin_status === 'rejected' && viewing?.admin_reject_reason && (
-                            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-300">
-                              <div className="font-medium text-red-200 mb-1">Rejection reason</div>
-                              <div className="whitespace-pre-line">{viewing.admin_reject_reason}</div>
+                            <div className="p-4 bg-red-50 border border-red-100 rounded-lg text-sm text-red-700 shadow-sm">
+                              <div className="font-bold text-red-800 mb-1 flex items-center">
+                                <LogOut className="h-4 w-4 mr-2 rotate-180" />
+                                Rejection Reason
+                              </div>
+                              <div className="whitespace-pre-line italic font-medium">{viewing.admin_reject_reason}</div>
                             </div>
                           )}
                           {viewing?.medical_certificate && (
                             <div>
-                              <p className="text-sm text-gray-400 mb-2">Medical certificate</p>
+                              <p className="text-sm text-muted-foreground mb-2">Medical certificate</p>
                               {
                                 (() => {
                                   const url = viewing?.medical_certificate?.startsWith('data:')
@@ -531,7 +536,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                                   if (isPdf) {
                                     return (
                                       <>
-                                        <object data={url} type="application/pdf" className="w-full h-96 rounded border border-gray-700">
+                                        <object data={url} type="application/pdf" className="w-full h-96 rounded border border-border">
                                           <a href={url} target="_blank" rel="noreferrer" className="text-blue-400 underline">Open PDF</a>
                                         </object>
                                         <div className="mt-2 flex gap-3 text-sm">
@@ -543,10 +548,10 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                                   }
                                   return (
                                     <>
-                                      <img src={url} alt="Medical certificate" className="max-h-96 rounded border border-gray-700" />
-                                      <div className="mt-2 flex gap-3 text-sm">
-                                        <a href={url} target="_blank" rel="noreferrer" className="text-blue-400 underline">Open full</a>
-                                        <a href={url} download className="text-blue-400 underline">Download</a>
+                                      <img src={url} alt="Medical certificate" className="max-h-96 rounded-lg border border-border shadow-md transition-transform hover:scale-[1.01]" />
+                                      <div className="mt-2 flex gap-4 text-sm font-bold">
+                                        <a href={url} target="_blank" rel="noreferrer" className="text-primary hover:underline">Open Full Image</a>
+                                        <a href={url} download className="text-primary hover:underline">Download Copy</a>
                                       </div>
                                     </>
                                   );
@@ -562,51 +567,56 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                           )}
                           {/* Invoice summary and payment */}
                           {(viewing as any)?.invoice_status === 'sent' && (
-                            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded text-sm text-blue-200">
-                              <div className="font-medium text-blue-100 mb-2">Invoice Ready — Please Pay</div>
-                              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-gray-200">
-                                <div>Method</div><div className="text-white font-medium capitalize">{(viewing as any).invoice_method?.toString().replace(/_/g,' ') || '—'}</div>
-                                <div>Medicine</div><div className="text-white font-medium">{Number((viewing as any).invoice_medicine_total || 0).toFixed(2)}</div>
-                                <div>Doctor</div><div className="text-white font-medium">{Number((viewing as any).invoice_doctor_fee || 0).toFixed(2)}</div>
-                                <div>Service</div><div className="text-white font-medium">{Number((viewing as any).invoice_service_fee || 0).toFixed(2)}</div>
-                                <div>Delivery</div><div className="text-white font-medium">{Number((viewing as any).invoice_delivery_fee || 0).toFixed(2)}</div>
-                                <div className="font-semibold">Total</div><div className="text-white font-semibold">{Number((viewing as any).invoice_total || 0).toFixed(2)}</div>
+                            <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl text-sm text-foreground shadow-sm mb-4">
+                              <div className="font-bold text-primary mb-3 flex items-center">
+                                <Activity className="h-4 w-4 mr-2" />
+                                Invoice Ready — Please Complete Payment
+                              </div>
+                              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-muted-foreground bg-white/50 p-3 rounded-lg border border-primary/5">
+                                <div className="font-medium">Method</div><div className="text-foreground font-bold capitalize">{(viewing as any).invoice_method?.toString().replace(/_/g,' ') || '—'}</div>
+                                <div className="font-medium">Medicine</div><div className="text-foreground font-bold">{Number((viewing as any).invoice_medicine_total || 0).toFixed(2)} RWF</div>
+                                <div className="font-medium">Doctor Fee</div><div className="text-foreground font-bold">{Number((viewing as any).invoice_doctor_fee || 0).toFixed(2)} RWF</div>
+                                <div className="font-medium">Service Fee</div><div className="text-foreground font-bold">{Number((viewing as any).invoice_service_fee || 0).toFixed(2)} RWF</div>
+                                <div className="font-medium">Delivery Fee</div><div className="text-foreground font-bold">{Number((viewing as any).invoice_delivery_fee || 0).toFixed(2)} RWF</div>
+                                <div className="font-black text-primary border-t border-primary/10 pt-2 text-base">Total</div><div className="text-primary font-black border-t border-primary/10 pt-2 text-base">{Number((viewing as any).invoice_total || 0).toFixed(2)} RWF</div>
                               </div>
                               {viewing?.payment_status !== 'confirmed' && (
-                                <div className="mt-3">
-                                  <div className="flex gap-2 flex-wrap">
-                                    <Button
-                                      className="bg-emerald-600 hover:bg-emerald-700"
-                                      onClick={() => { setMomoOpen(true); setMomoOrder(viewing); setMsisdn(''); setMomoRef(null); setMomoStatus(null); }}
-                                    >
-                                      Pay Now
-                                    </Button>
-                                  </div>
+                                <div className="mt-4">
+                                  <Button
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 shadow-lg transition-all"
+                                    onClick={() => { setMomoOpen(true); setMomoOrder(viewing); setMsisdn(''); setMomoRef(null); setMomoStatus(null); }}
+                                  >
+                                    Pay with Mobile Money (MoMo)
+                                  </Button>
                                 </div>
                               )}
                             </div>
                           )}
               {/* Unified Treatment Plan (visible after payment or after delivery) */}
               {((viewing?.payment_status === 'confirmed') || (viewing?.pharmacy_status === 'delivered')) && (viewing?.medicine_name || viewing?.doctor_instructions || viewing?.doctor_advice || viewing?.adherence_plan) && (
-                            <div className="p-3 bg-gray-700/60 border border-gray-700 rounded-lg space-y-2">
-                              <p className="text-sm font-bold text-emerald-400 mb-1">Treatment Plan: {viewing.medicine_name || 'Medicine'}</p>
+                            <div className="p-4 bg-emerald-50 rounded-xl space-y-3 border border-emerald-100 shadow-sm">
+                              <p className="text-sm font-black text-emerald-700 mb-1 uppercase tracking-tight flex items-center">
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Treatment Plan: {viewing.medicine_name || 'Medicine'}
+                              </p>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="text-xs space-y-1">
-                                  <p className="text-[10px] uppercase text-gray-500 font-bold">Fulfillment</p>
-                                  <div><span className="text-gray-400">Qty:</span> <span className="text-gray-100">{viewing?.prescription_quantity || viewing?.dosage || '-'}</span></div>
-                                  {viewing?.doctor_instructions && <div className="italic text-gray-200">“{viewing.doctor_instructions}”</div>}
+                                  <p className="text-[10px] uppercase text-emerald-600 font-black">Fulfillment</p>
+                                  <div><span className="text-emerald-700/70 font-bold">Qty:</span> <span className="text-emerald-900 font-bold">{viewing?.prescription_quantity || viewing?.dosage || '-'}</span></div>
+                                  {viewing?.doctor_instructions && <div className="italic text-emerald-800 font-medium bg-white/50 p-2 rounded border border-emerald-100/50 mt-1">“{viewing.doctor_instructions}”</div>}
                                 </div>
                                 <div className="text-xs space-y-1">
-                                  <p className="text-[10px] uppercase text-gray-500 font-bold">Adherence & Advice</p>
-                                  {viewing?.doctor_advice && <div><span className="text-gray-400">Advice:</span> <span className="text-blue-300 line-clamp-3">{viewing.doctor_advice}</span></div>}
-                                  {viewing?.adherence_plan && <div className="pt-1 border-t border-gray-600/50 mt-1"><span className="text-gray-400 font-bold uppercase text-[9px] block">Plan:</span> <span className="text-amber-300/80">{viewing.adherence_plan}</span></div>}
+                                  <p className="text-[10px] uppercase text-emerald-600 font-black">Adherence & Advice</p>
+                                  {viewing?.doctor_advice && <div><span className="text-emerald-700/70 font-bold">Advice:</span> <span className="text-primary font-bold line-clamp-3">{viewing.doctor_advice}</span></div>}
+                                  {viewing?.doctor_advice && <div><span className="text-emerald-700/70 font-bold">Advice:</span> <span className="text-emerald-900 font-bold line-clamp-3">{viewing.doctor_advice}</span></div>}
+                                  {viewing?.adherence_plan && <div className="pt-2 border-t border-emerald-100 mt-2"><span className="text-amber-700 font-black uppercase text-[9px] block mb-1">Pharmacist Plan:</span> <span className="text-amber-800 font-bold italic">{viewing.adherence_plan}</span></div>}
                                 </div>
                               </div>
                             </div>
                           )}
-              {viewing && (viewing.payment_status !== 'confirmed') && (viewing.pharmacy_status !== 'delivered') && (viewing.medicine_name || viewing.doctor_instructions || viewing.doctor_advice || viewing.adherence_plan) && (
-                            <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded text-sm text-yellow-200">
-                Doctor guidance will be available after payment is confirmed or once delivery is completed.
+                          {viewing && (viewing.payment_status !== 'confirmed') && (viewing.pharmacy_status !== 'delivered') && (viewing.medicine_name || viewing.doctor_instructions || viewing.doctor_advice || viewing.adherence_plan) && (
+                            <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg text-sm text-amber-700 font-medium italic shadow-sm">
+                              Doctor guidance will be unlocked once payment is confirmed or delivery is completed.
                             </div>
                           )}
                         </div>
@@ -617,12 +627,12 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                         </div>
                       </DialogContent>
                     </Dialog>
-                    <Button variant="outline" className="text-blue-300 border-blue-400 hover:bg-blue-600/10" onClick={openChat}>
+                    <Button variant="outline" className="text-primary border-primary/50 hover:bg-primary/10" onClick={openChat}>
                       {chatLabel}
                     </Button>
                     {canPay && (
                       <Button
-                        className="bg-emerald-600 hover:bg-emerald-700"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
                         onClick={() => { setMomoOpen(true); setMomoOrder(o); setMsisdn(''); setMomoRef(null); setMomoStatus(null); }}
                       >
                         Pay Now
@@ -632,9 +642,8 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                       <>
                         <Dialog onOpenChange={(open) => { if (!open) setEditing(null); }}>
                           <DialogTrigger asChild>
-                            <Button variant="outline" className="text-yellow-300 border-yellow-400 hover:bg-yellow-600/10" onClick={() => {
+                            <Button variant="outline" className="text-amber-700 border-amber-600/50 hover:bg-amber-50" onClick={() => {
                               setEditing(o);
-                              // prefill form values for editing
                               reset({
                                 fullName: o.full_name || '',
                                 idCard: o.id_card || '',
@@ -654,7 +663,7 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                               Edit
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-3xl max-h-[80vh]">
+                          <DialogContent className="bg-card border-border text-foreground max-w-3xl max-h-[80vh]">
                             <DialogHeader>
                               <DialogTitle>Edit Request</DialogTitle>
                               <DialogDescription className="sr-only">Update your personal details, location, or medication information for this request.</DialogDescription>
@@ -662,40 +671,40 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                             <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-4">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2">
                                 <div>
-                                  <Label className="text-gray-300">Full Name</Label>
-                                  <Input className="bg-gray-700 border-gray-600 text-white" {...register('fullName')} />
+                                  <Label className="text-foreground">Full Name</Label>
+                                  <Input className="bg-background border-border text-foreground" {...register('fullName')} />
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">ID Card</Label>
-                                  <Input className="bg-gray-700 border-gray-600 text-white" {...register('idCard')} />
+                                  <Label className="text-foreground">ID Card</Label>
+                                  <Input className="bg-background border-border text-foreground" {...register('idCard')} />
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">Phone</Label>
-                                  <Input className="bg-gray-700 border-gray-600 text-white" {...register('phone')} />
+                                  <Label className="text-foreground">Phone</Label>
+                                  <Input className="bg-background border-border text-foreground" {...register('phone')} />
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">District</Label>
-                                  <Input className="bg-gray-700 border-gray-600 text-white" {...register('district')} />
+                                  <Label className="text-foreground">District</Label>
+                                  <Input className="bg-background border-border text-foreground" {...register('district')} />
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">Sector</Label>
-                                  <Input className="bg-gray-700 border-gray-600 text-white" {...register('sector')} />
+                                  <Label className="text-foreground">Sector</Label>
+                                  <Input className="bg-background border-border text-foreground" {...register('sector')} />
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">Cell</Label>
-                                  <Input className="bg-gray-700 border-gray-600 text-white" {...register('cell')} />
+                                  <Label className="text-foreground">Cell</Label>
+                                  <Input className="bg-background border-border text-foreground" {...register('cell')} />
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">Village</Label>
-                                  <Input className="bg-gray-700 border-gray-600 text-white" {...register('village')} />
+                                  <Label className="text-foreground">Village</Label>
+                                  <Input className="bg-background border-border text-foreground" {...register('village')} />
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">Chronic Disease</Label>
+                                  <Label className="text-foreground">Chronic Disease</Label>
                                   <Select onValueChange={(v) => setValue('disease', v)}>
-                                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                                    <SelectTrigger className="bg-background border-border text-foreground">
                                       <SelectValue placeholder="Select disease" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
+                                    <SelectContent className="bg-card border-border text-foreground">
                                       {chronicDiseasesRW.map((d) => (
                                         <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
                                       ))}
@@ -703,12 +712,12 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                                   </Select>
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">Quantity</Label>
+                                  <Label className="text-foreground">Quantity</Label>
                                   <Select onValueChange={(v) => setValue('dosage', v)}>
-                                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                                    <SelectTrigger className="bg-background border-border text-foreground">
                                       <SelectValue placeholder="Select dose" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
+                                    <SelectContent className="bg-card border-border text-foreground">
                                       {dosageFrequencies.map((d) => (
                                         <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
                                       ))}
@@ -716,16 +725,16 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                                   </Select>
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">Age</Label>
-                                  <Input type="number" className="bg-gray-700 border-gray-600 text-white" {...register('age', { valueAsNumber: true })} />
+                                  <Label className="text-foreground">Age</Label>
+                                  <Input type="number" className="bg-background border-border text-foreground" {...register('age', { valueAsNumber: true })} />
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">Gender</Label>
+                                  <Label className="text-foreground">Gender</Label>
                                   <Select onValueChange={(v) => setValue('gender', v)}>
-                                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                                    <SelectTrigger className="bg-background border-border text-foreground">
                                       <SelectValue placeholder="Select gender" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
+                                    <SelectContent className="bg-card border-border text-foreground">
                                       {genders.map((g) => (
                                         <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>
                                       ))}
@@ -733,12 +742,12 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                                   </Select>
                                 </div>
                                 <div>
-                                  <Label className="text-gray-300">Payment Method</Label>
+                                  <Label className="text-foreground">Payment Method</Label>
                                   <Select onValueChange={(v) => setValue('paymentMethod', v)}>
-                                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                                    <SelectTrigger className="bg-background border-border text-foreground">
                                       <SelectValue placeholder="Select payment method" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
+                                    <SelectContent className="bg-card border-border text-foreground">
                                       {paymentMethods.map((p) => (
                                         <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
                                       ))}
@@ -746,13 +755,13 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                                   </Select>
                                 </div>
                                 <div className="md:col-span-2">
-                                  <Label className="text-gray-300">Medical Certificate (PDF/JPG/PNG)</Label>
-                                  <Input type="file" accept=".pdf,image/*" className="bg-gray-700 border-gray-600 text-white" {...register('medicalCertificate')} />
+                                  <Label className="text-foreground">Medical Certificate (PDF/JPG/PNG)</Label>
+                                  <Input type="file" accept=".pdf,image/*" className="bg-background border-border text-foreground" {...register('medicalCertificate')} />
                                 </div>
                               </div>
                               <div className="flex justify-end gap-2">
                                 <Button type="button" variant="outline" onClick={() => setEditing(null)}>Close</Button>
-                                <Button type="submit" disabled={editSubmitting} className="bg-blue-600 hover:bg-blue-700">
+                                <Button type="submit" disabled={editSubmitting} className="bg-primary text-primary-foreground hover:bg-primary/90">
                                   {editSubmitting ? 'Saving...' : 'Save Changes'}
                                 </Button>
                               </div>
@@ -761,20 +770,20 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                         </Dialog>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="outline" className="text-red-300 border-red-400 hover:bg-red-600/10">
+                            <Button variant="outline" className="text-red-600 border-red-600/50 hover:bg-red-50">
                               Cancel
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent className="bg-gray-800 border-gray-700 text-gray-100">
+                          <AlertDialogContent className="bg-card border-border text-foreground">
                             <AlertDialogHeader>
                               <AlertDialogTitle>Cancel this request?</AlertDialogTitle>
-                              <AlertDialogDescription className="text-gray-300">
+                              <AlertDialogDescription className="text-muted-foreground">
                                 This action cannot be undone. Your request will be canceled and removed from active review.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel className="bg-gray-700 border-gray-600 text-gray-100 hover:bg-gray-600">No, keep it</AlertDialogCancel>
-                              <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={() => onCancelOrder(o.id)}>
+                              <AlertDialogCancel className="bg-secondary border-border text-foreground hover:bg-accent">No, keep it</AlertDialogCancel>
+                              <AlertDialogAction className="bg-red-600 hover:bg-red-700 text-white" onClick={() => onCancelOrder(o.id)}>
                                 Yes, cancel
                               </AlertDialogAction>
                             </AlertDialogFooter>
@@ -785,19 +794,22 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                   </div>
                   {/* brief invoice summary on card */}
                   {(o as any).invoice_status === 'sent' && (
-                    <div className="mt-3 text-xs text-blue-200 bg-blue-500/10 border border-blue-500/20 rounded p-2">
+                    <div className="mt-3 text-xs text-primary bg-primary/10 border border-primary/20 rounded p-2">
                       <div className="font-medium mb-1">Invoice</div>
                       <div className="flex flex-wrap gap-x-4 gap-y-1">
-                        <div>Method: <span className="text-white capitalize">{(o as any).invoice_method?.toString().replace(/_/g,' ') || '—'}</span></div>
-                        <div>Total: <span className="text-white">{Number((o as any).invoice_total || 0).toFixed(2)}</span></div>
+                        <div>Method: <span className="text-foreground font-bold capitalize">{(o as any).invoice_method?.toString().replace(/_/g,' ') || '—'}</span></div>
+                        <div>Total: <span className="text-foreground font-bold">{Number((o as any).invoice_total || 0).toFixed(2)}</span></div>
                       </div>
                     </div>
                   )}
                   {/* brief treatment summary on card (visible after payment or delivery) */}
                   {(o.payment_status === 'confirmed' || o.pharmacy_status === 'delivered') && (o.medicine_name || o.doctor_instructions || o.doctor_advice || o.prescription_quantity) && (
-                    <div className="mt-3 p-2 bg-emerald-950/20 border border-emerald-900/30 rounded text-xs">
-                      <div className="font-bold text-emerald-400 mb-1">Active Treatment: {o.medicine_name}</div>
-                      <div className="text-gray-300 italic line-clamp-1">“{o.doctor_instructions || 'Follow prescribed routine.'}”</div>
+                    <div className="mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded-lg text-xs shadow-sm">
+                      <div className="font-black text-emerald-700 mb-1 flex items-center">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Active Treatment: {o.medicine_name}
+                      </div>
+                      <div className="text-emerald-600 font-medium italic line-clamp-1">“{o.doctor_instructions || 'Follow prescribed routine.'}”</div>
                     </div>
                   )}
                 </div>
@@ -868,22 +880,22 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-gray-100 max-w-md">
+      <DialogContent className="bg-card border-border text-foreground max-w-md">
         <DialogHeader>
           <DialogTitle>Pay with MTN MoMo</DialogTitle>
           <DialogDescription className="sr-only">Initiate a secure mobile money payment to complete your medication order.</DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
-          <div className="text-sm text-gray-300">Order #{order?.id}</div>
-          <div className="text-sm text-gray-300">Amount to pay: <span className="text-white font-semibold">{total.toFixed(2)}</span></div>
+          <div className="text-sm text-muted-foreground">Order #{order?.id}</div>
+          <div className="text-sm text-muted-foreground">Amount to pay: <span className="text-foreground font-bold">{total.toFixed(2)}</span></div>
           <div>
-            <Label className="text-gray-300">MTN Number (2507XXXXXXXX or 07XXXXXXXX)</Label>
-            <Input value={msisdn} onChange={(e:any)=>setMsisdn(e.target.value)} placeholder="07XXXXXXXX or 2507XXXXXXXX" className="bg-gray-700 border-gray-600 text-white" />
+            <Label className="text-foreground">MTN Number (2507XXXXXXXX or 07XXXXXXXX)</Label>
+            <Input value={msisdn} onChange={(e:any)=>setMsisdn(e.target.value)} placeholder="07XXXXXXXX or 2507XXXXXXXX" className="bg-background border-border text-foreground" />
           </div>
           {!referenceId ? (
             <Button
               disabled={disabled}
-              className="bg-yellow-600 hover:bg-yellow-700"
+              className="bg-amber-600 hover:bg-amber-700 text-white w-full"
               onClick={async ()=>{
                 try {
                   let normalizedMsisdn = msisdn.trim();
@@ -908,8 +920,8 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
             </Button>
           ) : (
             <div className="space-y-2">
-              <div className="text-sm">Reference: <span className="font-mono">{referenceId}</span></div>
-              <div className="text-sm">Status: <span className={`font-semibold ${status === 'SUCCESSFUL' ? 'text-green-400' : 'text-yellow-400'}`}>{status || 'PENDING'}</span></div>
+              <div className="text-sm border-t border-border pt-2">Reference: <span className="font-mono font-bold text-primary">{referenceId}</span></div>
+              <div className="text-sm font-medium">Status: <span className={`font-black tracking-tight ${status === 'SUCCESSFUL' ? 'text-emerald-700' : 'text-amber-700'}`}>{status || 'PENDING'}</span></div>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -934,14 +946,14 @@ export function MtnMomoDialog({ open, onOpenChange, order, msisdn, setMsisdn, re
                 </Button>
                 {status === 'SUCCESSFUL' && (
                   <Button
-                    className="bg-green-600 hover:bg-green-700 w-full"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white w-full font-bold shadow-md"
                     onClick={()=>{ onPaid && onPaid(); onOpenChange(false); }}
                   >
                     Done
                   </Button>
                 )}
               </div>
-              <div className="text-xs text-gray-400 italic text-center mt-2">
+              <div className="text-xs text-muted-foreground italic text-center mt-2">
                 Waiting for payment confirmation... (Auto-polling)
               </div>
             </div>

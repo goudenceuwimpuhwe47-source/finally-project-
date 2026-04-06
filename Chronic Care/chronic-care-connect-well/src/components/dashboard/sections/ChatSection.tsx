@@ -386,34 +386,34 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
     <div className="space-y-6 flex flex-col h-full max-w-5xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            {target === 'admin' ? 'Support Portal' : target === 'doctor' ? `Consultation with ${doctorName}` : 'Pharmacy Chat'}
+          <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight flex items-center">
+            {target === 'admin' ? 'Support Center' : target === 'doctor' ? `Consultation: ${doctorName}` : 'Pharmacy Direct'}
           </h1>
-          <div className="flex items-center mt-1 space-x-2">
-            <span className={`relative flex h-2 w-2`}>
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${target === 'admin' ? (adminOnline ? 'bg-emerald-400' : 'bg-slate-500') : target === 'doctor' ? (doctorOnline ? 'bg-emerald-400' : 'bg-slate-500') : (providerOnline ? 'bg-emerald-400' : 'bg-slate-500')}`}></span>
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${target === 'admin' ? (adminOnline ? 'bg-emerald-500' : 'bg-slate-600') : target === 'doctor' ? (doctorOnline ? 'bg-emerald-500' : 'bg-slate-600') : (providerOnline ? 'bg-emerald-500' : 'bg-slate-600')}`}></span>
-            </span>
-            <span className="text-xs font-medium text-slate-400">
-              {(target === 'admin' ? (adminOnline ? 'Admin is online' : 'Admin is offline') : target === 'doctor' ? (doctorOnline ? 'Physician is online' : 'Physician is offline') : (providerOnline ? 'Pharmacy is online' : 'Pharmacy is offline'))}
+          <div className="flex items-center mt-2 space-x-3">
+            <div className={`relative flex h-3 w-3`}>
+              <div className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-30 ${target === 'admin' ? (adminOnline ? 'bg-emerald-500' : 'bg-slate-400') : target === 'doctor' ? (doctorOnline ? 'bg-emerald-500' : 'bg-slate-400') : (providerOnline ? 'bg-emerald-500' : 'bg-slate-400')}`}></div>
+              <div className={`relative inline-flex rounded-full h-3 w-3 border-2 border-white ${target === 'admin' ? (adminOnline ? 'bg-emerald-500' : 'bg-slate-400') : target === 'doctor' ? (doctorOnline ? 'bg-emerald-500' : 'bg-slate-400') : (providerOnline ? 'bg-emerald-500' : 'bg-slate-400')}`}></div>
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 bg-secondary/50 px-2 py-0.5 rounded-full">
+              {(target === 'admin' ? (adminOnline ? 'Admin Online' : 'Admin Away') : target === 'doctor' ? (doctorOnline ? 'Physician Online' : 'Physician Away') : (providerOnline ? 'Pharmacist Online' : 'Pharmacist Away'))}
             </span>
           </div>
         </div>
       </div>
 
-      <Card className="h-[550px] sm:h-[650px] flex flex-col bg-slate-900/50 border-slate-800 backdrop-blur-xl overflow-hidden shadow-2xl">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-slate-800 bg-slate-900/30 py-3 px-4 sm:px-6">
-          <CardTitle className="text-base sm:text-lg font-bold flex items-center text-slate-200">
-            <div className="p-1.5 bg-indigo-500/10 rounded-lg mr-3">
-              <MessageSquare className="h-5 w-5 text-indigo-400" />
+      <Card className="h-[550px] sm:h-[650px] flex flex-col bg-white border-border overflow-hidden shadow-2xl rounded-2xl ring-1 ring-black/[0.03]">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-slate-50/50 py-4 px-4 sm:px-6">
+          <CardTitle className="text-base sm:text-lg font-black flex items-center text-foreground uppercase tracking-tight">
+            <div className="p-2 bg-primary/10 rounded-xl mr-3 shadow-sm">
+              <MessageSquare className="h-5 w-5 text-primary" />
             </div>
-            {target === 'admin' ? 'Administrative Help' : 'Clinical Direct'}
-            {target === 'admin' ? (adminTyping && <span className="ml-3 text-xs font-normal text-indigo-400 animate-pulse italic">typing…</span>) : target === 'doctor' ? (doctorTyping && <span className="ml-3 text-xs font-normal text-indigo-400 animate-pulse italic">typing…</span>) : ''}
+            {target === 'admin' ? 'Care Support' : 'Clinical Direct'}
+            {target === 'admin' ? (adminTyping && <span className="ml-3 text-[10px] font-black text-primary animate-pulse uppercase tracking-widest">typiing…</span>) : target === 'doctor' ? (doctorTyping && <span className="ml-3 text-[10px] font-black text-primary animate-pulse uppercase tracking-widest">typing…</span>) : ''}
           </CardTitle>
           <Button
             variant="ghost"
             size="sm"
-            className="text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 text-xs font-semibold uppercase tracking-wider transition-all"
+            className="text-muted-foreground hover:text-red-600 hover:bg-red-50 text-[10px] font-black uppercase tracking-widest transition-all h-8"
             onClick={() => {
               const key = getConvKey();
               const now = Date.now();
@@ -422,20 +422,20 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
               setMessages([]);
             }}
           >
-            Clear History
+            Clear Thread
           </Button>
         </CardHeader>
         
         <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-          <div ref={scrollRef} className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 bg-slate-950/40 custom-scrollbar scroll-smooth">
+          <div ref={scrollRef} className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 bg-background custom-scrollbar scroll-smooth">
             {messages.length === 0 && (
               <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-20 px-6">
-                <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center border border-slate-700/50">
-                  <MessageSquare className="h-8 w-8 text-slate-600" />
+                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center border border-border">
+                  <MessageSquare className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-slate-300 font-semibold">Start a conversation</h3>
-                  <p className="text-sm text-slate-500 mt-2 max-w-[240px]">
+                  <h3 className="text-foreground font-semibold">Start a conversation</h3>
+                  <p className="text-sm text-muted-foreground mt-2 max-w-[240px]">
                     How can we assist you with your health concerns today?
                   </p>
                 </div>
@@ -445,20 +445,20 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
               const mine = m.from_role === 'patient';
               return (
                 <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
-                  <div className={`relative group max-w-[85%] sm:max-w-md ${mine ? 'bg-indigo-600 rounded-2xl rounded-tr-none' : 'bg-slate-800 rounded-2xl rounded-tl-none'} p-3.5 sm:p-4 shadow-lg shadow-black/20`}>
-                    <p className="text-[13px] sm:text-[15px] leading-relaxed select-text">{m.content}</p>
-                    <div className={`text-[10px] mt-2 flex items-center gap-2 font-medium tracking-tight ${mine ? 'text-indigo-200/80' : 'text-slate-500'}`}>
+                  <div className={`relative group max-w-[85%] sm:max-w-md ${mine ? 'bg-primary text-primary-foreground rounded-2xl rounded-tr-none shadow-lg' : 'bg-slate-100 text-slate-800 rounded-2xl rounded-tl-none shadow-sm'} p-4 transition-all hover:shadow-md`}>
+                    <p className="text-[14px] sm:text-[15px] font-medium leading-relaxed select-text tracking-tight">{m.content}</p>
+                    <div className={`text-[9px] mt-2 flex items-center gap-2 font-black uppercase tracking-widest ${mine ? 'text-primary-foreground/60' : 'text-slate-400'}`}>
                       <span>{new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       {mine && (
-                        <span className={`text-[11px] font-bold ${m.status === 'read' ? 'text-emerald-300' : 'text-indigo-300'}`}>
-                          {m.status === 'read' ? '✓✓' : m.status === 'delivered' ? '✓✓' : '✓'}
+                        <span className={`text-[10px] font-black ${m.status === 'read' ? 'text-emerald-300' : 'text-primary-foreground/80'}`}>
+                          {m.status === 'read' ? 'READ' : m.status === 'delivered' ? '✓✓' : '✓'}
                         </span>
                       )}
                     </div>
-                    {mine && (
+                     {mine && (
                       <button
                         aria-label="Delete message"
-                        className="opacity-0 group-hover:opacity-100 absolute -top-2 -right-2 bg-slate-950/90 text-slate-400 hover:text-rose-400 rounded-full p-1.5 border border-slate-800 backdrop-blur-md transition-all scale-75 group-hover:scale-100"
+                        className="opacity-0 group-hover:opacity-100 absolute -top-2 -right-2 bg-background text-muted-foreground hover:text-red-500 rounded-full p-1.5 border border-border shadow-sm backdrop-blur-md transition-all scale-75 group-hover:scale-100"
                         onClick={() => {
                           const key = getConvKey();
                           if (key) {
@@ -479,11 +479,11 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
             })}
           </div>
 
-          <div className="p-4 bg-slate-900/40 border-t border-slate-800">
-            <div className="flex space-x-2 relative items-center">
+          <div className="p-4 sm:p-6 bg-slate-50/50 border-t border-border">
+            <div className="flex space-x-3 relative items-center">
               <Input 
-                placeholder="Type your health concern..."
-                className="flex-1 bg-slate-950/50 border-slate-700 text-slate-200 h-10 sm:h-12 rounded-xl focus:ring-indigo-500/30 transition-all placeholder:text-slate-600"
+                placeholder="Talk to your healthcare team..."
+                className="flex-1 bg-white border-border text-foreground h-12 sm:h-14 rounded-2xl focus:ring-primary/40 focus:border-primary shadow-sm transition-all placeholder:text-muted-foreground/50 font-medium px-5"
                 value={text}
                 onChange={(e) => {
                   setText(e.target.value);
@@ -494,10 +494,10 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
                 onKeyDown={(e) => { if (e.key === 'Enter') onSend(); }}
               />
               <Button 
-                className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-900/20 rounded-xl w-10 sm:w-12 h-10 sm:h-12 flex items-center justify-center p-0 shrink-0" 
+                className="bg-primary hover:bg-primary-hover text-white shadow-xl shadow-primary/25 rounded-2xl w-12 sm:w-14 h-12 sm:h-14 flex items-center justify-center p-0 shrink-0 transition-all active:scale-95" 
                 onClick={onSend}
               >
-                <Send className="h-5 w-5" />
+                <Send className="h-6 w-6" />
               </Button>
             </div>
           </div>
@@ -506,52 +506,52 @@ export function ChatSection({ to }: { to?: ChatTarget }) {
 
       <div className="space-y-4">
         <div className="flex items-center space-x-2 px-1">
-          <TrendingUp className="h-4 w-4 text-slate-500" />
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Quick Health Topics</h3>
+          <div className="h-4 w-1 bg-primary rounded-full" />
+          <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em]">Quick Consult Topics</h3>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button 
             onClick={() => setText("I need help managing my pain levels.")}
-            className="group h-auto p-4 text-left bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all shadow-lg"
+            className="group h-auto p-5 text-left bg-white border border-border/60 rounded-3xl hover:border-primary/40 hover:bg-slate-50 transition-all shadow-sm hover:shadow-lg"
           >
-            <div className="p-2 bg-rose-500/10 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
-              <Activity className="h-5 w-5 text-rose-400" />
+            <div className="p-2.5 bg-red-50 rounded-2xl w-fit mb-4 group-hover:bg-red-100 transition-colors">
+              <Activity className="h-5 w-5 text-red-600" />
             </div>
-            <p className="font-bold text-sm text-slate-200">Pain Management</p>
-            <p className="text-xs text-slate-500 mt-1 line-clamp-1">Discuss symptoms and levels</p>
+            <p className="font-black text-sm text-slate-800 uppercase tracking-tight">Pain Control</p>
+            <p className="text-[11px] font-bold text-muted-foreground mt-1.5 opacity-70">Evaluate symptom levels</p>
           </button>
           
           <button 
             onClick={() => setText("I want to report medication side effects.")}
-            className="group h-auto p-4 text-left bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-emerald-500/50 hover:bg-slate-800/80 transition-all shadow-lg"
+            className="group h-auto p-5 text-left bg-white border border-border/60 rounded-3xl hover:border-primary/40 hover:bg-slate-50 transition-all shadow-sm hover:shadow-lg"
           >
-            <div className="p-2 bg-emerald-500/10 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
-              <FileWarning className="h-5 w-5 text-emerald-400" />
+            <div className="p-2.5 bg-emerald-50 rounded-2xl w-fit mb-4 group-hover:bg-emerald-100 transition-colors">
+              <FileWarning className="h-5 w-5 text-emerald-600" />
             </div>
-            <p className="font-bold text-sm text-slate-200">Side Effects</p>
-            <p className="text-xs text-slate-500 mt-1 line-clamp-1">Report new concerns</p>
+            <p className="font-black text-sm text-slate-800 uppercase tracking-tight">Side Effects</p>
+            <p className="text-[11px] font-bold text-muted-foreground mt-1.5 opacity-70">Report new reactions</p>
           </button>
           
           <button 
             onClick={() => setText("I have a question about my medication dosage.")}
-            className="group h-auto p-4 text-left bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-blue-500/50 hover:bg-slate-800/80 transition-all shadow-lg"
+            className="group h-auto p-5 text-left bg-white border border-border/60 rounded-3xl hover:border-primary/40 hover:bg-slate-50 transition-all shadow-sm hover:shadow-lg"
           >
-            <div className="p-2 bg-blue-500/10 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
-              <Clock className="h-5 w-5 text-blue-400" />
+            <div className="p-2.5 bg-blue-50 rounded-2xl w-fit mb-4 group-hover:bg-blue-100 transition-colors">
+              <Clock className="h-5 w-5 text-blue-600" />
             </div>
-            <p className="font-bold text-sm text-slate-200">Dosage Help</p>
-            <p className="text-xs text-slate-500 mt-1 line-clamp-1">Ask about timing or doses</p>
+            <p className="font-black text-sm text-slate-800 uppercase tracking-tight">Dosage Help</p>
+            <p className="text-[11px] font-bold text-muted-foreground mt-1.5 opacity-70">Timing or dose questions</p>
           </button>
           
           <button 
             onClick={() => setText("I need urgent medical assistance.")}
-            className="group h-auto p-4 text-left bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-red-500/50 hover:bg-slate-800/80 transition-all shadow-lg"
+            className="group h-auto p-5 text-left bg-white border border-border/60 rounded-3xl hover:border-primary/40 hover:bg-slate-50 transition-all shadow-sm hover:shadow-lg"
           >
-            <div className="p-2 bg-red-500/10 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
+            <div className="p-2.5 bg-red-50 rounded-2xl w-fit mb-4 group-hover:bg-red-100 transition-colors">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
-            <p className="font-bold text-sm text-slate-200">Emergency</p>
-            <p className="text-xs text-slate-500 mt-1 line-clamp-1">Urgent clinical concerns</p>
+            <p className="font-black text-sm text-slate-800 uppercase tracking-tight">Urgent Case</p>
+            <p className="text-[11px] font-bold text-muted-foreground mt-1.5 opacity-70">Clinical emergency help</p>
           </button>
         </div>
       </div>

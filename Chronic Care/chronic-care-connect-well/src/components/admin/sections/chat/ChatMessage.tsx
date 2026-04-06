@@ -7,20 +7,20 @@ interface ChatMessageProps {
 
 export const ChatMessage = ({ message }: ChatMessageProps) => {
   return (
-    <div className={`flex ${message.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-xs lg:max-w-md px-3 py-2 rounded-lg ${
+    <div className={`flex ${message.sender === 'admin' ? 'justify-end' : 'justify-start'} mb-6 group`}>
+      <div className={`max-w-[85%] lg:max-w-md px-6 py-4 rounded-[28px] border shadow-sm transition-all duration-200 hover:shadow-md ${
         message.sender === 'admin'
-          ? 'bg-blue-600 text-white'
-          : 'bg-orange-500 text-white'
+          ? 'bg-primary border-primary/10 text-white rounded-tr-none ml-12'
+          : 'bg-white border-slate-100 text-slate-800 rounded-tl-none mr-12'
       }`}>
-        <p className="text-sm">{message.message}</p>
-        <div className="flex items-center gap-2 mt-1">
-          <p className={`text-xs ${message.sender === 'admin' ? 'text-blue-200' : 'text-orange-200'}`}>
+        <p className="text-sm font-bold leading-relaxed">{message.message}</p>
+        <div className="flex items-center justify-between gap-6 mt-3 border-t border-black/5 pt-2 opacity-60">
+          <p className="text-[9px] font-black uppercase tracking-widest">
             {message.timestamp}
           </p>
           {message.sender === 'admin' && (
-            <span className="text-[10px] opacity-80">
-              {message.status === 'read' ? '✓✓' : message.status === 'delivered' ? '✓✓' : '✓'}
+            <span className="text-[9px] font-black uppercase tracking-widest text-white/80">
+              {message.status === 'read' ? 'Manifest Seen' : 'Transmitted'}
             </span>
           )}
         </div>

@@ -116,13 +116,13 @@ export function DashboardSidebar({ activeSection, setActiveSection }: DashboardS
     };
   }, [token]);
   return (
-    <Sidebar className="border-r border-gray-700 bg-gray-800">
-      <SidebarHeader className="p-6 border-b border-gray-700">
+    <Sidebar className="border-r border-sidebar-border bg-sidebar">
+      <SidebarHeader className="p-6 border-b border-sidebar-border">
         <div className="flex items-center space-x-2">
-          <div className="bg-blue-600 p-2 rounded-lg">
-            <Pill className="h-6 w-6 text-white" />
+          <div className="bg-primary p-2 rounded-lg">
+            <Pill className="h-6 w-6 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold text-white">ChronicCare</span>
+          <span className="text-xl font-bold text-sidebar-foreground">ChronicCare</span>
         </div>
       </SidebarHeader>
       
@@ -135,24 +135,24 @@ export function DashboardSidebar({ activeSection, setActiveSection }: DashboardS
                   <SidebarMenuButton
                     onClick={() => setActiveSection(item.id)}
                     isActive={activeSection === item.id}
-                    className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-700 data-[state=open]:bg-blue-600 data-[state=open]:text-white"
+                    className="w-full justify-start text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent data-[state=open]:bg-primary data-[state=open]:text-primary-foreground"
                   >
                     <div className="relative">
                       {item.icon && <item.icon className="h-5 w-5" />}
                       {item.id === 'chat-admin' && unreadAdmin > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center">{unreadAdmin}</span>
+                        <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center font-bold">{unreadAdmin}</span>
                       )}
                       {item.id === 'chat-doctor' && unreadDoctor > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center">{unreadDoctor}</span>
+                        <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center font-bold">{unreadDoctor}</span>
                       )}
                       {item.id === 'notifications' && unreadNotifications > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center">{unreadNotifications}</span>
+                        <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center font-bold">{unreadNotifications}</span>
                       )}
                       {item.id === 'alerts' && unreadAlerts > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center">{unreadAlerts}</span>
+                        <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center font-bold">{unreadAlerts}</span>
                       )}
                       {item.id === 'chat-pharmacy' && unreadPharmacy > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center">{unreadPharmacy}</span>
+                        <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center font-bold">{unreadPharmacy}</span>
                       )}
                     </div>
                     <span className="ml-2">{item.title}</span>
@@ -163,9 +163,9 @@ export function DashboardSidebar({ activeSection, setActiveSection }: DashboardS
           </SidebarGroupContent>
         </SidebarGroup>
         
-        <div className="mt-auto pt-4 border-t border-gray-700">
+        <div className="mt-auto pt-4 border-t border-sidebar-border">
           <div className="px-2">
-            <LogoutConfirm triggerClassName="w-full justify-start text-red-400 hover:text-red-300" />
+            <LogoutConfirm triggerClassName="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive font-medium" />
           </div>
         </div>
       </SidebarContent>

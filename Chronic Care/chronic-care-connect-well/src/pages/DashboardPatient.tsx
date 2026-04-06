@@ -8,13 +8,13 @@ const DashboardPatient = () => {
 	const [activeSection, setActiveSection] = useState("health");
 
 	return (
-		<div className="min-h-screen bg-gray-900">
+		<div className="min-h-screen bg-background">
 			<SidebarProvider>
 				<DashboardSidebar 
 					activeSection={activeSection} 
 					setActiveSection={setActiveSection} 
 				/>
-				<SidebarInset className="bg-gray-900 flex flex-col min-h-screen overflow-x-hidden">
+				<SidebarInset className="bg-background flex flex-col min-h-screen overflow-x-hidden">
 					<PatientHeader />
 					<div className="flex-1 p-2 sm:p-4 md:p-6">
 						<DashboardContent activeSection={activeSection} setActiveSection={setActiveSection} />

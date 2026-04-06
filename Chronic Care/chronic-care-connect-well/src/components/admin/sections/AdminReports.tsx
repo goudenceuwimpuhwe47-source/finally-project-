@@ -120,20 +120,33 @@ export const AdminReports = () => {
   };
 
   if (isLoading) {
-    return <div className="text-white">Loading reports...</div>;
+    return (
+      <div className="space-y-8 animate-pulse h-full">
+        <div className="flex justify-between items-center">
+          <div className="h-10 bg-slate-200 rounded-2xl w-64"></div>
+          <div className="h-12 bg-slate-200 rounded-xl w-96"></div>
+        </div>
+        <div className="h-96 bg-slate-200 rounded-[32px]"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6 flex flex-col h-full">
-      <div className="flex flex-col xl:flex-row gap-6 justify-between items-start xl:items-center">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Reports & Analytics</h1>
-          <p className="text-gray-400 text-sm mt-1">Generate and export system-wide clinical data reports.</p>
+    <div className="space-y-10 flex flex-col h-full">
+      <div className="flex flex-col xl:flex-row gap-8 justify-between items-start xl:items-center mb-4">
+        <div className="space-y-2">
+          <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+            <div className="p-2 bg-primary rounded-2xl shadow-lg shadow-primary/20">
+              <TrendingUp className="h-6 w-6 text-white" />
+            </div>
+            Clinical Intelligence
+          </h1>
+          <p className="text-slate-400 font-bold text-sm">Synchronize and export system-wide clinical persistence data.</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap gap-2 w-full xl:w-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap gap-3 w-full xl:w-auto p-4 bg-slate-50/50 rounded-[28px] border border-slate-100 shadow-inner">
           <Button
             onClick={() => generateReportMutation.mutate("patient_engagement")}
-            className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm font-semibold shadow-lg shadow-blue-900/20"
+            className="bg-primary hover:bg-primary-hover text-white font-black uppercase text-[10px] tracking-widest h-12 px-6 rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]"
             disabled={generateReportMutation.isPending}
           >
             <TrendingUp className="h-4 w-4 mr-2" />
@@ -141,90 +154,110 @@ export const AdminReports = () => {
           </Button>
           <Button
             onClick={() => generateReportMutation.mutate("medication_usage")}
-            className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm font-semibold shadow-lg shadow-green-900/20"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest h-12 px-6 rounded-xl shadow-lg shadow-emerald-200 transition-all hover:scale-[1.02]"
             disabled={generateReportMutation.isPending}
           >
-            <FileText className="h-4 w-4 mr-2" />
-            Usage
+            <Layers className="h-4 w-4 mr-2" />
+            Usage Metrics
           </Button>
           <Button
             onClick={() => generateReportMutation.mutate("provider_activity")}
-            className="bg-purple-600 hover:bg-purple-700 text-xs sm:text-sm font-semibold shadow-lg shadow-purple-900/20"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase text-[10px] tracking-widest h-12 px-6 rounded-xl shadow-lg shadow-indigo-200 transition-all hover:scale-[1.02]"
             disabled={generateReportMutation.isPending}
           >
             <FileText className="h-4 w-4 mr-2" />
-            Activity
+            Activity Log
           </Button>
           <Button
             onClick={generateAll}
             variant="outline"
-            className="border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs sm:text-sm font-semibold"
+            className="border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-black uppercase text-[10px] tracking-widest h-12 px-6 rounded-xl transition-all"
             disabled={generateReportMutation.isPending}
             title="Generate all reports"
           >
-            <Layers className="h-4 w-4 mr-2 text-gray-400" />
-            Generate All
+            <Layers className="h-4 w-4 mr-2 text-primary" />
+            Batch Process
           </Button>
         </div>
       </div>
       
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Generated Reports</CardTitle>
+      <Card className="bg-white border-border shadow-sm rounded-[32px] overflow-hidden">
+        <CardHeader className="px-8 pt-8 pb-4 border-b border-slate-50">
+          <CardTitle className="text-xl font-black text-slate-800 tracking-tight flex items-center">
+            <Layers className="h-5 w-5 mr-3 text-primary" />
+            Archive Manifest
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="p-4 sm:p-8">
+          <div className="space-y-6">
             {reports?.map((report) => (
-              <div key={report.id} className="p-4 bg-gray-700 rounded-lg">
-                  <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0 w-full sm:w-auto">
-                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="border border-blue-600/30 text-blue-400 hover:bg-blue-600 hover:text-white text-[10px] font-bold uppercase transition-all"
-                        onClick={() => exportJSON(report)}
-                        title="Export JSON"
-                      >
-                        <Download className="h-3.5 w-3.5 mr-1.5" />
-                        JSON
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="border border-green-600/30 text-green-400 hover:bg-green-600 hover:text-white text-[10px] font-bold uppercase transition-all"
-                        onClick={() => exportCSV(report)}
-                        title="Export CSV"
-                      >
-                        <Download className="h-3.5 w-3.5 mr-1.5" />
-                        CSV
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="border border-indigo-600/30 text-indigo-400 hover:bg-indigo-600 hover:text-white text-[10px] font-bold uppercase transition-all"
-                        onClick={() => exportServer(report, 'json')}
-                        title="Download from server (JSON)"
-                      >
-                        <CloudDownload className="h-3.5 w-3.5 mr-1.5" />
-                        Srvr JSON
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="border border-emerald-600/30 text-emerald-400 hover:bg-emerald-600 hover:text-white text-[10px] font-bold uppercase transition-all"
-                        onClick={() => exportServer(report, 'csv')}
-                        title="Download from server (CSV)"
-                      >
-                        <CloudDownload className="h-3.5 w-3.5 mr-1.5" />
-                        Srvr CSV
-                      </Button>
+              <div key={report.id} className="p-8 bg-slate-50 border border-slate-100 rounded-[28px] hover:shadow-md transition-all group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-primary opacity-20" />
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
+                      <FileText className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-black text-slate-800 tracking-tight leading-none capitalize">
+                        {report.type.replace(/_/g, ' ')}
+                      </h3>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{format(new Date(report.generated_at), 'MMMM dd, yyyy · HH:mm:ss')}</p>
                     </div>
                   </div>
+                  <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="bg-white border border-slate-100 text-primary hover:bg-primary hover:text-white text-[10px] font-black uppercase tracking-widest h-10 px-5 rounded-xl transition-all shadow-sm"
+                      onClick={() => exportJSON(report)}
+                      title="Local Object Export"
+                    >
+                      <Download className="h-3.5 w-3.5 mr-2" />
+                      JSON
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="bg-white border border-slate-100 text-emerald-600 hover:bg-emerald-600 hover:text-white text-[10px] font-black uppercase tracking-widest h-10 px-5 rounded-xl transition-all shadow-sm"
+                      onClick={() => exportCSV(report)}
+                      title="Spreadsheet Export"
+                    >
+                      <Download className="h-3.5 w-3.5 mr-2" />
+                      CSV
+                    </Button>
+                    <div className="w-[1px] h-8 bg-slate-200 mx-1 hidden md:block" />
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="bg-white border border-slate-100 text-indigo-600 hover:bg-indigo-600 hover:text-white text-[10px] font-black uppercase tracking-widest h-10 px-5 rounded-xl transition-all shadow-sm"
+                      onClick={() => exportServer(report, 'json')}
+                      title="Cloud Persistence Retrieval"
+                    >
+                      <CloudDownload className="h-3.5 w-3.5 mr-2" />
+                      SRVR JSON
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="bg-white border border-slate-100 text-rose-600 hover:bg-rose-600 hover:text-white text-[10px] font-black uppercase tracking-widest h-10 px-5 rounded-xl transition-all shadow-sm"
+                      onClick={() => exportServer(report, 'csv')}
+                      title="Cloud CSV Retrieval"
+                    >
+                      <CloudDownload className="h-3.5 w-3.5 mr-2" />
+                      SRVR CSV
+                    </Button>
+                  </div>
+                </div>
               </div>
             ))}
             {reports?.length === 0 && (
-              <div className="text-center py-8 text-gray-400">
-                No reports generated yet
+              <div className="text-center py-24 bg-slate-50/50 rounded-[32px] border-2 border-dashed border-slate-100">
+                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                  <FileText className="h-8 w-8 text-slate-200" />
+                </div>
+                <h3 className="text-slate-400 font-black uppercase text-xs tracking-widest">Archive Void</h3>
+                <p className="text-slate-400 font-bold text-[10px] mt-2">No clinical reports have been manifested for this period.</p>
               </div>
             )}
           </div>

@@ -72,10 +72,10 @@ export function NotificationsSection() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-white">Notifications</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Notifications</h1>
         <Button
           variant="outline"
-          className="w-full sm:w-auto text-sm"
+          className="w-full sm:w-auto text-sm border-border text-foreground hover:bg-accent"
           onClick={()=> {
             setItems(prev => prev.map(i=> ({ ...i, status: 'read' })));
             // inform sidebar to clear unread badge immediately
@@ -89,22 +89,37 @@ export function NotificationsSection() {
 
       <div className="space-y-4">
         {items.length === 0 && (
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="p-4 text-gray-300">No notifications yet.</CardContent>
+          <Card className="bg-card border-border">
+            <CardContent className="p-4 text-muted-foreground">No notifications yet.</CardContent>
           </Card>
         )}
         {items.map((n) => (
           <Card
             key={n.id}
-            className={`border ${n.status === 'unread' ? 'bg-blue-900/20 border-blue-700' : 'bg-gray-800 border-gray-700'} cursor-pointer`}
+            className={`border transition-all duration-200 cursor-pointer hover:shadow-md ${
+              n.status === 'unread' 
+                ? 'bg-blue-50 border-blue-100 shadow-sm ring-1 ring-blue-50' 
+                : 'bg-white border-border shadow-sm opacity-80 hover:opacity-100'
+            }`}
             onClick={() => markOneRead(n)}
           >
-            <CardHeader className="pb-2">
-              <CardTitle className="text-white flex items-center gap-2"><Bell className="h-4 w-4" /> {n.title}</CardTitle>
+            <CardHeader className="pb-1 pt-4">
+              <CardTitle className={`text-sm md:text-base font-black flex items-center gap-2 ${n.status === 'unread' ? 'text-blue-800' : 'text-foreground'}`}>
+                {n.status === 'unread' && <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />}
+                <Bell className={`h-4 w-4 ${n.status === 'unread' ? 'text-blue-600' : 'text-muted-foreground'}`} /> 
+                {n.title}
+              </CardTitle>
             </CardHeader>
-            <CardContent className="pt-0 text-gray-300">
-              <div className="text-sm">{n.message}</div>
-              <div className="text-xs text-gray-400 mt-2">{new Date(n.created_at).toLocaleString()}</div>
+            <CardContent className="pb-4 text-muted-foreground">
+              <div className={`text-sm font-medium ${n.status === 'unread' ? 'text-blue-900/80' : 'text-muted-foreground'}`}>{n.message}</div>
+              <div className="flex items-center gap-2 mt-3 overflow-hidden">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 bg-secondary/50 px-2 py-0.5 rounded-full">
+                  {new Date(n.created_at).toLocaleDateString()}
+                </span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 bg-secondary/50 px-2 py-0.5 rounded-full">
+                  {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
             </CardContent>
           </Card>
         ))}

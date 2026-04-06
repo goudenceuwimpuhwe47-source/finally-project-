@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Search, Package, User, Calendar, MapPin, CheckCircle, XCircle, Clock } from "lucide-react";
+import { FileText, Search, Package, User, Calendar, MapPin, CheckCircle, XCircle, Clock, TrendingUp, Pill } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -145,15 +145,15 @@ export const AdminOrders = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+        return 'bg-amber-50 text-amber-600 border-amber-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full';
       case 'under_review':
-        return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+        return 'bg-blue-50 text-blue-600 border-blue-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full';
       case 'approved':
-        return 'bg-green-500/10 text-green-400 border-green-500/20';
+        return 'bg-emerald-50 text-emerald-600 border-emerald-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full';
       case 'rejected':
-        return 'bg-red-500/10 text-red-400 border-red-500/20';
+        return 'bg-rose-50 text-rose-600 border-rose-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full';
       default:
-        return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
+        return 'bg-slate-50 text-slate-500 border-slate-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full';
     }
   };
 
@@ -174,16 +174,16 @@ export const AdminOrders = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-700 rounded w-48"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="h-10 bg-gray-700 rounded"></div>
-            <div className="h-10 bg-gray-700 rounded"></div>
+      <div className="space-y-8">
+        <div className="animate-pulse space-y-6">
+          <div className="h-10 bg-slate-200 rounded-2xl w-64"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="h-14 bg-slate-200 rounded-2xl"></div>
+            <div className="h-14 bg-slate-200 rounded-2xl"></div>
           </div>
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-gray-700 rounded-lg"></div>
+              <div key={i} className="h-64 bg-slate-200 rounded-3xl"></div>
             ))}
           </div>
         </div>
@@ -192,90 +192,113 @@ export const AdminOrders = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
-          <FileText className="h-6 w-6 md:h-8 md:w-8" />
-          Orders
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+        <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+          <div className="p-2 bg-primary rounded-2xl shadow-lg shadow-primary/20">
+            <FileText className="h-6 w-6 text-white" />
+          </div>
+          Order Manifest
         </h1>
-        <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 w-fit">{filteredOrders.length} Orders</Badge>
+        <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black uppercase tracking-widest px-4 py-1.5 rounded-full text-[10px]">
+          {filteredOrders.length} Total Records
+        </Badge>
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-3xl border border-border shadow-sm">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
           <Input
-      placeholder="Search by disease, username, email..."
+            placeholder="Search manifests, patients, or data..."
             value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-800 border-gray-700 text-white"
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-12 bg-slate-50 border-border text-foreground h-14 rounded-2xl focus:ring-primary/40 focus:border-primary font-bold placeholder:text-muted-foreground/50 transition-all shadow-inner"
           />
         </div>
         
-    <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v)}>
-          <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-            <SelectValue placeholder="Filter by status" />
+        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v)}>
+          <SelectTrigger className="bg-slate-50 border-border text-foreground h-14 rounded-2xl focus:ring-primary/40 focus:border-primary font-bold shadow-inner">
+            <div className="flex items-center gap-2">
+              <Package className="h-4 w-4 text-slate-400" />
+              <SelectValue placeholder="Status: All Records" />
+            </div>
           </SelectTrigger>
-          <SelectContent className="bg-gray-800 border-gray-700">
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-      <SelectItem value="under_review">Under Review</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
+          <SelectContent className="bg-white border-border rounded-2xl shadow-2xl p-2 ring-1 ring-black/[0.05]">
+            <SelectItem value="all" className="rounded-xl font-bold py-3 hover:bg-slate-50">Global View</SelectItem>
+            <SelectItem value="pending" className="rounded-xl font-bold py-3 hover:bg-amber-50 text-amber-600">Pending Review</SelectItem>
+            <SelectItem value="under_review" className="rounded-xl font-bold py-3 hover:bg-blue-50 text-blue-600">Clinical Review</SelectItem>
+            <SelectItem value="approved" className="rounded-xl font-bold py-3 hover:bg-emerald-50 text-emerald-600">Approved Orders</SelectItem>
+            <SelectItem value="rejected" className="rounded-xl font-bold py-3 hover:bg-rose-50 text-rose-600">Rejected Requests</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Orders List */}
-      <div className="grid gap-4">
+      <div className="grid gap-6">
         {filteredOrders.length > 0 ? (
           filteredOrders.map((order) => (
-            <Card key={order.id} className="bg-gray-800 border-gray-700">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-                  <div className="flex-1 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <Package className="h-5 w-5 text-white" />
+            <Card key={order.id} className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-lg transition-all group">
+              <CardContent className="p-0">
+                <div className="flex flex-col lg:flex-row lg:items-stretch justify-between">
+                  <div className="flex-1 p-6 sm:p-8 space-y-6">
+                    <div className="flex items-center gap-5">
+                      <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm group-hover:bg-primary/5 transition-colors">
+                        <Package className="h-7 w-7 text-primary" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-white">{order.disease?.replace(/_/g, ' ') || 'Medication Request'}</h3>
-                        <p className="text-sm text-gray-400">Order #{order.id}</p>
+                        <h3 className="text-xl font-black text-slate-800 tracking-tight group-hover:text-primary transition-colors">{order.disease?.replace(/_/g, ' ') || 'Consultation Request'}</h3>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1 opacity-60">Manifest ID: #{order.id}</p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div className="flex items-center gap-2 text-gray-400">
-                        <User className="h-4 w-4" />
-                        <span className="text-sm">{order.user_full_name || order.full_name || order.username || order.email || 'Unknown Patient'}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
+                      <div className="flex items-center gap-3 text-slate-600">
+                        <div className="p-2 bg-slate-100 rounded-xl">
+                          <User className="h-4 w-4 text-slate-500" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Patient Name</span>
+                          <span className="text-sm font-bold">{order.user_full_name || order.full_name || order.username || order.email || 'Anonymous'}</span>
+                        </div>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-gray-400">
-                        <Package className="h-4 w-4" />
-                        <span className="text-sm">Dosage: {order.dosage}</span>
+                      <div className="flex items-center gap-3 text-slate-600">
+                        <div className="p-2 bg-slate-100 rounded-xl">
+                          <Package className="h-4 w-4 text-slate-500" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Intensity</span>
+                          <span className="text-sm font-bold">Qty: {order.dosage}</span>
+                        </div>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-gray-400">
-                        <Calendar className="h-4 w-4" />
-                        <span className="text-sm">
-                          {new Date(order.created_at).toLocaleDateString()}
-                        </span>
+                      <div className="flex items-center gap-3 text-slate-600">
+                        <div className="p-2 bg-slate-100 rounded-xl">
+                          <Calendar className="h-4 w-4 text-slate-500" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Dispatch Date</span>
+                          <span className="text-sm font-bold">{new Date(order.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
                       </div>
 
                       {order.district && (
-                        <div className="flex items-center gap-2 text-gray-400 md:col-span-2">
-                          <MapPin className="h-4 w-4" />
-                          <span className="text-sm">{order.district}, {order.sector}, {order.cell}, {order.village}</span>
+                        <div className="flex items-center gap-3 text-slate-600 md:col-span-2 bg-slate-50 p-3 rounded-2xl border border-slate-100 shadow-inner">
+                          <MapPin className="h-4 w-4 text-primary" />
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-primary/60 uppercase tracking-widest">Geolocation</span>
+                            <span className="text-xs font-bold">{order.district}, {order.sector}, {order.cell}, {order.village}</span>
+                          </div>
                         </div>
                       )}
 
                       {order.medical_certificate && (
-                        <div className="md:col-span-3">
+                        <div className="md:col-span-3 pt-2">
                           <Button
                             variant="link"
                             size="sm"
-                            className="p-0 h-auto text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                            className="p-0 h-auto text-primary hover:text-primary-hover font-black uppercase text-[10px] tracking-widest flex items-center gap-2 group/link"
                             onClick={() => {
                               const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
                               const path = order.medical_certificate.startsWith('/') ? order.medical_certificate : `/${order.medical_certificate}`;
@@ -283,95 +306,93 @@ export const AdminOrders = () => {
                                 ? order.medical_certificate
                                 : (order.medical_certificate.startsWith('http') ? order.medical_certificate : `${base}${path}`);
                               setCertUrl(url);
-                              setCertFileName(order.medical_certificate.startsWith('data:') ? 'Embedded Image' : order.medical_certificate);
+                              setCertFileName(order.medical_certificate.startsWith('data:') ? 'Secured Medical Document' : order.medical_certificate);
                               setCertViewerOpen(true);
                             }}
                           >
-                            <FileText className="h-4 w-4" />
-                            View Attached Medical Certificate
+                            <div className="p-1.5 bg-primary/10 rounded-lg group-hover/link:bg-primary group-hover/link:text-white transition-all">
+                              <FileText className="h-3 w-3" />
+                            </div>
+                            View Digital Certificate
                           </Button>
                         </div>
                       )}
                     </div>
-
-                    {/* Notes/amount not available in current schema */}
                   </div>
 
-                  <div className="flex flex-col gap-3 items-end">
+                  <div className="bg-slate-50/50 border-l border-border p-6 sm:p-8 flex flex-col gap-6 items-center lg:items-end justify-center lg:w-72 shrink-0">
                     <Badge variant="outline" className={getStatusColor(order.admin_status)}>
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-2">
                         {getStatusIcon(order.admin_status)}
                         {order.admin_status}
                       </span>
                     </Badge>
 
                     {order.admin_status === 'pending' && (
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-3 w-full">
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700"
+                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest h-10 rounded-xl shadow-lg shadow-emerald-200 transition-all active:scale-95"
                           onClick={() => { setAssignOrderId(order.id); setAssignOpen(true); loadDoctors(); }}
                           disabled={updateOrderMutation.isPending}
                         >
-                          Move to Review
+                          <CheckCircle className="h-3 w-3 mr-2" /> Assign Reviewer
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
-                          className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+                          className="w-full border-rose-200 text-rose-600 hover:bg-rose-50 font-black uppercase text-[10px] tracking-widest h-10 rounded-xl transition-all"
                           onClick={() => { setPendingRejectId(order.id); setRejectReason(""); setRejectOpen(true); }}
                           disabled={updateOrderMutation.isPending}
                         >
-                          Reject
+                          <XCircle className="h-3 w-3 mr-2" /> Decline Request
                         </Button>
                       </div>
                     )}
 
                     {order.admin_status === 'under_review' && (
-                      <div className="flex flex-col gap-2 items-end">
-                        {/* Show find provider only if not assigned and not confirmed yet */}
+                      <div className="flex flex-col gap-3 items-end w-full">
                         {(!order.provider_id && !order.provider_confirmed) && (
                           <Button
                             size="sm"
-                            className="bg-indigo-600 hover:bg-indigo-700"
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase text-[10px] tracking-widest h-10 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95"
                             disabled={order.doctor_status !== 'approved'}
-                            title={order.doctor_status !== 'approved' ? 'Doctor must approve first' : ''}
+                            title={order.doctor_status !== 'approved' ? 'Awaiting Doctor Approval' : ''}
                             onClick={async () => {
                               try {
                                 const res = await fetch(`${API_URL}/orders/${order.id}/nearest-providers`, { headers: { Authorization: `Bearer ${token}` } });
                                 const data = await res.json();
-                                if (!res.ok || data?.error) throw new Error(data?.error || 'Failed to search providers');
+                                if (!res.ok || data?.error) throw new Error(data?.error || 'Targeting failed');
                                 setProviders(Array.isArray(data.providers) ? data.providers : []);
                                 setMatchLevel(data.matchLevel || null);
                                 setSelectedProviderId(null);
                                 setProviderOrderId(order.id);
                                 setProviderOpen(true);
                               } catch (e:any) {
-                                toast({ title: 'Search failed', description: e?.message || 'Could not find providers', variant: 'destructive' });
+                                toast({ title: 'System Error', description: e?.message || 'Geographical scan failed', variant: 'destructive' });
                               }
                             }}
                           >
-                            Find nearest provider
+                            <MapPin className="h-3 w-3 mr-2" /> Locate Provider
                           </Button>
                         )}
 
                         {/* If provider confirmed, show quote summary and payment action */}
                         {order.provider_confirmed ? (
-                          <div className="flex flex-col gap-2 items-end w-full">
-                            <div className="text-right text-sm text-gray-300">
-                              <div>Provider confirmed: <span className="text-white font-medium">{order.provider_confirmed_qty}</span> units</div>
-                              <div>Total price: <span className="text-white font-medium">{Number(order.provider_confirmed_price || 0).toFixed(2)}</span></div>
+                          <div className="flex flex-col gap-4 items-end w-full">
+                            <div className="text-right p-4 bg-white border border-slate-100 rounded-2xl shadow-inner w-full">
+                              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Provider Confirmation</div>
+                              <div className="text-sm font-bold text-slate-700">Stock: <span className="text-primary">{order.provider_confirmed_qty} Units</span></div>
+                              <div className="text-sm font-bold text-slate-700">Quoted: <span className="text-emerald-600">{Number(order.provider_confirmed_price || 0).toFixed(2)} RWF</span></div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="grid grid-cols-1 gap-2 w-full">
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/10"
+                                className="w-full border-amber-200 text-amber-600 hover:bg-amber-50 font-black uppercase text-[10px] tracking-widest h-10 rounded-xl"
                                 onClick={() => {
                                   setInvoiceOrder(order);
-                                  // default method: online (no delivery fee)
                                   setFulfillmentMethod('online');
-                                  // suggest fees (admin can edit)
                                   setDoctorFee('0');
                                   setServiceFee('0');
                                   setDeliveryFee('0');
@@ -379,27 +400,25 @@ export const AdminOrders = () => {
                                   setInvoiceOpen(true);
                                 }}
                                 disabled={!!order.invoice_total && order.invoice_status === 'sent'}
-                                title={order.invoice_status === 'sent' ? 'Invoice already sent' : ''}
                               >
-                                {order.invoice_status === 'sent' ? 'Invoice Sent' : 'Create Invoice'}
+                                {order.invoice_status === 'sent' ? 'Invoice Released' : 'Generate Invoice'}
                               </Button>
                               {order.invoice_status === 'sent' && order.payment_status !== 'confirmed' && (
                                 <Button
                                   size="sm"
                                   variant="destructive"
-                                  className="bg-red-600 hover:bg-red-700"
+                                  className="w-full bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-100 font-black uppercase text-[10px] tracking-widest h-10 rounded-xl"
                                   onClick={() => {
                                     setCancelInvoiceOrderId(order.id);
                                     setCancelInvoiceOpen(true);
                                   }}
-                                  title="Cancel the sent invoice so you can create a new one"
                                 >
-                                  Cancel Invoice
+                                  Void Invoice
                                 </Button>
                               )}
                               <Button
                                 size="sm"
-                                className="bg-emerald-600 hover:bg-emerald-700"
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest h-10 rounded-xl shadow-lg shadow-emerald-200 transition-all active:scale-95"
                                 disabled={order.payment_status === 'confirmed'}
                                 onClick={async () => {
                                   try {
@@ -409,27 +428,27 @@ export const AdminOrders = () => {
                                       body: JSON.stringify({ status: 'confirmed' })
                                     });
                                     const body = await res.json();
-                                    if (!res.ok || body?.error) throw new Error(body?.error || 'Payment update failed');
+                                    if (!res.ok || body?.error) throw new Error(body?.error || 'Handshake failed');
                                     queryClient.invalidateQueries({ queryKey: ['adminOrders'] });
-                                    toast({ title: 'Payment confirmed', description: `Order #${order.id} marked as paid` });
+                                    toast({ title: 'Transaction Secured', description: `Order #${order.id} verified` });
                                   } catch (e:any) {
-                                    toast({ title: 'Error', description: e?.message || 'Could not update payment', variant: 'destructive' });
+                                    toast({ title: 'System Error', description: e?.message || 'Payment logic failed', variant: 'destructive' });
                                   }
                                 }}
                               >
-                                {order.payment_status === 'confirmed' ? 'Payment Confirmed' : 'Confirm Payment'}
+                                {order.payment_status === 'confirmed' ? 'Payment Verified' : 'Verify Transaction'}
                               </Button>
                             </div>
                           </div>
                         ) : null}
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700"
+                          className="w-full bg-primary hover:bg-primary-hover text-white font-black uppercase text-[10px] tracking-widest h-12 rounded-xl shadow-xl shadow-primary/25 transition-all active:scale-95"
                           onClick={() => updateOrderMutation.mutate({ orderId: order.id, status: 'approved' })}
                           disabled={updateOrderMutation.isPending || order.doctor_status !== 'approved' || String(order.payment_status).toLowerCase() !== 'confirmed'}
-                          title={order.doctor_status !== 'approved' ? 'Doctor must approve first' : (String(order.payment_status).toLowerCase() !== 'confirmed' ? 'Payment must be confirmed first' : '')}
+                          title={order.doctor_status !== 'approved' ? 'Medical authorization missing' : (String(order.payment_status).toLowerCase() !== 'confirmed' ? 'Financial settlement pending' : '')}
                         >
-                          Approve
+                          Execute Approval
                         </Button>
                       </div>
                     )}
@@ -450,17 +469,17 @@ export const AdminOrders = () => {
             </Card>
           ))
         ) : (
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="py-12 text-center">
-              <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400 opacity-50" />
-              <h3 className="text-lg font-medium text-white mb-2">No Orders Found</h3>
-              <p className="text-gray-400">
-                {searchTerm || statusFilter !== "all" 
-                  ? "No orders match your search criteria." 
-                  : "No orders have been placed yet."}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="text-center py-32 bg-white rounded-[40px] border-2 border-dashed border-slate-100 shadow-inner">
+            <div className="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-sm">
+              <FileText className="h-12 w-12 text-slate-200" />
+            </div>
+            <h3 className="text-slate-800 font-black tracking-tight uppercase text-sm mb-2">No Active Manifests</h3>
+            <p className="text-slate-400 font-bold text-xs max-w-[300px] mx-auto px-6">
+              {searchTerm || statusFilter !== "all" 
+                ? "Your search query yielded no results in the central registry." 
+                : "The medication order queue is currently empty."}
+            </p>
+          </div>
         )}
       </div>
 
@@ -482,30 +501,33 @@ export const AdminOrders = () => {
 
       {/* Assign Doctor dialog */}
       <Dialog open={assignOpen} onOpenChange={setAssignOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white">
+        <DialogContent className="bg-white border-border text-foreground shadow-2xl rounded-[32px] p-8 ring-1 ring-black/[0.05]">
           <DialogHeader>
-            <DialogTitle>Assign a Doctor</DialogTitle>
-            <DialogDescription className="sr-only">Choose a healthcare professional to review and handle this medication order.</DialogDescription>
+            <DialogTitle className="text-2xl font-black tracking-tight text-slate-800">Assign Reviewer</DialogTitle>
+            <DialogDescription className="font-bold text-slate-400">Select a certified healthcare professional to analyze this request.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <Label className="text-gray-300">Select Doctor</Label>
+          <div className="space-y-4 py-4">
+            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Medical Professional</Label>
             <Select onValueChange={(v)=> setSelectedDoctorId(Number(v))}>
-              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                <SelectValue placeholder="Choose a doctor" />
+              <SelectTrigger className="bg-slate-50 border-border text-foreground h-14 rounded-2xl focus:ring-primary/40 focus:border-primary font-bold shadow-inner">
+                <SelectValue placeholder="Choose a specialist" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700 text-white max-h-64">
+              <SelectContent className="bg-white border-border text-foreground max-h-64 rounded-2xl shadow-2xl p-2">
                 {doctors.map(d => (
-                  <SelectItem key={d.id} value={String(d.id)}>
-                    {d.username ? `@${d.username}` : d.name} — {d.email}
+                  <SelectItem key={d.id} value={String(d.id)} className="rounded-xl font-bold py-3 hover:bg-slate-50">
+                    <div className="flex flex-col">
+                      <span className="text-sm">{d.username ? `@${d.username}` : d.name}</span>
+                      <span className="text-[10px] text-muted-foreground opacity-60 font-black uppercase tracking-widest">{d.email}</span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={()=> setAssignOpen(false)}>Cancel</Button>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="ghost" className="font-bold text-slate-500 rounded-xl px-6" onClick={()=> setAssignOpen(false)}>Dismiss</Button>
             <Button
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest h-12 px-8 rounded-xl shadow-lg shadow-emerald-200 transition-all active:scale-95"
               disabled={!assignOrderId || !selectedDoctorId}
               onClick={async ()=>{
                 if (!assignOrderId || !selectedDoctorId) return;
@@ -515,18 +537,18 @@ export const AdminOrders = () => {
                     body: JSON.stringify({ doctorId: selectedDoctorId })
                   });
                   const data = await res.json();
-                  if (!res.ok || data?.error) throw new Error(data?.error || 'Assign failed');
+                  if (!res.ok || data?.error) throw new Error(data?.error || 'Authorization denied');
                   setAssignOpen(false);
                   setAssignOrderId(null);
                   setSelectedDoctorId(null);
                   queryClient.invalidateQueries({ queryKey: ['adminOrders'] });
-                  toast({ title: 'Assigned', description: 'Order moved to review and assigned to the doctor.' });
+                  toast({ title: 'Assigned Successfully', description: 'Review protocols initialized.' });
                 } catch (e:any) {
-                  toast({ title: 'Error', description: e?.message || 'Failed to assign doctor', variant: 'destructive' });
+                  toast({ title: 'System Error', description: e?.message || 'Handshake failed', variant: 'destructive' });
                 }
               }}
             >
-              Assign
+              Confirm Assignment
             </Button>
           </div>
         </DialogContent>
@@ -534,53 +556,58 @@ export const AdminOrders = () => {
 
       {/* Create Invoice dialog */}
       <Dialog open={invoiceOpen} onOpenChange={setInvoiceOpen}>
-  <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-lg h-[85vh] p-0 overflow-hidden flex flex-col">
+        <DialogContent className="bg-white border-border text-foreground max-w-lg h-[90vh] p-0 overflow-hidden flex flex-col rounded-[40px] shadow-2xl ring-1 ring-black/[0.05]">
           <div className="flex h-full flex-col">
-      <DialogHeader className="px-6 pt-6">
-              <DialogTitle>Create Invoice</DialogTitle>
-              <DialogDescription>Review provider quote, choose fulfillment, add fees, and send the invoice to the patient.</DialogDescription>
+            <DialogHeader className="px-8 pt-8 pb-4 bg-slate-50/50 border-b border-border/50">
+              <DialogTitle className="text-2xl font-black tracking-tight text-slate-800">Financial Settlement</DialogTitle>
+              <DialogDescription className="font-bold text-slate-400 mt-1">Review provider quote and configure clinical fees.</DialogDescription>
             </DialogHeader>
             {invoiceOrder && (
               <>
-                <div className="px-6 pb-4 flex-1 overflow-y-auto">
-                  <div className="space-y-4 pr-2">
-                    <div className="text-sm text-gray-300">
-                      <div>Order #{invoiceOrder.id}</div>
-                      <div>Medicine: <span className="text-white font-medium">{invoiceOrder.medicine_name || '—'}</span></div>
-                      <div>Quantity confirmed: <span className="text-white font-medium">{invoiceOrder.provider_confirmed_qty}</span></div>
-                      <div>Medicine total (from provider): <span className="text-white font-medium">{Number(invoiceOrder.provider_confirmed_price || 0).toFixed(2)}</span></div>
+                <div className="px-8 py-6 flex-1 overflow-y-auto">
+                  <div className="space-y-6 pr-2">
+                    <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100 shadow-inner">
+                      <div className="text-[10px] font-black text-primary uppercase tracking-widest mb-3 opacity-60">Verified Order Metrics</div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center"><span className="text-xs font-bold text-slate-500">Manifest ID</span><span className="text-xs font-black text-slate-800">#{invoiceOrder.id}</span></div>
+                        <div className="flex justify-between items-center"><span className="text-xs font-bold text-slate-500">Medicine</span><span className="text-xs font-black text-slate-800">{invoiceOrder.medicine_name || '—'}</span></div>
+                        <div className="flex justify-between items-center"><span className="text-xs font-bold text-slate-500">Inventory Units</span><span className="text-xs font-black text-slate-800">{invoiceOrder.provider_confirmed_qty}</span></div>
+                        <div className="flex justify-between items-center pt-2 border-t border-slate-200 mt-2"><span className="text-xs font-black text-slate-500 uppercase tracking-widest">Base Quote</span><span className="text-sm font-black text-emerald-600">{Number(invoiceOrder.provider_confirmed_price || 0).toFixed(2)} RWF</span></div>
+                      </div>
                     </div>
-                    <Separator className="bg-gray-700" />
-                    <div className="space-y-2">
-                      <Label className="text-gray-300">Fulfillment Method</Label>
+
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Fulfillment Protocol</Label>
                       <Select value={fulfillmentMethod} onValueChange={(v)=> setFulfillmentMethod(v as any)}>
-                        <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                        <SelectTrigger className="bg-slate-50 border-border text-foreground h-14 rounded-2xl focus:ring-primary/40 focus:border-primary font-bold shadow-inner">
                           <SelectValue placeholder="Select method" />
                         </SelectTrigger>
-                        <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                          <SelectItem value="online">Online (no delivery fee)</SelectItem>
-                          <SelectItem value="home_delivery">Home Delivery</SelectItem>
-                          <SelectItem value="pharmacy_pickup">Pharmacy Pickup</SelectItem>
+                        <SelectContent className="bg-white border-border rounded-2xl shadow-2xl p-2">
+                          <SelectItem value="online" className="rounded-xl font-bold py-3">Digital Fulfillment (No Fee)</SelectItem>
+                          <SelectItem value="home_delivery" className="rounded-xl font-bold py-3">Direct Home Delivery</SelectItem>
+                          <SelectItem value="pharmacy_pickup" className="rounded-xl font-bold py-3">On-site Pharmacy Pickup</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-gray-300">Doctor Fee</Label>
-                        <Input type="number" min="0" step="0.01" className="bg-gray-800 border-gray-700 text-white" value={doctorFee} onChange={(e)=> setDoctorFee(e.target.value)} />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Review Fee</Label>
+                        <Input type="number" min="0" step="0.01" className="bg-slate-50 border-border h-14 rounded-2xl focus:ring-primary/40 focus:border-primary font-bold shadow-inner" value={doctorFee} onChange={(e)=> setDoctorFee(e.target.value)} />
                       </div>
-                      <div>
-                        <Label className="text-gray-300">Service Fee</Label>
-                        <Input type="number" min="0" step="0.01" className="bg-gray-800 border-gray-700 text-white" value={serviceFee} onChange={(e)=> setServiceFee(e.target.value)} />
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Service Fee</Label>
+                        <Input type="number" min="0" step="0.01" className="bg-slate-50 border-border h-14 rounded-2xl focus:ring-primary/40 focus:border-primary font-bold shadow-inner" value={serviceFee} onChange={(e)=> setServiceFee(e.target.value)} />
                       </div>
-                      <div className="col-span-2">
-                        <Label className="text-gray-300">Delivery Fee {fulfillmentMethod === 'online' && <span className="text-xs text-gray-400">(ignored for online)</span>}</Label>
-                        <Input type="number" min="0" step="0.01" className="bg-gray-800 border-gray-700 text-white" value={deliveryFee} onChange={(e)=> setDeliveryFee(e.target.value)} />
+                      <div className="col-span-2 space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Logistics {fulfillmentMethod === 'online' && <span className="text-[8px] text-rose-400 font-black ml-2">(DISABLED FOR DIGITAL)</span>}</Label>
+                        <Input type="number" min="0" step="0.01" className="bg-slate-50 border-border h-14 rounded-2xl focus:ring-primary/40 focus:border-primary font-bold shadow-inner" value={deliveryFee} onChange={(e)=> setDeliveryFee(e.target.value)} />
                       </div>
                     </div>
-                    <div>
-                      <Label className="text-gray-300">Notes (optional)</Label>
-                      <Textarea className="bg-gray-800 border-gray-700 text-white" rows={3} value={notes} onChange={(e)=> setNotes(e.target.value)} />
+
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Administrative Notes</Label>
+                      <Textarea className="bg-slate-50 border-border rounded-2xl focus:ring-primary/40 focus:border-primary font-bold shadow-inner min-h-[100px]" rows={3} value={notes} onChange={(e)=> setNotes(e.target.value)} placeholder="Attach specific instructions or context..." />
                     </div>
                     {(() => {
                       const med = Number(invoiceOrder.provider_confirmed_price || 0) || 0;
@@ -589,22 +616,30 @@ export const AdminOrders = () => {
                       const del = fulfillmentMethod === 'online' ? 0 : (Number(deliveryFee || 0) || 0);
                       const total = med + d + s + del;
                       return (
-                        <div className="bg-gray-800 border border-gray-700 rounded p-3 text-sm">
-                          <div className="flex justify-between"><span className="text-gray-300">Medicine</span><span className="text-white font-medium">{med.toFixed(2)}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-300">Doctor</span><span className="text-white font-medium">{d.toFixed(2)}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-300">Service</span><span className="text-white font-medium">{s.toFixed(2)}</span></div>
-                          <div className="flex justify-between"><span className="text-gray-300">Delivery</span><span className="text-white font-medium">{del.toFixed(2)}</span></div>
-                          <Separator className="my-2 bg-gray-700" />
-                          <div className="flex justify-between text-base font-semibold"><span>Total</span><span>{total.toFixed(2)}</span></div>
+                        <div className="bg-slate-900 rounded-3xl p-6 shadow-2xl relative overflow-hidden group">
+                          <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                            <TrendingUp className="h-24 w-24 text-white" />
+                          </div>
+                          <div className="space-y-3 relative z-10">
+                            <div className="flex justify-between items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Base Quote</span><span className="text-sm font-bold text-white">{med.toFixed(2)}</span></div>
+                            <div className="flex justify-between items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Clinical Review</span><span className="text-sm font-bold text-white">{d.toFixed(2)}</span></div>
+                            <div className="flex justify-between items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Access</span><span className="text-sm font-bold text-white">{s.toFixed(2)}</span></div>
+                            <div className="flex justify-between items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Logistic Fee</span><span className="text-sm font-bold text-white">{del.toFixed(2)}</span></div>
+                            <Separator className="my-4 bg-slate-800" />
+                            <div className="flex justify-between items-end">
+                              <span className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Authenticated Total</span>
+                              <span className="text-3xl font-black text-white tracking-tighter">{total.toFixed(2)} <span className="text-xs opacity-40">RWF</span></span>
+                            </div>
+                          </div>
                         </div>
                       );
                     })()}
                   </div>
                 </div>
-                <div className="px-6 pb-6 pt-3 flex justify-end gap-2 border-t border-gray-800 bg-gray-900 shrink-0 sticky bottom-0">
-                  <Button variant="outline" onClick={()=> setInvoiceOpen(false)}>Cancel</Button>
+                <div className="px-8 pb-8 pt-6 flex justify-end gap-3 border-t border-border bg-slate-50/50 shrink-0 sticky bottom-0">
+                  <Button variant="ghost" className="font-bold text-slate-500 rounded-xl px-6" onClick={()=> setInvoiceOpen(false)}>Dismiss</Button>
                   <Button
-                    className="bg-yellow-600 hover:bg-yellow-700"
+                    className="bg-primary hover:bg-primary-hover text-white font-black uppercase text-[10px] tracking-widest h-14 px-10 rounded-2xl shadow-xl shadow-primary/25 transition-all active:scale-95"
                     disabled={submittingInvoice}
                     onClick={async ()=>{
                       if (!invoiceOrder) return;
@@ -629,19 +664,19 @@ export const AdminOrders = () => {
                           })
                         });
                         const body = await res.json();
-                        if (!res.ok || body?.error) throw new Error(body?.error || 'Failed to create invoice');
+                        if (!res.ok || body?.error) throw new Error(body?.error || 'Validation failed');
                         setInvoiceOpen(false);
                         setInvoiceOrder(null);
                         queryClient.invalidateQueries({ queryKey: ['adminOrders'] });
-                        toast({ title: 'Invoice sent', description: `Invoice sent to patient for Order #${invoiceOrder.id}` });
+                        toast({ title: 'Invoice Dispatched', description: `Financial record sent to order #${invoiceOrder.id}` });
                       } catch (e:any) {
-                        toast({ title: 'Error', description: e?.message || 'Could not create invoice', variant: 'destructive' });
+                        toast({ title: 'Transmission Error', description: e?.message || 'Invoice finalization failed', variant: 'destructive' });
                       } finally {
                         setSubmittingInvoice(false);
                       }
                     }}
                   >
-                    Send Invoice
+                    Release Invoice
                   </Button>
                 </div>
               </>
@@ -652,42 +687,50 @@ export const AdminOrders = () => {
 
       {/* Assign Provider dialog */}
       <Dialog open={providerOpen} onOpenChange={setProviderOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white">
+        <DialogContent className="bg-white border-border text-foreground shadow-2xl rounded-[32px] p-8 ring-1 ring-black/[0.05]">
           <DialogHeader>
-            <DialogTitle>Assign a Provider/Pharmacy</DialogTitle>
-            <DialogDescription className="sr-only">Select a local pharmacy or healthcare provider to fulfill this prescription.</DialogDescription>
+            <DialogTitle className="text-2xl font-black tracking-tight text-slate-800">Target Fulfillment</DialogTitle>
+            <DialogDescription className="font-bold text-slate-400">Identify a local pharmacy or clinical provider to fulfill this manifest.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <div className="text-sm text-gray-300">
+          <div className="space-y-6 pt-4">
+            <div className="text-sm">
               {matchLevel === 'all' ? (
-                <div className="bg-yellow-900/30 border border-yellow-600/50 rounded p-3 mb-2">
-                  <span className="text-yellow-400 font-medium">⚠️ No nearest providers found.</span>
-                  <p className="text-gray-300 mt-1">Showing all providers in the system. Please choose any provider you want.</p>
+                <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 mb-4 shadow-sm">
+                  <span className="text-amber-600 font-black uppercase text-[10px] tracking-widest block mb-1">⚠️ Wide Coverage Mode</span>
+                  <p className="text-slate-600 font-medium text-xs leading-relaxed">No nearest facilities detected. Platform is now scanning the global provider network. Please select any available hub.</p>
                 </div>
               ) : matchLevel ? (
-                <span>Matched by <span className="font-medium">{matchLevel}</span>. Choose a provider to assign.</span>
+                <div className="flex items-center gap-3 bg-emerald-50 p-4 rounded-2xl border border-emerald-100 mb-2">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-bold text-emerald-800">Geographical Match: <span className="uppercase text-[10px] tracking-widest">{matchLevel}</span> Precision</span>
+                </div>
               ) : (
-                <span>No providers found in the system.</span>
+                <div className="bg-slate-50 p-4 rounded-2xl text-center border border-slate-100 text-slate-400 font-bold text-xs uppercase tracking-widest">Network Offline / No Providers</div>
               )}
             </div>
-            <Label className="text-gray-300">Select Provider</Label>
-            <Select onValueChange={(v)=> setSelectedProviderId(Number(v))}>
-              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                <SelectValue placeholder={providers.length ? 'Choose a provider' : 'No providers found'} />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700 text-white max-h-64">
-                {providers.map((p:any) => (
-                  <SelectItem key={p.id} value={String(p.id)}>
-                    {(p.name || p.username || p.email)} — {p.district}, {p.sector}, {p.cell}, {p.village}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Select Licensed Hub</Label>
+              <Select onValueChange={(v)=> setSelectedProviderId(Number(v))}>
+                <SelectTrigger className="bg-slate-50 border-border text-foreground h-14 rounded-2xl focus:ring-primary/40 focus:border-primary font-bold shadow-inner">
+                  <SelectValue placeholder={providers.length ? 'Choose a hub' : 'No hubs synchronized'} />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-border text-foreground max-h-64 rounded-2xl shadow-2xl p-2">
+                  {providers.map((p:any) => (
+                    <SelectItem key={p.id} value={String(p.id)} className="rounded-xl font-bold py-3 hover:bg-slate-50">
+                      <div className="flex flex-col">
+                        <span className="text-sm">{(p.name || p.username || p.email)}</span>
+                        <span className="text-[10px] text-muted-foreground opacity-60 font-black uppercase tracking-widest">{p.district}, {p.sector}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={()=> setProviderOpen(false)}>Close</Button>
+          <div className="flex justify-end gap-3 pt-6">
+            <Button variant="ghost" className="font-bold text-slate-500 rounded-xl px-6" onClick={()=> setProviderOpen(false)}>Dismiss</Button>
             <Button
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase text-[10px] tracking-widest h-12 px-8 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95"
               disabled={!providerOrderId || !selectedProviderId}
               onClick={async ()=>{
                 if (!providerOrderId || !selectedProviderId) return;
@@ -697,18 +740,18 @@ export const AdminOrders = () => {
                     body: JSON.stringify({ providerId: selectedProviderId })
                   });
                   const data = await res.json();
-                  if (!res.ok || data?.error) throw new Error(data?.error || 'Assignment failed');
+                  if (!res.ok || data?.error) throw new Error(data?.error || 'Targeting failed');
                   setProviderOpen(false);
                   setProviderOrderId(null);
                   setSelectedProviderId(null);
                   queryClient.invalidateQueries({ queryKey: ['adminOrders'] });
-                  toast({ title: 'Provider assigned', description: 'Order assigned to the selected provider/pharmacy.' });
+                  toast({ title: 'Hub Assigned', description: 'Logistics protocols initialized for manifest.' });
                 } catch (e:any) {
-                  toast({ title: 'Error', description: e?.message || 'Failed to assign provider', variant: 'destructive' });
+                  toast({ title: 'System Error', description: e?.message || 'Assignment handshake failed', variant: 'destructive' });
                 }
               }}
             >
-              Assign Provider
+              Initialize Fulfillment
             </Button>
           </div>
         </DialogContent>
@@ -716,17 +759,17 @@ export const AdminOrders = () => {
 
       {/* Cancel Invoice confirm */}
       <AlertDialog open={cancelInvoiceOpen} onOpenChange={setCancelInvoiceOpen}>
-        <AlertDialogContent className="bg-gray-900 border-gray-700 text-white">
+        <AlertDialogContent className="bg-white border-border text-foreground shadow-2xl rounded-[32px] p-8 ring-1 ring-black/[0.05]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel this invoice?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will void the sent invoice as long as it is not yet paid. The order will return to invoice draft so you can create a new one.
+            <AlertDialogTitle className="text-2xl font-black tracking-tight text-slate-800">Void Financial Record?</AlertDialogTitle>
+            <AlertDialogDescription className="font-bold text-slate-400 mt-2">
+              This action will permanently invalidate the current invoice. Only proceed if the transaction has not been clinicaly settled.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Close</AlertDialogCancel>
+          <AlertDialogFooter className="pt-6 gap-3">
+            <AlertDialogCancel className="font-bold text-slate-500 rounded-xl px-8 border-slate-200">Keep Original</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-rose-600 hover:bg-rose-700 text-white font-black uppercase text-[10px] tracking-widest h-12 px-8 rounded-xl shadow-lg shadow-rose-200 transition-all active:scale-95"
               onClick={async ()=>{
                 if (!cancelInvoiceOrderId) return;
                 try {
@@ -735,17 +778,17 @@ export const AdminOrders = () => {
                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                   });
                   const body = await res.json();
-                  if (!res.ok || body?.error) throw new Error(body?.error || 'Failed to cancel invoice');
+                  if (!res.ok || body?.error) throw new Error(body?.error || 'Voiding cancelled');
                   setCancelInvoiceOpen(false);
                   setCancelInvoiceOrderId(null);
                   queryClient.invalidateQueries({ queryKey: ['adminOrders'] });
-                  toast({ title: 'Invoice canceled', description: `Invoice was canceled for order #${body?.orderId || cancelInvoiceOrderId}. You can create a new invoice.` });
+                  toast({ title: 'Invoice Voided', description: `Record cleared for manifest #${cancelInvoiceOrderId}.` });
                 } catch (e:any) {
-                  toast({ title: 'Error', description: e?.message || 'Could not cancel invoice', variant: 'destructive' });
+                  toast({ title: 'Security Error', description: e?.message || 'Failed to void transaction', variant: 'destructive' });
                 }
               }}
             >
-              Cancel Invoice
+              Confirm Void
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -753,28 +796,37 @@ export const AdminOrders = () => {
 
       {/* Certificate Viewer dialog */}
       <Dialog open={certViewerOpen} onOpenChange={setCertViewerOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-4xl max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle>Medical Certificate Preview</DialogTitle>
-            <DialogDescription className="text-gray-400 truncate">{certFileName}</DialogDescription>
+        <DialogContent className="bg-white border-border text-foreground max-w-4xl max-h-[90vh] p-0 overflow-hidden rounded-[40px] shadow-2xl ring-1 ring-black/[0.05]">
+          <DialogHeader className="px-10 pt-10 pb-6 bg-slate-50/50 border-b border-border/50">
+            <DialogTitle className="text-3xl font-black tracking-tight text-slate-800">Clinical Verification</DialogTitle>
+            <DialogDescription className="font-bold text-slate-400 mt-1 truncate max-w-md">Reference: <span className="text-primary">{certFileName}</span></DialogDescription>
           </DialogHeader>
-          <div className="mt-4 flex flex-col items-center justify-center overflow-auto max-h-[70vh]">
+          <div className="flex flex-col items-center justify-center p-8 overflow-auto max-h-[60vh] bg-slate-100/30">
             {certUrl?.toLowerCase().endsWith('.pdf') ? (
-              <object data={certUrl} type="application/pdf" className="w-full h-[60vh] rounded border border-gray-700">
-                <div className="p-12 text-center">
-                  <p className="mb-4">PDF cannot be previewed in browser.</p>
-                  <Button asChild><a href={certUrl} target="_blank" rel="noreferrer">Open PDF in New Tab</a></Button>
+              <object data={certUrl} type="application/pdf" className="w-full h-[55vh] rounded-3xl border border-slate-200 shadow-2xl bg-white">
+                <div className="p-16 text-center">
+                  <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <FileText className="h-10 w-10 text-slate-300" />
+                  </div>
+                  <h3 className="text-slate-800 font-black tracking-tight uppercase text-xs">PDF Render Error</h3>
+                  <p className="text-slate-400 font-bold text-xs mt-4 mb-8">This browser manifest does not support direct PDF streaming.</p>
+                  <Button asChild className="bg-primary hover:bg-primary-hover text-white font-black uppercase text-[10px] tracking-widest px-8 rounded-xl h-12 shadow-lg shadow-primary/20 transition-all"><a href={certUrl} target="_blank" rel="noreferrer">Open Secure Stream</a></Button>
                 </div>
               </object>
             ) : (
-              <img src={certUrl || ''} alt="Medical Certificate" className="max-w-full max-h-full object-contain rounded border border-gray-700 shadow-xl" />
+              <div className="relative group/preview">
+                <img src={certUrl || ''} alt="Clinical Verification" className="max-w-full max-h-full object-contain rounded-[32px] border-4 border-white shadow-2xl ring-1 ring-black/[0.05]" />
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-[32px] pointer-events-none" />
+              </div>
             )}
           </div>
-          <div className="mt-6 flex justify-end gap-3">
-            <Button variant="outline" asChild>
-              <a href={certUrl || ''} target="_blank" rel="noreferrer">Open Full View</a>
+          <div className="px-10 py-8 flex justify-end gap-4 border-t border-border bg-slate-50/50">
+            <Button variant="ghost" className="font-bold text-slate-500 rounded-xl px-8 h-12 hover:bg-white hover:text-primary transition-all" asChild>
+              <a href={certUrl || ''} target="_blank" rel="noreferrer">
+                <Search className="h-4 w-4 mr-2" /> Inspect Original
+              </a>
             </Button>
-            <Button variant="outline" onClick={() => setCertViewerOpen(false)}>Close</Button>
+            <Button variant="default" className="bg-primary hover:bg-primary-hover text-white font-black uppercase text-[10px] tracking-widest px-10 h-12 rounded-xl shadow-xl shadow-primary/25 transition-all" onClick={() => setCertViewerOpen(false)}>Close Inspector</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -782,7 +834,6 @@ export const AdminOrders = () => {
   );
 };
 
-// Reject confirmation dialog
 export const AdminOrdersRejectDialog = ({ open, onOpenChange, reason, setReason, onConfirm, loading }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -793,31 +844,30 @@ export const AdminOrdersRejectDialog = ({ open, onOpenChange, reason, setReason,
 }) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="bg-gray-900 border-gray-700 text-white">
+      <AlertDialogContent className="bg-white border-border text-foreground shadow-2xl rounded-[32px] p-8 ring-1 ring-black/[0.05]">
         <AlertDialogHeader>
-          <AlertDialogTitle>Reject this order?</AlertDialogTitle>
-          <AlertDialogDescription className="text-gray-300">
-            Are you sure you want to reject this order? Please provide a reason. The patient will see this reason.
+          <AlertDialogTitle className="text-2xl font-black tracking-tight text-slate-800">Decline Request?</AlertDialogTitle>
+          <AlertDialogDescription className="font-bold text-slate-400 mt-2">
+            This action will permanently reject the clinical manifest. Transparent reasoning must be provided to the patient.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="space-y-2">
-          <label className="text-sm text-gray-300">Reason</label>
-          <Textarea
+        <div className="py-6">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-rose-500 ml-1">Reason for Rejection</Label>
+          <Textarea 
+            className="mt-2 bg-slate-50 border-border rounded-2xl focus:ring-rose-500/40 focus:border-rose-500 font-bold shadow-inner min-h-[120px]" 
+            placeholder="Document the clinical or administrative reason for this decline..."
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Explain why this order is being rejected..."
-            className="bg-gray-800 border-gray-700 text-white"
-            rows={4}
           />
         </div>
-        <AlertDialogFooter>
-          <AlertDialogCancel className="bg-gray-800 border-gray-700 text-white">Cancel</AlertDialogCancel>
+        <AlertDialogFooter className="gap-3">
+          <AlertDialogCancel className="font-bold text-slate-500 rounded-xl px-8 border-slate-200">Reconsider</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-red-600 hover:bg-red-700"
-            disabled={!reason.trim() || loading}
+            className="bg-rose-600 hover:bg-rose-700 text-white font-black uppercase text-[10px] tracking-widest h-12 px-8 rounded-xl shadow-lg shadow-rose-200 transition-all active:scale-95"
             onClick={onConfirm}
+            disabled={loading || !reason.trim()}
           >
-            {loading ? 'Rejecting...' : 'Reject'}
+            {loading ? 'Processing...' : 'Confirm Rejection'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

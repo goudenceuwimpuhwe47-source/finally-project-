@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { MtnMomoDialog } from './RequestMedicationSection';
 import { io } from 'socket.io-client';
 import { API_URL } from '@/lib/utils';
+import { CheckCircle, LogOut } from 'lucide-react';
 
 type Order = {
   id: number;
@@ -77,9 +78,9 @@ export function MyRequestsSection({ setActiveSection }: { setActiveSection?: (s:
 
   return (
   <div className="space-y-6">
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-white">My Requests</CardTitle>
+          <CardTitle className="text-foreground">My Requests</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -89,23 +90,23 @@ export function MyRequestsSection({ setActiveSection }: { setActiveSection?: (s:
               const chatLabel = stage === 'admin' ? 'Chat with Admin' : stage === 'doctor' ? 'Chat with Doctor' : 'Chat with Pharmacy';
               const canPay = (o as any).invoice_status === 'sent' && o.payment_status !== 'confirmed';
               return (
-                <div key={o.id} className="p-3 bg-gray-700 rounded-lg">
+                <div key={o.id} className="p-3 bg-secondary rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-white font-medium capitalize">{o.disease.replace(/_/g,' ')}</p>
-                      <p className="text-xs text-gray-300">{new Date(o.created_at).toLocaleString()}</p>
+                      <p className="text-foreground font-medium capitalize">{o.disease.replace(/_/g,' ')}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</p>
                     </div>
                     <div className="flex gap-2 text-xs">
-                      <span className="px-2 py-1 rounded bg-gray-600 text-gray-100">Admin: {o.admin_status}</span>
-                      <span className="px-2 py-1 rounded bg-gray-600 text-gray-100">Doctor: {o.doctor_status}</span>
-                      <span className="px-2 py-1 rounded bg-gray-600 text-gray-100">Payment: {o.payment_status}</span>
-                      <span className="px-2 py-1 rounded bg-gray-600 text-gray-100">Pharmacy: {o.pharmacy_status}</span>
+                      <span className="px-2 py-1 rounded bg-background border border-border text-foreground">Admin: {o.admin_status}</span>
+                      <span className="px-2 py-1 rounded bg-background border border-border text-foreground">Doctor: {o.doctor_status}</span>
+                      <span className="px-2 py-1 rounded bg-background border border-border text-foreground">Payment: {o.payment_status}</span>
+                      <span className="px-2 py-1 rounded bg-background border border-border text-foreground">Pharmacy: {o.pharmacy_status}</span>
                     </div>
                   </div>
-                  <div className="mt-2 text-xs text-gray-300">
+                  <div className="mt-2 text-xs text-muted-foreground">
                     {(() => {
                       const s = stage;
-                      const cls = (x: string) => x === s ? 'text-blue-400 underline' : 'text-gray-300';
+                      const cls = (x: string) => x === s ? 'text-primary font-bold underline' : 'text-muted-foreground';
                       return (
                         <div className="flex items-center gap-2">
                           <span className={cls('admin')}>Admin</span>
@@ -119,7 +120,7 @@ export function MyRequestsSection({ setActiveSection }: { setActiveSection?: (s:
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {(() => { const chatStage: 'admin'|'doctor'|'pharmacy' = stage === 'canceled' ? 'admin' : stage; return (
-                    <Button variant="outline" className="text-gray-300 border-gray-400 hover:bg-gray-600/20" onClick={() => openChat(chatStage)}>
+                    <Button variant="outline" className="text-foreground border-border hover:bg-accent" onClick={() => openChat(chatStage)}>
                       {chatLabel}
                     </Button>
                     ); })()}
@@ -134,15 +135,21 @@ export function MyRequestsSection({ setActiveSection }: { setActiveSection?: (s:
                   </div>
                   <PatientOrderPrescriptions order={o} token={token!} />
                   {o.admin_status === 'rejected' && o.admin_reject_reason && (
-                    <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-300">
-                      <div className="font-medium text-red-200 mb-1">Rejection reason</div>
-                      <div className="whitespace-pre-line">{o.admin_reject_reason}</div>
+                    <div className="mt-3 p-4 bg-red-50 border border-red-100 rounded-lg text-sm text-red-700 shadow-sm">
+                      <div className="font-bold text-red-800 mb-1 flex items-center capitalize">
+                        <LogOut className="h-4 w-4 mr-2 rotate-180" />
+                        Admin Rejection Reason
+                      </div>
+                      <div className="whitespace-pre-line font-medium italic">{o.admin_reject_reason}</div>
                     </div>
                   )}
                   {o.doctor_status === 'rejected' && (o as any).doctor_reject_reason && (
-                    <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-300">
-                      <div className="font-medium text-red-200 mb-1">Doctor rejection reason</div>
-                      <div className="whitespace-pre-line">{(o as any).doctor_reject_reason}</div>
+                    <div className="mt-3 p-4 bg-red-50 border border-red-100 rounded-lg text-sm text-red-700 shadow-sm">
+                      <div className="font-bold text-red-800 mb-1 flex items-center capitalize">
+                        <LogOut className="h-4 w-4 mr-2 rotate-180" />
+                        Doctor Rejection Reason
+                      </div>
+                      <div className="whitespace-pre-line font-medium italic">{(o as any).doctor_reject_reason}</div>
                     </div>
                   )}
                 </div>
@@ -210,33 +217,36 @@ function PatientOrderPrescriptions({ order, token }: { order: Order; token: stri
   const medicine = p.medicine_name || order.medicine_name || 'Medicine';
 
   return (
-    <div className="mt-4 p-3 bg-gray-800/60 border border-gray-700 rounded-lg space-y-3">
-      <div className="flex justify-between items-center border-b border-gray-700 pb-2">
-        <div className="text-emerald-400 font-bold text-sm">Treatment Plan: {medicine}</div>
-        <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-300 border border-blue-700/40 uppercase tracking-tighter font-semibold">{p.status || 'Active'}</span>
+    <div className="mt-4 p-4 bg-emerald-50 rounded-xl space-y-3 border border-emerald-100 shadow-sm transition-all hover:shadow-md">
+      <div className="flex justify-between items-center border-b border-emerald-100/50 pb-2">
+        <div className="text-emerald-700 font-black text-sm uppercase tracking-tight flex items-center">
+          <CheckCircle className="h-4 w-4 mr-2" />
+          Treatment Plan: {medicine}
+        </div>
+        <span className="text-[10px] px-2 py-1 rounded-full bg-blue-100 text-blue-700 border border-blue-200 uppercase tracking-tight font-black shadow-sm">{p.status || 'Active'}</span>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-        <div className="space-y-1">
-          <p className="text-[10px] uppercase text-gray-500 font-bold">Fulfillment</p>
-          <div><span className="text-gray-400">Qty:</span> <span className="text-gray-200">{p.quantity || order.prescription_quantity || '-'}</span></div>
-          {p.dosage && <div><span className="text-gray-400">Dose:</span> <span className="text-gray-200">{p.dosage}</span></div>}
-          {p.frequency_per_day != null && <div><span className="text-gray-400">Freq:</span> <span className="text-gray-200">{p.frequency_per_day}x daily</span></div>}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium">
+        <div className="space-y-2">
+          <p className="text-[10px] uppercase text-emerald-600/70 font-black tracking-widest">Fulfillment</p>
+          <div><span className="text-emerald-700/60 font-bold">Qty:</span> <span className="text-emerald-900 font-black text-sm">{p.quantity || order.prescription_quantity || '-'}</span></div>
+          {p.dosage && <div><span className="text-emerald-700/60 font-bold">Dose:</span> <span className="text-emerald-900 font-black text-sm">{p.dosage}</span></div>}
+          {p.frequency_per_day != null && <div><span className="text-emerald-700/60 font-bold">Freq:</span> <span className="text-emerald-900 font-black text-sm">{p.frequency_per_day}x Daily</span></div>}
         </div>
-        <div className="space-y-1">
-          <p className="text-[10px] uppercase text-gray-500 font-bold">Guidance</p>
-          <div className="text-gray-100 italic">“{p.instructions || order.doctor_instructions || 'Take as prescribed.'}”</div>
+        <div className="space-y-2">
+          <p className="text-[10px] uppercase text-emerald-600/70 font-black tracking-widest">Medical Guidance</p>
+          <div className="text-emerald-800 italic bg-white/60 p-2 rounded-lg border border-emerald-100/50 shadow-inner">“{p.instructions || order.doctor_instructions || 'Take as prescribed.'}”</div>
           {order.doctor_advice && (
-            <div className="text-[11px] text-blue-300 bg-blue-900/10 p-1.5 rounded mt-1 border border-blue-900/30">
-              <span className="font-bold">Advice:</span> {order.doctor_advice}
+            <div className="text-[11px] text-blue-700 bg-blue-50 p-2 rounded-lg mt-1 border border-blue-100 shadow-sm">
+              <span className="font-black uppercase text-[9px] block text-blue-600/70 mb-1">Doctor's Advice</span> {order.doctor_advice}
             </div>
           )}
         </div>
       </div>
       
       {order.adherence_plan && (
-        <div className="text-[11px] text-amber-300/70 border-t border-gray-700 pt-2">
-          <span className="font-bold text-gray-500 uppercase text-[9px] block mb-0.5">Adherence Adherence</span>
+        <div className="text-[11px] text-amber-700 border-t border-emerald-100/50 pt-2 font-medium">
+          <span className="font-black text-amber-600/70 uppercase text-[9px] block mb-1 tracking-widest">Pharmacist Adherence Plan</span>
           {order.adherence_plan}
         </div>
       )}

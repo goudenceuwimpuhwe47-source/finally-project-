@@ -60,13 +60,14 @@ export const AdminDashboard = () => {
 
   if (statsLoading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-4">
+      <div className="p-2 sm:p-6">
+        <div className="animate-pulse space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-32 bg-gray-700 rounded-lg"></div>
+              <div key={i} className="h-32 bg-slate-200 rounded-3xl"></div>
             ))}
           </div>
+          <div className="h-64 bg-slate-200 rounded-3xl"></div>
         </div>
       </div>
     );
@@ -74,77 +75,89 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-white">Admin Dashboard</h1>
-        <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20 w-fit">
-          System Active
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Executive Summary</h1>
+        <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-100 font-bold px-3 py-1 rounded-full uppercase text-[10px] tracking-widest shadow-sm">
+          System Operational
         </Badge>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">Patients</CardTitle>
-            <Users className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Patients</CardTitle>
+            <div className="p-1.5 bg-emerald-50 rounded-lg">
+              <Users className="h-4 w-4 text-emerald-600" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats?.totalUsers ?? 0}</div>
-            <p className="text-xs text-gray-400">Registered patients</p>
+          <CardContent className="pt-2">
+            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.totalUsers ?? 0}</div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Total registered</p>
           </CardContent>
         </Card>
-
-        <Card className="bg-gray-800 border-gray-700">
+        
+        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">Pharmacies</CardTitle>
-            <Activity className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Pharmacies</CardTitle>
+            <div className="p-1.5 bg-purple-50 rounded-lg">
+              <Activity className="h-4 w-4 text-purple-600" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats?.totalProviders ?? 0}</div>
-            <p className="text-xs text-gray-400">Registered pharmacies</p>
+          <CardContent className="pt-2">
+            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.totalProviders ?? 0}</div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Active providers</p>
           </CardContent>
         </Card>
-
-        <Card className="bg-gray-800 border-gray-700">
+        
+        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">Doctors</CardTitle>
-            <Stethoscope className="h-4 w-4 text-cyan-500" />
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Doctors</CardTitle>
+            <div className="p-1.5 bg-cyan-50 rounded-lg">
+              <Stethoscope className="h-4 w-4 text-cyan-600" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats?.totalDoctors ?? 0}</div>
-            <p className="text-xs text-gray-400">Medical doctors</p>
+          <CardContent className="pt-2">
+            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.totalDoctors ?? 0}</div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Medical experts</p>
           </CardContent>
         </Card>
-
-        <Card className="bg-gray-800 border-gray-700">
+        
+        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">Pending Orders</CardTitle>
-            <AlertCircle className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Attention</CardTitle>
+            <div className="p-1.5 bg-orange-50 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats?.pendingOrders ?? 0}</div>
-            <p className="text-xs text-gray-400">Orders awaiting approval</p>
+          <CardContent className="pt-2">
+            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.pendingOrders ?? 0}</div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Awaiting review</p>
           </CardContent>
         </Card>
-
-        <Card className="bg-gray-800 border-gray-700">
+        
+        <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">Total Orders</CardTitle>
-            <FileText className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume</CardTitle>
+            <div className="p-1.5 bg-blue-50 rounded-lg">
+              <FileText className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats?.totalOrders ?? 0}</div>
-            <p className="text-xs text-gray-400">All time orders</p>
+          <CardContent className="pt-2">
+            <div className="text-3xl font-black text-slate-800 tracking-tighter">{stats?.totalOrders ?? 0}</div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Total requests</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Recent Orders */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Recent Orders
+      <Card className="bg-white border-border shadow-sm rounded-3xl overflow-hidden mt-8">
+        <CardHeader className="border-b border-slate-50 py-6">
+          <CardTitle className="text-slate-800 flex items-center gap-3 font-black tracking-tight">
+            <div className="p-2 bg-slate-100 rounded-xl">
+              <TrendingUp className="h-5 w-5 text-primary" />
+            </div>
+            Real-time Clinical Activity
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -152,9 +165,9 @@ export const AdminDashboard = () => {
             <div className="text-sm text-red-400 mb-3">Failed to load recent orders.</div>
           )}
           {recentLoading ? (
-            <div className="space-y-3">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-700/50 rounded" />
+            <div className="space-y-4">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-20 bg-slate-50 animate-pulse rounded-2xl" />
               ))}
             </div>
           ) : recent && recent.length > 0 ? (
@@ -164,35 +177,41 @@ export const AdminDashboard = () => {
                 const status = order.admin_status;
                 const badgeClass =
                   status === "pending"
-                    ? "bg-orange-500/10 text-orange-400 border-orange-500/20"
+                    ? "bg-amber-50 text-amber-600 border-amber-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full"
                     : status === "under_review"
-                    ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
+                    ? "bg-blue-50 text-blue-600 border-blue-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full"
                     : status === "approved"
-                    ? "bg-green-500/10 text-green-400 border-green-500/20"
+                    ? "bg-emerald-50 text-emerald-600 border-emerald-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full"
                     : status === "rejected"
-                    ? "bg-red-500/10 text-red-400 border-red-500/20"
-                    : "bg-gray-500/10 text-gray-300 border-gray-500/20";
+                    ? "bg-rose-50 text-rose-600 border-rose-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full"
+                    : "bg-slate-50 text-slate-500 border-slate-100 font-black uppercase text-[9px] tracking-widest px-3 py-1 rounded-full";
                 return (
-                  <div key={order.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-700/50">
-                  <div className="flex-1">
-                    <p className="font-medium text-white">{order.disease?.replace(/_/g, ' ') || 'Medication Request'}</p>
-                    <p className="text-sm text-gray-400">Patient: {patient}</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </p>
+                  <div key={order.id} className="flex items-center justify-between p-5 rounded-2xl bg-white border border-slate-50 hover:border-primary/20 hover:shadow-md transition-all group">
+                    <div className="flex-1">
+                      <p className="font-black text-slate-800 tracking-tight text-base group-hover:text-primary transition-colors">{order.disease?.replace(/_/g, ' ') || 'Medical Consultation'}</p>
+                      <div className="flex items-center gap-3 mt-1.5">
+                        <p className="text-xs font-bold text-muted-foreground uppercase opacity-70">Patient: <span className="text-slate-700">{patient}</span></p>
+                        <div className="h-1 w-1 rounded-full bg-slate-300" />
+                        <p className="text-xs font-bold text-slate-400 uppercase">
+                          {new Date(order.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right flex flex-col items-end gap-2">
+                      <Badge className={badgeClass} variant="outline">{status}</Badge>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 py-0.5 bg-slate-50 rounded-full border border-slate-100">Qty: {order.dosage}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <Badge className={badgeClass}>{status}</Badge>
-                    <p className="text-xs text-gray-400 mt-1">Dosage: {order.dosage}</p>
-                  </div>
-                </div>
                 );
               })}
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-400">
-              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No recent orders found</p>
+            <div className="text-center py-20 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
+              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-6">
+                <FileText className="h-8 w-8 text-slate-300" />
+              </div>
+              <h3 className="text-slate-800 font-black tracking-tight uppercase text-xs">Queue Clear</h3>
+              <p className="text-slate-400 font-bold text-[11px] mt-2 max-w-[200px] mx-auto">No pending or recent orders require immediate action.</p>
             </div>
           )}
         </CardContent>

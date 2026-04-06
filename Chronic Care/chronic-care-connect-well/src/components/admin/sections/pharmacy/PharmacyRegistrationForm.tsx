@@ -70,106 +70,115 @@ export const PharmacyRegistrationForm = ({ onCancel, onSuccess }: PharmacyRegist
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onCancel}
-          className="text-gray-400 hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-        <Building2 className="h-8 w-8 text-blue-500" />
-        <h1 className="text-3xl font-bold text-white">Register New Pharmacy</h1>
+    <div className="space-y-10 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onCancel}
+            className="text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl h-12 w-12 p-0 transition-all border border-slate-100"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Building2 className="h-6 w-6 text-primary" />
+              </div>
+              <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-none">Register Clinical Node</h1>
+            </div>
+            <p className="text-slate-400 font-bold text-xs mt-2 uppercase tracking-widest">Onboard a new distribution partner into the network.</p>
+          </div>
+        </div>
       </div>
 
-      <Card className="bg-gray-800 border-gray-700 max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-white">Pharmacy Information</CardTitle>
+      <Card className="bg-white border-border shadow-xl shadow-slate-200/40 rounded-[32px] overflow-hidden border-t-4 border-t-primary">
+        <CardHeader className="p-8 pb-0">
+          <CardTitle className="text-slate-800 font-black text-xl tracking-tight">Partner Credentials</CardTitle>
+          <p className="text-slate-400 font-bold text-xs mt-1">Please provide the verified clinical and operational details.</p>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-gray-300">Pharmacy Name *</Label>
+        <CardContent className="p-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Pharmacy Name / Ident</Label>
                 <Input
                   id="name"
                   required
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
-                  placeholder="Enter pharmacy name"
+                  className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl focus:ring-primary/40 focus:border-primary placeholder:text-slate-300"
+                  placeholder="e.g. Apex Clinical Center"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="license_number" className="text-gray-300">License Number *</Label>
+              <div className="space-y-3">
+                <Label htmlFor="license_number" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Clinical License Cert</Label>
                 <Input
                   id="license_number"
                   required
                   value={formData.license_number}
                   onChange={(e) => handleInputChange("license_number", e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
-                  placeholder="Enter license number"
+                  className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl focus:ring-primary/40 focus:border-primary placeholder:text-slate-300"
+                  placeholder="Official license string"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="address" className="text-gray-300">Address *</Label>
+            <div className="space-y-3">
+              <Label htmlFor="address" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Geospatial Address</Label>
               <Input
                 id="address"
                 required
                 value={formData.address}
                 onChange={(e) => handleInputChange("address", e.target.value)}
-                className="bg-gray-700 border-gray-600 text-white"
-                placeholder="Enter full address"
+                className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl focus:ring-primary/40 focus:border-primary placeholder:text-slate-300"
+                placeholder="Full operational location"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-gray-300">Phone Number *</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Comms Line (Voice)</Label>
                 <Input
                   id="phone"
                   type="tel"
                   required
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
-                  placeholder="Enter phone number"
+                  className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl focus:ring-primary/40 focus:border-primary placeholder:text-slate-300"
+                  placeholder="+250..."
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-300">Email</Label>
+              <div className="space-y-3">
+                <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Digital Uplink (Email)</Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
-                  placeholder="Enter email address"
+                  className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl focus:ring-primary/40 focus:border-primary placeholder:text-slate-300"
+                  placeholder="contact@pharmacy.com"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="contact_person" className="text-gray-300">Contact Person</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <Label htmlFor="contact_person" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Liaison Officer</Label>
                 <Input
                   id="contact_person"
                   value={formData.contact_person}
                   onChange={(e) => handleInputChange("contact_person", e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
-                  placeholder="Enter contact person name"
+                  className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl focus:ring-primary/40 focus:border-primary placeholder:text-slate-300"
+                  placeholder="Primary contact name"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="delivery_radius" className="text-gray-300">Delivery Radius (km)</Label>
+              <div className="space-y-3">
+                <Label htmlFor="delivery_radius" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Operational Radius (KM)</Label>
                 <Input
                   id="delivery_radius"
                   type="number"
@@ -177,40 +186,40 @@ export const PharmacyRegistrationForm = ({ onCancel, onSuccess }: PharmacyRegist
                   max="50"
                   value={formData.delivery_radius}
                   onChange={(e) => handleInputChange("delivery_radius", e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
+                  className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl focus:ring-primary/40 focus:border-primary"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="status" className="text-gray-300">Status</Label>
+            <div className="space-y-3">
+              <Label htmlFor="status" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Network Deployment Status</Label>
               <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger className="h-14 bg-slate-50 border-slate-100 text-slate-700 font-bold rounded-2xl focus:ring-primary/40">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-700 border-gray-600">
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
+                <SelectContent className="bg-white border-slate-100 rounded-2xl shadow-xl">
+                  <SelectItem value="active" className="font-bold text-slate-700 focus:bg-emerald-50 focus:text-emerald-600">Active Node</SelectItem>
+                  <SelectItem value="inactive" className="font-bold text-slate-700 focus:bg-slate-50 focus:text-slate-600">Standby Mode</SelectItem>
+                  <SelectItem value="suspended" className="font-bold text-slate-700 focus:bg-rose-50 focus:text-rose-600">Access Restricted</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onCancel}
-                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
+                className="flex-1 h-14 border-slate-200 text-slate-500 font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-slate-50 active:scale-95 transition-all"
               >
-                Cancel
+                Abort Operation
               </Button>
               <Button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                className="flex-1 h-14 bg-primary hover:bg-primary-hover text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-xl shadow-primary/20 active:scale-95 transition-all"
               >
-                {loading ? "Registering..." : "Register Pharmacy"}
+                {loading ? "Transmitting..." : "Initialize Node Deployment"}
               </Button>
             </div>
           </form>
