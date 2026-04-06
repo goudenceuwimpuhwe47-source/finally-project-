@@ -170,39 +170,70 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
         </Card>
       </div>
 
-      <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle className="text-white">Doctor Guidance & Pharmacy Prescription</CardTitle>
+          <CardTitle className="text-white">Active Treatment Plan</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {(!overview || overview.length === 0) && (
-            <div className="text-gray-400 text-sm">No approved guidance yet.</div>
+            <div className="text-gray-400 text-sm">No active treatments at the moment.</div>
           )}
           {overview && overview.map((it:any) => {
             const p = it.prescription || {};
+            const medicine = p.medicine_name || it.medicine_name || 'Medicine';
             return (
-              <div key={it.order_id} className="p-3 border border-gray-700 rounded-lg bg-gray-700/40">
-                <div className="text-white text-sm font-semibold mb-1">Doctor guidance</div>
-                <div className="text-xs text-gray-300">Medicine: {it.medicine_name || '-'}</div>
-                <div className="text-xs text-gray-300">Quantity: {it.prescription_quantity || '-'}</div>
-                {it.doctor_instructions && <div className="text-xs text-gray-300">How to take: {it.doctor_instructions}</div>}
-                {it.doctor_advice && <div className="text-xs text-gray-300">Advice: {it.doctor_advice}</div>}
-                {it.adherence_plan && <div className="text-xs text-gray-300">Adherence: {it.adherence_plan}</div>}
+              <div key={it.order_id} className="p-4 border border-gray-700 rounded-lg bg-gray-700/40 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="text-white font-bold text-lg">{medicine}</div>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-900/30 text-emerald-300 border border-emerald-700/40 capitalize">{p.status || 'Active'}</span>
+                </div>
 
-                <div className="text-white text-sm font-semibold mt-3 mb-1">Pharmacy prescription</div>
-                <div className="text-xs text-gray-300">Medicine: {p.medicine_name || '-'}</div>
-                <div className="text-xs text-gray-300">Quantity: {p.quantity || '-'}</div>
-                {p.dosage && <div className="text-xs text-gray-300">Dosage: {p.dosage}</div>}
-                {p.frequency_per_day && <div className="text-xs text-gray-300">Frequency: {p.frequency_per_day} per day</div>}
-                {p.duration_days && <div className="text-xs text-gray-300">Duration: {p.duration_days} day(s)</div>}
-                <div className="text-xs text-gray-300">Status: {p.status || '—'}</div>
-                {p.instructions && <div className="text-xs text-gray-300">Instructions: {p.instructions}</div>}
-                {p.created_at && <div className="text-[11px] text-gray-400 mt-1">{new Date(p.created_at).toLocaleString()}</div>}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Fulfillment Details</p>
+                    <div className="text-sm text-gray-100">
+                      <span className="text-gray-400 mr-2">Quantity:</span> {p.quantity || it.prescription_quantity || '-'}
+                    </div>
+                    {(p.dosage || it.dosage) && (
+                      <div className="text-sm text-gray-100">
+                        <span className="text-gray-400 mr-2">Dosage:</span> {p.dosage || it.dosage}
+                      </div>
+                    )}
+                    {(p.frequency_per_day || it.frequency_per_day) && (
+                      <div className="text-sm text-gray-100">
+                        <span className="text-gray-400 mr-2">Frequency:</span> {p.frequency_per_day || it.frequency_per_day}x daily
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Instructions & Advice</p>
+                    <div className="text-sm text-gray-100 italic">
+                      {p.instructions || it.doctor_instructions || 'Take as prescribed.'}
+                    </div>
+                    {it.doctor_advice && (
+                      <div className="text-xs text-blue-300 bg-blue-900/20 p-2 rounded border border-blue-800/30">
+                        <span className="font-bold mr-1">Advice:</span> {it.doctor_advice}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {it.adherence_plan && (
+                  <div className="text-xs text-amber-300/80 mt-2 border-t border-gray-700 pt-2">
+                    <span className="font-bold text-gray-500 uppercase text-[9px] block mb-1">Adherence Guidance</span>
+                    {it.adherence_plan}
+                  </div>
+                )}
+                
+                {p.created_at && (
+                  <div className="text-[9px] text-gray-600 mt-2 text-right">
+                    Last updated: {new Date(p.created_at).toLocaleString()}
+                  </div>
+                )}
               </div>
             );
           })}
         </CardContent>
-      </Card>
 
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>

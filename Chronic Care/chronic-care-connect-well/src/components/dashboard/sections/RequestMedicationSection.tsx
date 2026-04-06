@@ -586,15 +586,22 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                               )}
                             </div>
                           )}
-              {/* doctor guidance in details (visible after payment or after delivery) */}
+              {/* Unified Treatment Plan (visible after payment or after delivery) */}
               {((viewing?.payment_status === 'confirmed') || (viewing?.pharmacy_status === 'delivered')) && (viewing?.medicine_name || viewing?.doctor_instructions || viewing?.doctor_advice || viewing?.adherence_plan) && (
-                            <div className="p-3 bg-gray-700/60 border border-gray-700 rounded">
-                              <p className="text-sm text-gray-200 mb-2">Doctor Prescription & Guidance</p>
-                              {viewing?.medicine_name && <div className="text-sm"><span className="text-gray-400">Medicine:</span> <span className="text-gray-100">{viewing.medicine_name}</span></div>}
-                              {(viewing?.prescription_quantity || viewing?.dosage) && <div className="text-sm"><span className="text-gray-400">Quantity:</span> <span className="text-gray-100">{viewing?.prescription_quantity || viewing?.dosage}</span></div>}
-                              {viewing?.doctor_instructions && <div className="text-sm"><span className="text-gray-400">How to take:</span> <span className="text-gray-100 whitespace-pre-line">{viewing.doctor_instructions}</span></div>}
-                              {viewing?.doctor_advice && <div className="text-sm"><span className="text-gray-400">Advice:</span> <span className="text-gray-100 whitespace-pre-line">{viewing.doctor_advice}</span></div>}
-                              {viewing?.adherence_plan && <div className="text-sm"><span className="text-gray-400">Adherence plan:</span> <span className="text-gray-100 whitespace-pre-line">{viewing.adherence_plan}</span></div>}
+                            <div className="p-3 bg-gray-700/60 border border-gray-700 rounded-lg space-y-2">
+                              <p className="text-sm font-bold text-emerald-400 mb-1">Treatment Plan: {viewing.medicine_name || 'Medicine'}</p>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="text-xs space-y-1">
+                                  <p className="text-[10px] uppercase text-gray-500 font-bold">Fulfillment</p>
+                                  <div><span className="text-gray-400">Qty:</span> <span className="text-gray-100">{viewing?.prescription_quantity || viewing?.dosage || '-'}</span></div>
+                                  {viewing?.doctor_instructions && <div className="italic text-gray-200">“{viewing.doctor_instructions}”</div>}
+                                </div>
+                                <div className="text-xs space-y-1">
+                                  <p className="text-[10px] uppercase text-gray-500 font-bold">Adherence & Advice</p>
+                                  {viewing?.doctor_advice && <div><span className="text-gray-400">Advice:</span> <span className="text-blue-300 line-clamp-3">{viewing.doctor_advice}</span></div>}
+                                  {viewing?.adherence_plan && <div className="pt-1 border-t border-gray-600/50 mt-1"><span className="text-gray-400 font-bold uppercase text-[9px] block">Plan:</span> <span className="text-amber-300/80">{viewing.adherence_plan}</span></div>}
+                                </div>
+                              </div>
                             </div>
                           )}
               {viewing && (viewing.payment_status !== 'confirmed') && (viewing.pharmacy_status !== 'delivered') && (viewing.medicine_name || viewing.doctor_instructions || viewing.doctor_advice || viewing.adherence_plan) && (
@@ -786,14 +793,11 @@ export function RequestMedicationSection({ setActiveSection }: Props) {
                       </div>
                     </div>
                   )}
-                  {/* brief doctor guidance summary on card (visible after payment or delivery) */}
+                  {/* brief treatment summary on card (visible after payment or delivery) */}
                   {(o.payment_status === 'confirmed' || o.pharmacy_status === 'delivered') && (o.medicine_name || o.doctor_instructions || o.doctor_advice || o.prescription_quantity) && (
-                    <div className="mt-3 text-xs text-gray-200">
-                      <div className="font-medium mb-1">Doctor guidance</div>
-                      {o.medicine_name && <div><span className="text-gray-400">Medicine:</span> {o.medicine_name}</div>}
-                      {o.prescription_quantity && <div><span className="text-gray-400">Quantity:</span> {o.prescription_quantity}</div>}
-                      {o.doctor_instructions && <div className="line-clamp-2"><span className="text-gray-400">How to take:</span> {o.doctor_instructions}</div>}
-                      {o.doctor_advice && <div className="line-clamp-2"><span className="text-gray-400">Advice:</span> {o.doctor_advice}</div>}
+                    <div className="mt-3 p-2 bg-emerald-950/20 border border-emerald-900/30 rounded text-xs">
+                      <div className="font-bold text-emerald-400 mb-1">Active Treatment: {o.medicine_name}</div>
+                      <div className="text-gray-300 italic line-clamp-1">“{o.doctor_instructions || 'Follow prescribed routine.'}”</div>
                     </div>
                   )}
                 </div>

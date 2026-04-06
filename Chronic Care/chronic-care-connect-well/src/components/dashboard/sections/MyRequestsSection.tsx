@@ -132,16 +132,7 @@ export function MyRequestsSection({ setActiveSection }: { setActiveSection?: (s:
                       </Button>
                     )}
                   </div>
-    {(o.payment_status === 'confirmed' || o.pharmacy_status === 'delivered') && (o.medicine_name || o.doctor_instructions || o.doctor_advice || o.prescription_quantity) && (
-                    <div className="mt-3 text-xs text-gray-200">
-                      <div className="font-medium mb-1">Doctor guidance</div>
-                      {o.medicine_name && <div><span className="text-gray-400">Medicine:</span> {o.medicine_name}</div>}
-            {o.prescription_quantity && <div><span className="text-gray-400">Quantity:</span> {o.prescription_quantity}</div>}
-                      {o.doctor_instructions && <div className="line-clamp-2"><span className="text-gray-400">How to take:</span> {o.doctor_instructions}</div>}
-                      {o.doctor_advice && <div className="line-clamp-2"><span className="text-gray-400">Advice:</span> {o.doctor_advice}</div>}
-                    </div>
-                  )}
-      <PatientOrderPrescriptions orderId={o.id} token={token!} />
+                  <PatientOrderPrescriptions order={o} token={token!} />
                   {o.admin_status === 'rejected' && o.admin_reject_reason && (
                     <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-300">
                       <div className="font-medium text-red-200 mb-1">Rejection reason</div>
@@ -192,13 +183,13 @@ export function MyRequestsSectionWithMomo(props: { setActiveSection?: (s: string
   );
 }
 
-function PatientOrderPrescriptions({ orderId, token }: { orderId: number; token: string }) {
+function PatientOrderPrescriptions({ order, token }: { order: Order; token: string }) {
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => {
     let mounted = true;
     const load = async () => {
       try {
-        const r = await fetch(`${API_URL}/orders/${orderId}/prescriptions`, { headers: { Authorization: `Bearer ${token}` } });
+        const r = await fetch(`${API_URL}/orders/${order.id}/prescriptions`, { headers: { Authorization: `Bearer ${token}` } });
         const b = await r.json();
   const rows = Array.isArray(b?.prescriptions) ? b.prescriptions : [];
   // Only show the latest active prescription to the patient
@@ -209,25 +200,46 @@ function PatientOrderPrescriptions({ orderId, token }: { orderId: number; token:
     };
     load();
     return () => { mounted = false; };
-  }, [orderId, token]);
-  if (!items.length) return null;
+  }, [order.id, token]);
+
+  const hasGuidance = !!(order.medicine_name || order.doctor_instructions || order.doctor_advice || order.adherence_plan);
+  if (!items.length && !hasGuidance) return null;
+  if (order.payment_status !== 'confirmed' && order.pharmacy_status !== 'delivered') return null;
+
+  const p = items[0] || {};
+  const medicine = p.medicine_name || order.medicine_name || 'Medicine';
+
   return (
-    <div className="mt-3 text-xs text-gray-200">
-  <div className="font-medium mb-1">Pharmacy prescription</div>
-      <div className="space-y-1">
-    {items.map((p) => (
-          <div key={p.id} className="p-2 bg-gray-800 rounded border border-gray-700">
-            <div><span className="text-gray-400">Medicine:</span> {p.medicine_name}</div>
-            <div><span className="text-gray-400">Quantity:</span> {p.quantity}</div>
-      {p.dosage && <div><span className="text-gray-400">Dosage:</span> {p.dosage}</div>}
-      {p.frequency_per_day != null && <div><span className="text-gray-400">Frequency:</span> {p.frequency_per_day} per day</div>}
-      {p.duration_days != null && <div><span className="text-gray-400">Duration:</span> {p.duration_days} day(s)</div>}
-      {p.status && <div><span className="text-gray-400">Status:</span> {p.status}</div>}
-            {p.instructions && <div className="line-clamp-3"><span className="text-gray-400">Instructions:</span> {p.instructions}</div>}
-            <div className="text-gray-400">{new Date(p.created_at).toLocaleString()}</div>
-          </div>
-        ))}
+    <div className="mt-4 p-3 bg-gray-800/60 border border-gray-700 rounded-lg space-y-3">
+      <div className="flex justify-between items-center border-b border-gray-700 pb-2">
+        <div className="text-emerald-400 font-bold text-sm">Treatment Plan: {medicine}</div>
+        <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-300 border border-blue-700/40 uppercase tracking-tighter font-semibold">{p.status || 'Active'}</span>
       </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div className="space-y-1">
+          <p className="text-[10px] uppercase text-gray-500 font-bold">Fulfillment</p>
+          <div><span className="text-gray-400">Qty:</span> <span className="text-gray-200">{p.quantity || order.prescription_quantity || '-'}</span></div>
+          {p.dosage && <div><span className="text-gray-400">Dose:</span> <span className="text-gray-200">{p.dosage}</span></div>}
+          {p.frequency_per_day != null && <div><span className="text-gray-400">Freq:</span> <span className="text-gray-200">{p.frequency_per_day}x daily</span></div>}
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] uppercase text-gray-500 font-bold">Guidance</p>
+          <div className="text-gray-100 italic">“{p.instructions || order.doctor_instructions || 'Take as prescribed.'}”</div>
+          {order.doctor_advice && (
+            <div className="text-[11px] text-blue-300 bg-blue-900/10 p-1.5 rounded mt-1 border border-blue-900/30">
+              <span className="font-bold">Advice:</span> {order.doctor_advice}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {order.adherence_plan && (
+        <div className="text-[11px] text-amber-300/70 border-t border-gray-700 pt-2">
+          <span className="font-bold text-gray-500 uppercase text-[9px] block mb-0.5">Adherence Adherence</span>
+          {order.adherence_plan}
+        </div>
+      )}
     </div>
   );
 }
