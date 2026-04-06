@@ -24,18 +24,20 @@ function auth(requiredRoles = []) {
 router.post('/reminders', auth(['provider', 'doctor']), async (req, res) => {
 	try {
 		const providerId = req.user.role === 'provider' ? req.user.id : null;
-		const { patient_id, order_id, prescription_id, frequency_per_day, times, start_date, end_date } = req.body;
+		const { patient_id, order_id, prescription_id, frequency_per_day, times, start_date, end_date, dosage } = req.body;
 		if (!patient_id || !order_id || !frequency_per_day || !Array.isArray(times) || !start_date || !end_date) {
 			return res.status(400).json({ error: 'Missing fields' });
 		}
-		const timesSan = times.filter(t => /^\d{2}:\d{2}$/.test(String(t))).slice(0, 3);
+		const timesSan = times.filter(t => /^\d{2}:\d{2}$/.test(String(t))).slice(0, 4);
 		if (timesSan.length === 0) return res.status(400).json({ error: 'Invalid times' });
+
 		const [r] = await pool.query(
-			`INSERT INTO medication_reminders (patient_id, order_id, prescription_id, provider_id, frequency_per_day, times_json, start_date, end_date)
-			 VALUES (?,?,?,?,?,?,?,?)`,
-			[patient_id, order_id, prescription_id, providerId, Number(frequency_per_day), JSON.stringify(timesSan), start_date, end_date]
+			`INSERT INTO medication_reminders (patient_id, order_id, prescription_id, provider_id, frequency_per_day, dosage, times_json, start_date, end_date)
+			 VALUES (?,?,?,?,?,?,?,?,?)`,
+			[patient_id, order_id, prescription_id, providerId, Number(frequency_per_day), dosage || null, JSON.stringify(timesSan), start_date, end_date]
 		);
 		const reminderId = r.insertId;
+
 		// Pre-generate reminder events for each day
 		const start = new Date(`${start_date}T00:00:00`);
 		const end = new Date(`${end_date}T00:00:00`);
@@ -45,9 +47,9 @@ router.post('/reminders', auth(['provider', 'doctor']), async (req, res) => {
 				const whenAt = new Date(d);
 				whenAt.setHours(hh, mm, 0, 0);
 				await pool.query(
-					`INSERT INTO medication_reminder_events (reminder_id, patient_id, order_id, prescription_id, when_at)
-					 VALUES (?,?,?,?,?)`,
-					[reminderId, patient_id, order_id, prescription_id, whenAt]
+					`INSERT INTO medication_reminder_events (reminder_id, patient_id, order_id, prescription_id, when_at, dosage)
+					 VALUES (?,?,?,?,?,?)`,
+					[reminderId, patient_id, order_id, prescription_id, whenAt, dosage || null]
 				);
 			}
 		}

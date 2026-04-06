@@ -23,7 +23,9 @@ export const ProviderPatients = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [openId, setOpenId] = useState<number | null>(null);
   const [prescPatient, setPrescPatient] = useState<any | null>(null);
-  const [prescForm, setPrescForm] = useState<{ medicine_name: string; quantity: string; dosage?: string; frequency_per_day?: number | ""; instructions: string }>({ medicine_name: "", quantity: "", dosage: "", frequency_per_day: "", instructions: "" });
+  const [prescForm, setPrescForm] = useState<{ medicine_name: string; quantity: string; dose_amount: string; dose_unit: string; times_per_day: number; instructions: string }>({ 
+    medicine_name: "", quantity: "", dose_amount: "1", dose_unit: "piece(s)", times_per_day: 1, instructions: "" 
+  });
   const [prescOrderId, setPrescOrderId] = useState<number | null>(null);
   const [remPatient, setRemPatient] = useState<any | null>(null);
   const { data: patients, isLoading } = useQuery({
@@ -182,7 +184,7 @@ export const ProviderPatients = () => {
                         <Eye className="h-4 w-4 mr-1" />
                         View
                       </Button>
-                      <Button size="sm" variant="outline" className="border-green-600 text-green-400" onClick={()=>{ setPrescPatient(patient); setPrescForm({ medicine_name: "", quantity: "", dosage: "", frequency_per_day: "", instructions: "" }); setPrescOrderId(null); }}>
+                      <Button size="sm" variant="outline" className="border-green-600 text-green-400" onClick={()=>{ setPrescPatient(patient); setPrescForm({ medicine_name: "", quantity: "", dose_amount: "1", dose_unit: "piece(s)", times_per_day: 1, instructions: "" }); setPrescOrderId(null); }}>
                         <FileText className="h-4 w-4 mr-1" />
                         Prescribe
                       </Button>
@@ -318,13 +320,28 @@ function PatientSummary({ patientId, token }: { patientId: number | null; token:
   );
 }
 
+// Helper to detect medicine type and labels
+const getMedType = (label: string) => {
+  const l = (label || '').toLowerCase();
+  if (l.includes('ml') || l.includes('syrup') || l.includes('liquid')) {
+    return { type: 'liquid', totalLabel: 'Total Volume (ml)', dailyLabel: 'Daily Volume (ml)', placeholder: 'e.g. 500', unit: 'ml' };
+  }
+  if (l.includes('iu') || l.includes('unit') || l.includes('injection')) {
+    return { type: 'units', totalLabel: 'Total Units (IU)', dailyLabel: 'Daily Units (IU)', placeholder: 'e.g. 1000', unit: 'units' };
+  }
+  if (l.includes('inhaler') || l.includes('mcg') || l.includes('puff')) {
+    return { type: 'puffs', totalLabel: 'Total Puffs', dailyLabel: 'Daily Puffs', placeholder: 'e.g. 200', unit: 'puff(s)' };
+  }
+  return { type: 'solid', totalLabel: 'Total Pills/Tabs', dailyLabel: 'Pills per Day', placeholder: '30', unit: 'piece(s)' };
+};
+
 function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, selectedOrderId, setSelectedOrderId }: {
   open: boolean;
   onOpenChange: (v:boolean)=>void;
   patient: any;
   token: string;
-  form: { medicine_name: string; quantity: string; dosage?: string; frequency_per_day?: number | ""; instructions: string };
-  setForm: React.Dispatch<React.SetStateAction<{ medicine_name: string; quantity: string; dosage?: string; frequency_per_day?: number | ""; instructions: string }>>;
+  form: { medicine_name: string; quantity: string; dose_amount: string; dose_unit: string; times_per_day: number; instructions: string };
+  setForm: React.Dispatch<React.SetStateAction<{ medicine_name: string; quantity: string; dose_amount: string; dose_unit: string; times_per_day: number; instructions: string }>>;
   selectedOrderId: number | null;
   setSelectedOrderId: (v:number|null)=>void;
 }) {
@@ -347,23 +364,25 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
 
   // Keep reminder times in sync with frequency
   React.useEffect(() => {
-    const n = Number((form as any).frequency_per_day) || 1;
+    const n = Number(form.times_per_day) || 1;
     setReminderTimes(prev => {
       const base = prev.slice(0, n);
-      const defaults = ["08:00", "14:00", "20:00"];
+      const defaults = ["08:00", "14:00", "20:00", "04:00"];
       while (base.length < n) base.push(defaults[base.length] || "08:00");
       return base;
     });
-  }, [(form as any).frequency_per_day]);
+  }, [form.times_per_day]);
 
-  // Auto-calc duration from quantity/freq
+  // Auto-calc duration from quantity/freq (Total Clinical Accuracy)
   React.useEffect(() => {
     const qty = Number(form.quantity) || 0;
-    const freq = Number((form as any).frequency_per_day) || 1;
-    if (qty > 0 && freq > 0) {
-      setReminderDuration(Math.max(1, Math.ceil(qty / freq)));
+    const dose = Number(form.dose_amount) || 1;
+    const times = Number(form.times_per_day) || 1;
+    const dailyTotal = dose * times;
+    if (qty > 0 && dailyTotal > 0) {
+      setReminderDuration(Math.max(1, Math.ceil(qty / dailyTotal)));
     }
-  }, [form.quantity, (form as any).frequency_per_day]);
+  }, [form.quantity, form.dose_amount, form.times_per_day]);
 
   // Preselect latest eligible order when dialog opens and pre-fill form
   React.useEffect(()=>{
@@ -373,11 +392,17 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
       setSelectedOrderId(latest?.id || null);
       
       // Auto-prefill if doctor provided details
+      const doctorDosage = latest.dosage || '';
+      const m = doctorDosage.match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z/]+)$/);
+      const dAmount = m ? m[1] : (doctorDosage.match(/^\d+$/) ? doctorDosage : '1');
+      const dUnit = m ? m[2] : 'piece(s)';
+
       setForm({
         medicine_name: latest.medicine_name || '',
         quantity: String(latest.prescription_quantity || ''),
-        dosage: (form as any).dosage || '',
-        frequency_per_day: (form as any).frequency_per_day || 1,
+        dose_amount: dAmount,
+        dose_unit: dUnit,
+        times_per_day: 1,
         instructions: latest.doctor_instructions || ''
       });
     }
@@ -405,29 +430,47 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
                 ))}
               </SelectContent>
             </Select>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Medicine</label>
-              <Input className="bg-gray-800 border-gray-700 text-white" value={form.medicine_name} onChange={(e)=> setForm(f => ({ ...f, medicine_name: e.target.value }))} />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Quantity</label>
-              <Input className="bg-gray-800 border-gray-700 text-white" value={form.quantity} onChange={(e)=> setForm(f => ({ ...f, quantity: e.target.value }))} />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Dosage (e.g., 500mg)</label>
-              <Input className="bg-gray-800 border-gray-700 text-white" value={(form as any).dosage || ''} onChange={(e)=> setForm(f => ({ ...f, dosage: e.target.value }))} />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Frequency (pieces per day)</label>
-              <Input type="number" min={0} className="bg-gray-800 border-gray-700 text-white" value={(form as any).frequency_per_day || ''} onChange={(e)=> setForm(f => ({ ...f, frequency_per_day: Number(e.target.value) || '' }))} />
-              {(Number((form as any).frequency_per_day)||0) > 0 && Number(form.quantity) > 0 && (
-                <p className="text-xs text-gray-400 mt-1">Duration: {Math.ceil(Number(form.quantity) / Number((form as any).frequency_per_day))} day(s)</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Instructions</label>
-              <Textarea className="bg-gray-800 border-gray-700 text-white" rows={2} value={form.instructions} onChange={(e)=> setForm(f => ({ ...f, instructions: e.target.value }))} />
-            </div>
+            {(() => {
+              const info = getMedType(form.medicine_name);
+              // ensure units match detection if not set
+              React.useEffect(() => { if (!form.dose_unit || form.dose_unit === 'piece(s)') setForm(f=>({...f, dose_unit: info.unit})); }, [info.unit]);
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm text-gray-300 mb-1">Medicine Name</label>
+                    <Input className="bg-gray-800 border-gray-700 text-white" value={form.medicine_name} onChange={(e)=> setForm(f => ({ ...f, medicine_name: e.target.value }))} placeholder="e.g. Metformin 500mg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-1">{info.totalLabel}</label>
+                    <Input className="bg-gray-800 border-gray-700 text-white" value={form.quantity} onChange={(e)=> setForm(f => ({ ...f, quantity: e.target.value }))} placeholder={info.placeholder} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Dose Amount</label>
+                      <Input type="number" className="bg-gray-800 border-gray-700 text-white" value={form.dose_amount} onChange={(e)=> setForm(f => ({ ...f, dose_amount: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Unit</label>
+                      <Input className="bg-gray-800 border-gray-700 text-white" value={form.dose_unit} onChange={(e)=> setForm(f => ({ ...f, dose_unit: e.target.value }))} placeholder="ml, tabs, etc." />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-1">Times per Day</label>
+                    <Input type="number" min={1} max={6} className="bg-gray-800 border-gray-700 text-white" value={form.times_per_day} onChange={(e)=> setForm(f => ({ ...f, times_per_day: Number(e.target.value) || 1 }))} />
+                    {Number(form.times_per_day) > 0 && Number(form.quantity) > 0 && (
+                      <p className="text-[10px] text-emerald-400 mt-1 font-medium">
+                        Total Daily: {Number(form.dose_amount) * Number(form.times_per_day)} {form.dose_unit} • Duration: {Math.ceil(Number(form.quantity) / (Number(form.dose_amount) * Number(form.times_per_day)))} day(s)
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-1">Instructions</label>
+                    <Textarea className="bg-gray-800 border-gray-700 text-white" rows={2} value={form.instructions} onChange={(e)=> setForm(f => ({ ...f, instructions: e.target.value }))} placeholder="e.g. Take after meals" />
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="pt-3 border-t border-gray-700 mt-2 space-y-3">
               <div className="flex items-center justify-between">
@@ -501,8 +544,8 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
                     patient_id: patient.id,
                     medicine_name: form.medicine_name.trim(),
                     quantity: form.quantity.trim(),
-                    dosage: (form as any).dosage || undefined,
-                    frequency_per_day: Number((form as any).frequency_per_day) || undefined,
+                    dosage: `${form.dose_amount}${form.dose_unit}`,
+                    frequency_per_day: Number(form.times_per_day),
                     instructions: form.instructions.trim()
                   })
                 });
@@ -520,7 +563,8 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
                         patient_id: patient.id,
                         order_id: selectedOrderId,
                         prescription_id: body.prescription.id,
-                        frequency_per_day: Number((form as any).frequency_per_day) || 1,
+                        frequency_per_day: Number(form.times_per_day),
+                        dosage: `${form.dose_amount}${form.dose_unit}`,
                         times: reminderTimes,
                         start_date: reminderStartDate,
                         end_date: endDate,
@@ -534,7 +578,7 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
                 toast('Prescription created', { description: remindersEnabled ? 'Medication and reminders scheduled successfully.' : `Admin & patient notified for Order #${selectedOrderId}` });
                 onOpenChange(false);
                 setSelectedOrderId(null);
-                setForm({ medicine_name: '', quantity: '', dosage: '', frequency_per_day: '', instructions: '' });
+                setForm({ medicine_name: '', quantity: '', dose_amount: '1', dose_unit: 'piece(s)', times_per_day: 1, instructions: '' });
               } catch (e:any) {
                 toast(e?.message || 'Could not create prescription');
               }

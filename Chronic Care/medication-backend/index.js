@@ -421,6 +421,7 @@ async function ensureSchema() {
         prescription_id INT NULL,
         provider_id INT NULL,
         frequency_per_day INT NOT NULL,
+        dosage VARCHAR(64) NULL,
         times_json JSON NOT NULL,
         start_date DATE NOT NULL,
         end_date DATE NOT NULL,
@@ -439,6 +440,7 @@ async function ensureSchema() {
         order_id INT NOT NULL,
         prescription_id INT NULL,
         when_at DATETIME NOT NULL,
+        dosage VARCHAR(64) NULL,
         prealert_sent TINYINT(1) NOT NULL DEFAULT 0,
         status ENUM('pending','sent','taken','skipped') NOT NULL DEFAULT 'pending',
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -447,18 +449,18 @@ async function ensureSchema() {
         CONSTRAINT fk_rem_ev_rem FOREIGN KEY (reminder_id) REFERENCES medication_reminders(id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
-    // Add missing prealert_sent column if needed
+    // Add missing dosage/prealert_sent column if needed
     try {
       const dbName = process.env.DB_NAME;
-      const [chkPre] = await pool.query(
-        "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='medication_reminder_events' AND COLUMN_NAME='prealert_sent'",
-        [dbName]
-      );
-      if ((chkPre?.[0]?.cnt || 0) === 0) {
-        await pool.query("ALTER TABLE medication_reminder_events ADD COLUMN prealert_sent TINYINT(1) NOT NULL DEFAULT 0 AFTER when_at");
-        console.log("Added 'prealert_sent' to medication_reminder_events");
-      }
-    } catch (e) { console.warn('prealert_sent migration warn:', e?.message || e); }
+      const [chkRem] = await pool.query("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='medication_reminders' AND COLUMN_NAME='dosage'", [dbName]);
+      if ((chkRem?.[0]?.cnt || 0) === 0) await pool.query("ALTER TABLE medication_reminders ADD COLUMN dosage VARCHAR(64) NULL AFTER frequency_per_day");
+
+      const [chkEv] = await pool.query("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='medication_reminder_events' AND COLUMN_NAME='dosage'", [dbName]);
+      if ((chkEv?.[0]?.cnt || 0) === 0) await pool.query("ALTER TABLE medication_reminder_events ADD COLUMN dosage VARCHAR(64) NULL AFTER when_at");
+
+      const [chkPre] = await pool.query("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='medication_reminder_events' AND COLUMN_NAME='prealert_sent'", [dbName]);
+      if ((chkPre?.[0]?.cnt || 0) === 0) await pool.query("ALTER TABLE medication_reminder_events ADD COLUMN prealert_sent TINYINT(1) NOT NULL DEFAULT 0 AFTER dosage");
+    } catch (colErr) { console.warn('Missing column checks failed:', colErr.message); }
   } catch (e) {
     console.error('Ensure reminders tables failed:', e.message);
   }
