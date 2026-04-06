@@ -61,6 +61,18 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
     staleTime: 60_000,
   });
 
+  // Load master schedules (to see if pharmacist has acted)
+  const { data: scheduleData } = useQuery({
+    queryKey: ['patientSchedules'],
+    enabled: !!token,
+    queryFn: async () => {
+      const b = await apiGetJson(`/alerts/my/schedules`, token);
+      if (!b) return [] as any[];
+      return Array.isArray(b?.schedules) ? b.schedules : [];
+    },
+    staleTime: 60_000,
+  });
+
   // Load today's alerts (or next one)
   const { data: nextAlert } = useQuery({
     queryKey: ['patientNextAlert'],
@@ -142,9 +154,12 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
           <CardContent className="space-y-4">
             {!nextAlert && (
               <div className="text-gray-400 text-sm py-4 italic">
-                {prescriptions.length > 0 
-                  ? "No upcoming alerts for today. Your medicine is active." 
-                  : "No alerts scheduled. Please check your active prescriptions."}
+                {(() => {
+                   const hasSched = (scheduleData || []).length > 0;
+                   if (!hasSched && prescriptions.length > 0) return "Awaiting Pharmacist to finalize your intake schedule.";
+                   if (prescriptions.length > 0) return "No more upcoming alerts for today. Your medicine is active.";
+                   return "No alerts scheduled. Please check your active prescriptions.";
+                })()}
               </div>
             )}
             {nextAlert && (
@@ -260,7 +275,23 @@ export function MedicationsSection({ onRequestMedication }: MedicationsSectionPr
         </CardHeader>
         <CardContent className="space-y-3">
           {(!todayEvents || todayEvents.length === 0) && (
-            <div className="text-gray-400 text-sm">No events scheduled for today.</div>
+            <div className="text-gray-400 text-sm py-8 text-center border border-dashed border-gray-700/50 rounded-lg bg-gray-900/10">
+               {(() => {
+                  const activePrescs = prescriptions.length;
+                  const schedules = (scheduleData || []).length;
+                  if (activePrescs > 0 && schedules === 0) return (
+                    <div className="space-y-1">
+                      <p className="font-medium text-amber-400/80">Pending Pharmacist Approval</p>
+                      <p className="text-xs">Your doctor approved the medicine; the pharmacist is finalizing the schedule.</p>
+                    </div>
+                  );
+                  if (schedules > 0) {
+                    const next = scheduleData.find((s:any)=> new Date(s.start_date) > new Date());
+                    if (next) return `Your treatment schedule begins on ${format(new Date(next.start_date), 'PPP')}.`;
+                  }
+                  return "No events scheduled for today.";
+               })()}
+            </div>
           )}
           {todayEvents && todayEvents.length > 0 && (
             <>

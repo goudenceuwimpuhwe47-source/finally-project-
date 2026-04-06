@@ -145,6 +145,25 @@ router.get('/my', auth(['patient']), async (req, res) => {
 	}
 });
 
+// Patient reminder schedules (Master schedule view)
+router.get('/my/schedules', auth(['patient']), async (req, res) => {
+	try {
+		const patientId = req.user.id;
+		const [rows] = await pool.query(
+			`SELECT r.*, p.medicine_name
+				 FROM medication_reminders r
+				 LEFT JOIN prescriptions p ON p.id = r.prescription_id
+				WHERE r.patient_id=?
+				ORDER BY r.created_at DESC`,
+			[patientId]
+		);
+		res.json({ schedules: rows });
+	} catch (e) {
+		console.error('GET /alerts/my/schedules error', e.message);
+		res.status(500).json({ error: 'Server error' });
+	}
+});
+
 // Patient next alert (only one at a time: due or within next 2 minutes)
 router.get('/my/next', auth(['patient']), async (req, res) => {
 	try {
