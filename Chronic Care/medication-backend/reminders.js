@@ -20,12 +20,12 @@ function auth(requiredRoles = []) {
 	};
 }
 
-// Provider creates a reminder schedule
-router.post('/reminders', auth(['provider']), async (req, res) => {
+// Provider or Doctor creates a reminder schedule
+router.post('/reminders', auth(['provider', 'doctor']), async (req, res) => {
 	try {
-		const providerId = req.user.id;
+		const providerId = req.user.role === 'provider' ? req.user.id : null;
 		const { patient_id, order_id, prescription_id, frequency_per_day, times, start_date, end_date } = req.body;
-		if (!patient_id || !order_id || !prescription_id || !frequency_per_day || !Array.isArray(times) || !start_date || !end_date) {
+		if (!patient_id || !order_id || !frequency_per_day || !Array.isArray(times) || !start_date || !end_date) {
 			return res.status(400).json({ error: 'Missing fields' });
 		}
 		const timesSan = times.filter(t => /^\d{2}:\d{2}$/.test(String(t))).slice(0, 3);

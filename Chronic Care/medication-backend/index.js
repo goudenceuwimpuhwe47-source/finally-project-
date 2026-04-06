@@ -132,7 +132,9 @@ async function ensureSchema() {
       { name: 'invoice_total', ddl: "ALTER TABLE orders ADD COLUMN invoice_total DECIMAL(10,2) NULL AFTER invoice_delivery_fee" },
       { name: 'invoice_sent_at', ddl: "ALTER TABLE orders ADD COLUMN invoice_sent_at DATETIME NULL AFTER invoice_total" },
       { name: 'invoice_paid_at', ddl: "ALTER TABLE orders ADD COLUMN invoice_paid_at DATETIME NULL AFTER invoice_sent_at" },
-      { name: 'medical_certificate_longtext', ddl: "ALTER TABLE orders MODIFY COLUMN medical_certificate LONGTEXT NULL" }
+      { name: 'medical_certificate_longtext', ddl: "ALTER TABLE orders MODIFY COLUMN medical_certificate LONGTEXT NULL" },
+      { name: 'reminders_presc_id_null', ddl: "ALTER TABLE medication_reminders MODIFY COLUMN prescription_id INT NULL" },
+      { name: 'reminder_events_presc_id_null', ddl: "ALTER TABLE medication_reminder_events MODIFY COLUMN prescription_id INT NULL" }
     ];
 
     for (const col of ordersCols) {
@@ -416,7 +418,7 @@ async function ensureSchema() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         patient_id INT NOT NULL,
         order_id INT NOT NULL,
-        prescription_id INT NOT NULL,
+        prescription_id INT NULL,
         provider_id INT NULL,
         frequency_per_day INT NOT NULL,
         times_json JSON NOT NULL,
@@ -435,7 +437,7 @@ async function ensureSchema() {
         reminder_id INT NOT NULL,
         patient_id INT NOT NULL,
         order_id INT NOT NULL,
-        prescription_id INT NOT NULL,
+        prescription_id INT NULL,
         when_at DATETIME NOT NULL,
         prealert_sent TINYINT(1) NOT NULL DEFAULT 0,
         status ENUM('pending','sent','taken','skipped') NOT NULL DEFAULT 'pending',

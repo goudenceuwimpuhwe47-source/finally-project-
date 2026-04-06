@@ -340,6 +340,31 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
   const orders = data?.orders || [];
   const eligible = orders.filter((o:any)=> String(o.admin_status||'').toLowerCase()==='approved' && String(o.pharmacy_status||'').toLowerCase()!=='delivered');
 
+  const [remindersEnabled, setRemindersEnabled] = React.useState(true);
+  const [reminderTimes, setReminderTimes] = React.useState<string[]>(["08:00"]);
+  const [reminderStartDate, setReminderStartDate] = React.useState<string>(new Date().toISOString().split('T')[0]);
+  const [reminderDuration, setReminderDuration] = React.useState<number>(7);
+
+  // Keep reminder times in sync with frequency
+  React.useEffect(() => {
+    const n = Number((form as any).frequency_per_day) || 1;
+    setReminderTimes(prev => {
+      const base = prev.slice(0, n);
+      const defaults = ["08:00", "14:00", "20:00"];
+      while (base.length < n) base.push(defaults[base.length] || "08:00");
+      return base;
+    });
+  }, [(form as any).frequency_per_day]);
+
+  // Auto-calc duration from quantity/freq
+  React.useEffect(() => {
+    const qty = Number(form.quantity) || 0;
+    const freq = Number((form as any).frequency_per_day) || 1;
+    if (qty > 0 && freq > 0) {
+      setReminderDuration(Math.max(1, Math.ceil(qty / freq)));
+    }
+  }, [form.quantity, (form as any).frequency_per_day]);
+
   // Preselect latest eligible order when dialog opens
   React.useEffect(()=>{
     if (!open) return;
@@ -392,7 +417,62 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
             </div>
             <div>
               <label className="block text-sm text-gray-300 mb-1">Instructions</label>
-              <Textarea className="bg-gray-800 border-gray-700 text-white" rows={3} value={form.instructions} onChange={(e)=> setForm(f => ({ ...f, instructions: e.target.value }))} />
+              <Textarea className="bg-gray-800 border-gray-700 text-white" rows={2} value={form.instructions} onChange={(e)=> setForm(f => ({ ...f, instructions: e.target.value }))} />
+            </div>
+
+            <div className="pt-3 border-t border-gray-700 mt-2 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-emerald-400">Schedule Medication Reminders</label>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-gray-400">{remindersEnabled ? 'Enabled' : 'Disabled'}</span>
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 accent-emerald-600 rounded cursor-pointer" 
+                    checked={remindersEnabled} 
+                    onChange={e => setRemindersEnabled(e.target.checked)} 
+                  />
+                </div>
+              </div>
+              
+              {remindersEnabled && (
+                <div className="space-y-3 p-3 bg-emerald-950/20 rounded border border-emerald-900/30">
+                  <div>
+                    <label className="block text-[10px] text-gray-400 mb-1">Reminder time(s)</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {reminderTimes.map((t, idx) => (
+                        <Input 
+                          key={idx} 
+                          type="time" 
+                          className="bg-gray-800 border-gray-700 text-white h-8 text-xs" 
+                          value={t} 
+                          onChange={e => setReminderTimes(ts => ts.map((x, i) => i === idx ? e.target.value : x))} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Start date</label>
+                      <Input 
+                        type="date" 
+                        className="bg-gray-800 border-gray-700 text-white h-8 text-xs" 
+                        value={reminderStartDate} 
+                        onChange={e => setReminderStartDate(e.target.value)} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Duration (days)</label>
+                      <Input 
+                        type="number" 
+                        min={1} 
+                        className="bg-gray-800 border-gray-700 text-white h-8 text-xs" 
+                        value={reminderDuration} 
+                        onChange={e => setReminderDuration(Number(e.target.value) || 1)} 
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -404,6 +484,7 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
             onClick={async ()=>{
               if (!selectedOrderId || !patient) return;
               try {
+                // 1. Create Prescription
                 const res = await fetch(`${API_URL}/orders/${selectedOrderId}/prescriptions`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -418,7 +499,30 @@ function PrescribeDialog({ open, onOpenChange, patient, token, form, setForm, se
                 });
                 const body = await res.json();
                 if (!res.ok || body?.error) throw new Error(body?.error || 'Failed to create prescription');
-                toast('Prescription created', { description: `Admin & patient notified for Order #${selectedOrderId}` });
+                
+                // 2. Optional: Create Reminders
+                if (remindersEnabled) {
+                  try {
+                    const endDate = addDaysStr(reminderStartDate, Math.max(0, (Number(reminderDuration) || 1) - 1));
+                    await fetch(`${API_URL}/alerts/reminders`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                      body: JSON.stringify({
+                        patient_id: patient.id,
+                        order_id: selectedOrderId,
+                        prescription_id: body.prescription.id,
+                        frequency_per_day: Number((form as any).frequency_per_day) || 1,
+                        times: reminderTimes,
+                        start_date: reminderStartDate,
+                        end_date: endDate,
+                      })
+                    });
+                  } catch (remErr) {
+                    console.warn('Reminder creation failed, but prescription was created', remErr);
+                  }
+                }
+
+                toast('Prescription created', { description: remindersEnabled ? 'Medication and reminders scheduled successfully.' : `Admin & patient notified for Order #${selectedOrderId}` });
                 onOpenChange(false);
                 setSelectedOrderId(null);
                 setForm({ medicine_name: '', quantity: '', dosage: '', frequency_per_day: '', instructions: '' });
