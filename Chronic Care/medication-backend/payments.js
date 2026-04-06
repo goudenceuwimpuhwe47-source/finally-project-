@@ -101,8 +101,8 @@ router.post('/mtn/request', auth, requireRole('patient'), async (req, res) => {
         // auto mark as SUCCESSFUL shortly and update the order
         setTimeout(async () => {
           try {
-            await pool.query('UPDATE momo_payments SET status="SUCCESSFUL", updated_at=NOW() WHERE reference_id=?', [referenceId]);
-            await pool.query('UPDATE orders SET payment_status="confirmed", invoice_status="paid", invoice_paid_at=NOW() WHERE id=? AND payment_status!="confirmed"', [orderId]);
+            await pool.query('UPDATE momo_payments SET status=\'SUCCESSFUL\', updated_at=NOW() WHERE reference_id=?', [referenceId]);
+            await pool.query('UPDATE orders SET payment_status=\'confirmed\', invoice_status=\'paid\', invoice_paid_at=NOW() WHERE id=? AND payment_status!=\'confirmed\'', [orderId]);
             // emit events
             const emitToAdmins = req.app.get('emitToAdmins');
             emitToAdmins && emitToAdmins('order:payment_received', { orderId: Number(orderId) });
@@ -139,8 +139,8 @@ router.post('/mtn/request', auth, requireRole('patient'), async (req, res) => {
         );
         setTimeout(async () => {
           try {
-            await pool.query('UPDATE momo_payments SET status="SUCCESSFUL", updated_at=NOW() WHERE reference_id=?', [referenceId]);
-            await pool.query('UPDATE orders SET payment_status="confirmed", invoice_status="paid", invoice_paid_at=NOW() WHERE id=? AND payment_status!="confirmed"', [orderId]);
+            await pool.query('UPDATE momo_payments SET status=\'SUCCESSFUL\', updated_at=NOW() WHERE reference_id=?', [referenceId]);
+            await pool.query('UPDATE orders SET payment_status=\'confirmed\', invoice_status=\'paid\', invoice_paid_at=NOW() WHERE id=? AND payment_status!=\'confirmed\'', [orderId]);
             const emitToAdmins = req.app.get('emitToAdmins');
             emitToAdmins && emitToAdmins('order:payment_received', { orderId: Number(orderId) });
             const emitToUser = req.app.get('emitToUser');
@@ -216,32 +216,36 @@ router.get('/mtn/status/:referenceId', auth, async (req, res) => {
     if (!(req.user.role === 'admin' || req.user.id === own.user_id)) return res.status(403).json({ error: 'Forbidden' });
 
     if (MOMO_SHOULD_MOCK) {
-      // Just return DB status; may have been auto-updated by mock timer
-      let status = String(rec.status || 'PENDING').toUpperCase();
+      try {
+        let status = String(rec.status || 'PENDING').toUpperCase();
+        if (status === 'PENDING') {
+          status = 'SUCCESSFUL';
+          await pool.query('UPDATE momo_payments SET status=\'SUCCESSFUL\', updated_at=NOW() WHERE reference_id=?', [ref]);
+        }
 
-      // If still pending, auto-mark as successful (e.g., if server restarted and timer was lost)
-      if (status === 'PENDING') {
-        status = 'SUCCESSFUL';
-        await pool.query('UPDATE momo_payments SET status="SUCCESSFUL", updated_at=NOW() WHERE reference_id=?', [ref]);
+        if (status === 'SUCCESSFUL') {
+          await pool.query('UPDATE orders SET payment_status=\'confirmed\', invoice_status=\'paid\', invoice_paid_at=NOW() WHERE id=? AND payment_status!=\'confirmed\'', [rec.order_id]);
+          
+          try {
+            const emitToAdmins = req.app.get('emitToAdmins');
+            if (emitToAdmins) emitToAdmins('order:payment_received', { orderId: Number(rec.order_id) });
+
+            const emitToUser = req.app.get('emitToUser');
+            if (emitToUser) {
+              const [uRow] = await pool.query('SELECT user_id, provider_id FROM orders WHERE id=?', [rec.order_id]);
+              const U = uRow?.[0];
+              if (U?.provider_id) emitToUser('provider', U.provider_id, 'order:payment_received', { orderId: Number(rec.order_id) });
+              if (U?.user_id) emitToUser('patient', U.user_id, 'order:payment_received', { orderId: Number(rec.order_id) });
+            }
+          } catch (err) {
+            console.error('Mock polling notifications error (ignored):', err);
+          }
+        }
+        return res.json({ ok: true, status, raw: { mock: true } });
+      } catch (err) {
+        console.error('Mock polling error:', err);
+        throw err; // will be caught by outer try-catch
       }
-
-      if (status === 'SUCCESSFUL') {
-        // ensure order is updated (idempotent)
-        await pool.query('UPDATE orders SET payment_status="confirmed", invoice_status="paid", invoice_paid_at=NOW() WHERE id=? AND payment_status!="confirmed"', [rec.order_id]);
-
-        // Trigger notifications if needed
-        try {
-          const emitToAdmins = req.app.get('emitToAdmins');
-          emitToAdmins && emitToAdmins('order:payment_received', { orderId: Number(rec.order_id) });
-          // notify user
-          const emitToUser = req.app.get('emitToUser');
-          const [uRow] = await pool.query('SELECT user_id, provider_id FROM orders WHERE id=?', [rec.order_id]);
-          const U = uRow?.[0];
-          if (U?.provider_id) emitToUser && emitToUser('provider', U.provider_id, 'order:payment_received', { orderId: Number(rec.order_id) });
-          emitToUser && emitToUser('patient', U?.user_id, 'order:payment_received', { orderId: Number(rec.order_id) });
-        } catch {}
-      }
-      return res.json({ ok: true, status, raw: { mock: true } });
     }
 
     const token = await getAccessToken();
@@ -263,7 +267,7 @@ router.get('/mtn/status/:referenceId', auth, async (req, res) => {
 
   if (status === 'SUCCESSFUL') {
       // apply payment to order (idempotent)
-      await pool.query('UPDATE orders SET payment_status="confirmed", invoice_status="paid", invoice_paid_at=NOW() WHERE id=? AND payment_status!="confirmed"', [rec.order_id]);
+      await pool.query('UPDATE orders SET payment_status=\'confirmed\', invoice_status=\'paid\', invoice_paid_at=NOW() WHERE id=? AND payment_status!=\'confirmed\'', [rec.order_id]);
       try {
         const emitToAdmins = req.app.get('emitToAdmins');
         emitToAdmins && emitToAdmins('order:payment_received', { orderId: Number(rec.order_id) });
