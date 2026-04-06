@@ -762,18 +762,17 @@ router.get('/provider/patients', auth, requireRole('provider'), async (req, res)
          u.id,
          TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) AS full_name,
          u.email,
-         u.phone,
-         NULL AS date_of_birth,
-         NULL AS medical_conditions
+         u.phone
        FROM orders o
        JOIN users u ON u.id = o.user_id
        WHERE o.provider_id = ?
-       ORDER BY full_name IS NULL, full_name, u.email` ,
+       ORDER BY u.first_name ASC, u.last_name ASC, u.email ASC` ,
       [req.user.id]
     );
     res.json({ patients: rows });
   } catch (e) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('ERROR [GET /provider/patients]:', e.message);
+    res.status(500).json({ error: 'Server error', details: e.message });
   }
 });
 
