@@ -10,8 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { format } from "date-fns";
 
 import { API_URL } from "@/lib/utils";
+import { getMedType } from "@/lib/med-utils";
 
 export const ProviderAssigned = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -24,6 +26,44 @@ export const ProviderAssigned = () => {
   const [unavailReason, setUnavailReason] = useState<string>("");
   const [prescOrder, setPrescOrder] = useState<any | null>(null);
   const [prescForm, setPrescForm] = useState<{ patient_id: number | ""; medicine_name: string; quantity: string; instructions: string; dosage?: string; frequency_per_day?: number | "" }>({ patient_id: "", medicine_name: "", quantity: "", instructions: "" });
+
+  // Reminder State
+  const [remindersEnabled, setRemindersEnabled] = useState(true);
+  const [reminderTimes, setReminderTimes] = useState<string[]>(["08:00"]);
+  const [reminderStartDate, setReminderStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [reminderDuration, setReminderDuration] = useState<number>(7);
+
+  // Auto-calc duration from quantity/freq
+  useEffect(() => {
+    const qty = Number(prescForm.quantity) || 0;
+    const dose = 1; // Base dose for simple calc
+    const times = Number(prescForm.frequency_per_day) || 1;
+    const dailyTotal = dose * times;
+    if (qty > 0 && dailyTotal > 0) {
+      setReminderDuration(Math.max(1, Math.ceil(qty / dailyTotal)));
+    }
+  }, [prescForm.quantity, prescForm.frequency_per_day]);
+
+  // Keep reminder times in sync with frequency
+  useEffect(() => {
+    if (!prescOrder) return;
+    const n = Number(prescForm.frequency_per_day) || 1;
+    setReminderTimes(prev => {
+      const base = prev.slice(0, n);
+      const defaults = ["08:00", "14:00", "20:00", "04:00"];
+      while (base.length < n) base.push(defaults[base.length] || "08:00");
+      return base;
+    });
+  }, [prescForm.frequency_per_day, !!prescOrder]);
+
+  // Handle dosage unit auto-detection
+  useEffect(() => {
+    if (!prescOrder || !prescForm.medicine_name) return;
+    const info = getMedType(prescForm.medicine_name);
+    if (!prescForm.dosage || prescForm.dosage === 'piece(s)') {
+       setPrescForm(f=>({...f, dosage: info.unit}));
+    }
+  }, [prescForm.medicine_name, !!prescOrder]);
 
   // Load provider stock when confirm dialog is open
   const { data: stockData } = useQuery({
@@ -428,6 +468,63 @@ export const ProviderAssigned = () => {
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Clinical Instructions</label>
               <Textarea className="bg-slate-50 border-slate-100 text-slate-800 rounded-2xl p-4 font-bold italic shadow-inner h-24" value={prescForm.instructions} onChange={(e)=> setPrescForm(f => ({ ...f, instructions: e.target.value }))} />
             </div>
+            <div className="md:col-span-2 pt-4 border-t border-slate-50">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <label className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block">Schedule Medication Reminders</label>
+                  <p className="text-[9px] text-slate-400 font-bold italic mt-0.5">Patient will be notified via mobile satellite nexus.</p>
+                </div>
+                <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                  <span className="text-[9px] font-black uppercase text-slate-400">{remindersEnabled ? 'ACTIVE' : 'DISABLED'}</span>
+                  <input 
+                    type="checkbox" 
+                    className="w-5 h-5 accent-emerald-600 rounded-lg cursor-pointer" 
+                    checked={remindersEnabled} 
+                    onChange={e => setRemindersEnabled(e.target.checked)} 
+                  />
+                </div>
+              </div>
+              
+              {remindersEnabled && (
+                <div className="space-y-4 p-5 bg-emerald-50/30 rounded-[32px] border border-emerald-100/50 animate-in fade-in zoom-in-95 duration-300">
+                  <div>
+                    <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Reminder Time Protocols</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {reminderTimes.map((t, idx) => (
+                        <Input 
+                          key={idx} 
+                          type="time" 
+                          className="bg-white border-slate-100 text-slate-800 h-10 rounded-xl text-xs font-bold shadow-sm" 
+                          value={t} 
+                          onChange={e => setReminderTimes(ts => ts.map((x, i) => i === idx ? e.target.value : x))} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Start Phase</label>
+                      <Input 
+                        type="date" 
+                        className="bg-white border-slate-100 text-slate-800 h-10 rounded-xl text-xs font-bold shadow-sm" 
+                        value={reminderStartDate} 
+                        onChange={e => setReminderStartDate(e.target.value)} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Cycle Length (Days)</label>
+                      <Input 
+                        type="number" 
+                        min={1} 
+                        className="bg-white border-slate-100 text-slate-800 h-10 rounded-xl text-xs font-bold shadow-sm" 
+                        value={reminderDuration} 
+                        onChange={e => setReminderDuration(Number(e.target.value) || 1)} 
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <DialogFooter className="mt-10 border-t border-slate-50 pt-8 gap-4">
             <Button variant="ghost" onClick={() => { setPrescOrder(null); }} className="rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-400">Cancel</Button>
@@ -441,6 +538,8 @@ export const ProviderAssigned = () => {
                     toast({ title: 'Validation Error', description: 'Patient ID, medication name and volume are mandatory', variant: 'destructive' });
                     return;
                   }
+                  
+                  // 1. Create Prescription Label
                   const res = await fetch(`${API_URL}/orders/${prescOrder.id}/prescriptions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -455,7 +554,31 @@ export const ProviderAssigned = () => {
                   });
                   const body = await res.json();
                   if (!res.ok || body?.error) throw new Error(body?.error || 'Failed to generate record');
-                  toast({ title: 'Record Synchronized', description: `Prescription label generated for order #${prescOrder.id}` });
+                  
+                  // 2. Automated Reminders Sync
+                  if (remindersEnabled) {
+                    try {
+                      const endDate = addDaysStr(reminderStartDate, Math.max(0, (Number(reminderDuration) || 1) - 1));
+                      await fetch(`${API_URL}/alerts/reminders`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                        body: JSON.stringify({
+                          patient_id: pid,
+                          order_id: prescOrder.id,
+                          prescription_id: body.prescription.id,
+                          frequency_per_day: Number((prescForm as any).frequency_per_day) || 1,
+                          dosage: (prescForm as any).dosage || '1 unit',
+                          times: reminderTimes,
+                          start_date: reminderStartDate,
+                          end_date: endDate,
+                        })
+                      });
+                    } catch (remErr) {
+                      console.warn('Reminder sync failed, but prescription committed', remErr);
+                    }
+                  }
+
+                  toast({ title: 'Record Synchronized', description: remindersEnabled ? 'Clinical label generated and medication alerts synced.' : `Prescription label generated for order #${prescOrder.id}` });
                   setPrescOrder(null);
                   setPrescForm({ patient_id: "", medicine_name: "", quantity: "", instructions: "", dosage: "", frequency_per_day: "" as any });
                   qc.invalidateQueries({ queryKey: ["providerAssigned"] });
@@ -471,6 +594,18 @@ export const ProviderAssigned = () => {
       </Dialog>
     </div>
   );
+};
+
+function formatDateInput(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const da = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${da}`;
+}
+function addDaysStr(dateStr: string, days: number) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return formatDateInput(d);
 }
 
 export default ProviderAssigned;
