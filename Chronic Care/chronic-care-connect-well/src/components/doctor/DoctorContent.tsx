@@ -284,12 +284,12 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                       Audit
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-white border-slate-200 text-slate-800 max-w-4xl max-h-[80vh] rounded-3xl shadow-2xl">
-                    <DialogHeader>
+                  <DialogContent className="bg-white border-slate-200 text-slate-800 max-w-4xl max-h-[85vh] rounded-3xl shadow-2xl flex flex-col p-0 overflow-hidden">
+                    <DialogHeader className="p-8 pb-4 border-b border-slate-50">
                       <DialogTitle className="font-black uppercase tracking-tight text-slate-800">Review Clinical Request</DialogTitle>
                       <DialogDescription className="text-slate-500 font-medium italic">Satellite synchronization data for medication fulfillment.</DialogDescription>
                     </DialogHeader>
-                    <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-4">
+                    <div className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <div className="flex justify-between"><span className="text-gray-400">Full name</span><span className="font-medium">{viewing?.full_name || '-'}</span></div>
@@ -390,9 +390,9 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         </div>
                       )}
                     </div>
-                    <div className="mt-4 flex justify-end">
+                    <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
                       <DialogClose asChild>
-                        <Button variant="outline" onClick={() => setViewing(null)}>Close</Button>
+                        <Button variant="outline" className="rounded-xl font-bold" onClick={() => setViewing(null)}>Close Audit Log</Button>
                       </DialogClose>
                     </div>
                   </DialogContent>
@@ -421,229 +421,231 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                         Authenticate
                       </Button>
                     </DialogTrigger>
-          <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-2xl rounded-3xl shadow-2xl">
-                      <DialogHeader>
-            <DialogTitle className="font-black uppercase tracking-tight">Clinical Authorization</DialogTitle>
-            <DialogDescription className="text-slate-500 italic">Determine regimen parameters for this medication request.</DialogDescription>
+          <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-2xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col p-0 overflow-hidden">
+                      <DialogHeader className="p-8 pb-4 border-b border-slate-50">
+                        <DialogTitle className="font-black uppercase tracking-tight">Clinical Authorization</DialogTitle>
+                        <DialogDescription className="text-slate-500 italic">Determine regimen parameters for this medication request.</DialogDescription>
                       </DialogHeader>
-                      {approving?.doctor_status === 'approved' && (
-                        <div className="mb-3 text-sm p-2 rounded border border-yellow-500/30 bg-yellow-500/10 text-yellow-200">
-                          This order was already approved before. You can update the prescription and resend.
-                        </div>
-                      )}
                       
-                      {approving?.medical_certificate && (
-                        <div className="mb-6 p-5 bg-slate-50 border border-slate-100 rounded-3xl shadow-inner group">
-                          <div className="flex items-center justify-between mb-3 px-1">
-                             <Label className="text-slate-800 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
-                               <div className="p-1.5 bg-primary/10 rounded-lg">
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                               </div>
-                               Patient Medical Certificate
-                             </Label>
-                             <a 
-                               href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
-                               target="_blank" 
-                               rel="noreferrer" 
-                               className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
-                             >
-                               Open Full View
-                             </a>
+                      <div className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-8">
+                        {approving?.doctor_status === 'approved' && (
+                          <div className="mb-3 text-sm p-4 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 text-yellow-700 font-bold">
+                            Notice: This order was already approved before. You can update the prescription and resend.
                           </div>
-                          <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-                            {approving.medical_certificate.toLowerCase().endsWith('.pdf') ? (
-                              <div className="p-8 text-center bg-slate-50/50">
-                                <p className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">PDF Attachment</p>
-                                <Button variant="link" className="text-primary font-black uppercase text-[10px] tracking-widest p-0 h-auto" asChild>
-                                  <a href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} target="_blank" rel="noreferrer">
-                                    Launch Preview
-                                  </a>
-                                </Button>
+                        )}
+                        
+                        {approving?.medical_certificate && (
+                          <div className="mb-6 p-5 bg-slate-50 border border-slate-100 rounded-3xl shadow-inner group">
+                            <div className="flex items-center justify-between mb-3 px-1">
+                               <Label className="text-slate-800 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
+                                 <div className="p-1.5 bg-primary/10 rounded-lg">
+                                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                 </div>
+                                 Patient Medical Certificate
+                               </Label>
+                               <a 
+                                 href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
+                                 target="_blank" 
+                                 rel="noreferrer" 
+                                 className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
+                               >
+                                 Open Full View
+                               </a>
+                            </div>
+                            <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+                              {approving.medical_certificate.toLowerCase().endsWith('.pdf') ? (
+                                <div className="p-8 text-center bg-slate-50/50">
+                                  <p className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">PDF Attachment</p>
+                                  <Button variant="link" className="text-primary font-black uppercase text-[10px] tracking-widest p-0 h-auto" asChild>
+                                    <a href={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} target="_blank" rel="noreferrer">
+                                      Launch Preview
+                                    </a>
+                                  </Button>
+                                </div>
+                              ) : (
+                                 <img 
+                                   src={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
+                                   alt="Certificate Preview" 
+                                   className="max-h-64 w-full object-contain grayscale hover:grayscale-0 transition-all duration-500"
+                                 />
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="space-y-8">
+                          <div className="bg-slate-50 border border-slate-100 p-5 rounded-3xl shadow-inner space-y-4">
+                            <div className="flex items-center justify-between">
+                              <Label className="text-slate-800 font-black uppercase text-[10px] tracking-widest">Clinical Search Engine</Label>
+                              <label className="flex items-center gap-2 cursor-pointer group">
+                                <input 
+                                  type="checkbox" 
+                                  className="w-4 h-4 rounded-md border-slate-200 bg-white text-primary focus:ring-primary/20"
+                                  checked={showAll}
+                                  onChange={e => setShowAll(e.target.checked)}
+                                />
+                                <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors uppercase tracking-widest">Show all categories</span>
+                              </label>
+                            </div>
+                            <div className="relative">
+                              <Input
+                                placeholder="Search medicine database..."
+                                className="bg-white border-slate-100 text-slate-800 pl-10 rounded-2xl h-12 shadow-sm focus:ring-primary/20"
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                              />
+                              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                               </div>
-                            ) : (
-                               <img 
-                                 src={approving.medical_certificate.startsWith('http') ? approving.medical_certificate : `${API_URL.endsWith('/') ? API_URL.slice(0,-1) : API_URL}/uploads/${approving.medical_certificate.startsWith('/') ? approving.medical_certificate.slice(1) : approving.medical_certificate}`} 
-                                 alt="Certificate Preview" 
-                                 className="max-h-48 w-full object-contain grayscale hover:grayscale-0 transition-all duration-500"
-                               />
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Clinical Regimen Selection *</Label>
+                            <Select
+                              value={form.medicineName}
+                              onValueChange={(value) => {
+                                const medicine = availableMedicines.find(m => m.value === value);
+                                setForm(f => ({ ...f, medicineName: medicine?.label || value }));
+                              }}
+                            >
+                              <SelectTrigger className="bg-slate-50 border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm">
+                                <SelectValue placeholder="Select diagnostic medication">
+                                  {form.medicineName || "Select diagnostic medication"}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent className="bg-white border-slate-100 text-slate-800 max-h-[400px] rounded-2xl shadow-2xl">
+                                {(() => {
+                                  const diseaseToCategory: Record<string, string[]> = {
+                                    'diabetes': ['Diabetes'],
+                                    'hypertension': ['Hypertension'],
+                                    'asthma': ['Respiratory'],
+                                    'hiv_aids': ['HIV/AIDS'],
+                                    'tuberculosis': ['Tuberculosis'],
+                                    'ckd': ['Kidney Disease'],
+                                    'respiratory': ['Respiratory'],
+                                    'cancer': ['Cancer'],
+                                    'sickle_cell': ['Cardiovascular'],
+                                    'liver': ['Liver Disease'],
+                                    'epilepsy': ['Epilepsy'],
+                                    'cardiovascular': ['Cardiovascular'],
+                                  };
+
+                                  const supportCategories = ['Pain Management', 'Vitamins', 'Gastrointestinal'];
+                                  const patientDisease = (approving?.disease || '').toLowerCase();
+                                  const recommendedCategories = diseaseToCategory[patientDisease] || [];
+                                  
+                                  const filtered = availableMedicines.filter(m => {
+                                    const matchesSearch = !searchQuery || 
+                                      m.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      m.category.toLowerCase().includes(searchQuery.toLowerCase());
+                                    
+                                    if (!matchesSearch) return false;
+                                    if (showAll || searchQuery) return true;
+                                    
+                                    return recommendedCategories.includes(m.category) || supportCategories.includes(m.category);
+                                  });
+
+                                  if (filtered.length === 0) {
+                                    return <div className="p-4 text-center text-gray-400 text-sm">No medicines found matching your search.</div>;
+                                  }
+
+                                  const grouped: Record<string, typeof availableMedicines> = {};
+                                  filtered.forEach(m => {
+                                    if (!grouped[m.category]) grouped[m.category] = [];
+                                    grouped[m.category].push(m);
+                                  });
+
+                                  return Object.entries(grouped).sort((a,b) => {
+                                    const aRec = recommendedCategories.includes(a[0]);
+                                    const bRec = recommendedCategories.includes(b[0]);
+                                    if (aRec && !bRec) return -1;
+                                    if (!aRec && bRec) return 1;
+                                    return a[0].localeCompare(b[0]);
+                                  }).map(([cat, meds]) => (
+                                      <div key={cat} className="mb-3 last:mb-0">
+                                        <div className="px-3 py-2 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 bg-slate-50/80 flex justify-between items-center border-y border-slate-100/50 mb-2">
+                                          <span>{cat}</span>
+                                          {recommendedCategories.includes(cat) && <span className="bg-primary/10 text-primary px-2.5 py-1 rounded-full lowercase text-[8px] font-black tracking-widest border border-primary/10">clinical match</span>}
+                                        </div>
+                                      {meds.map((med) => (
+                                        <SelectItem
+                                          key={med.value}
+                                          value={med.value}
+                                          className="text-slate-700 hover:bg-slate-50 focus:bg-slate-50 pl-8 cursor-pointer rounded-xl font-bold py-3 transition-colors"
+                                        >
+                                          <div className="flex flex-col">
+                                            <span className="text-sm tracking-tight">{med.label}</span>
+                                          </div>
+                                        </SelectItem>
+                                      ))}
+                                    </div>
+                                  ));
+                                })()}
+                              </SelectContent>
+                            </Select>
+                            {!showAll && !searchQuery && (
+                              <p className="text-[10px] text-primary/80 mt-1.5 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                                Showing clinical matches for {approving?.disease?.replace(/_/g,' ')}. Toggle "Show all" for full list.
+                              </p>
                             )}
                           </div>
-                        </div>
-                      )}
-
-                      <div className="max-h-[70vh] overflow-y-auto pr-4 -mr-4 px-1 custom-scrollbar space-y-8">
-                        <div className="bg-slate-50 border border-slate-100 p-5 rounded-3xl shadow-inner space-y-4">
-                          <div className="flex items-center justify-between">
-                            <Label className="text-slate-800 font-black uppercase text-[10px] tracking-widest">Clinical Search Engine</Label>
-                            <label className="flex items-center gap-2 cursor-pointer group">
-                              <input 
-                                type="checkbox" 
-                                className="w-4 h-4 rounded-md border-slate-200 bg-white text-primary focus:ring-primary/20"
-                                checked={showAll}
-                                onChange={e => setShowAll(e.target.checked)}
-                              />
-                              <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors uppercase tracking-widest">Show all categories</span>
-                            </label>
-                          </div>
-                          <div className="relative">
-                            <Input
-                              placeholder="Search medicine database..."
-                              className="bg-white border-slate-100 text-slate-800 pl-10 rounded-2xl h-12 shadow-sm focus:ring-primary/20"
-                              value={searchQuery}
-                              onChange={e => setSearchQuery(e.target.value)}
-                            />
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Clinical Regimen Selection *</Label>
-                          <Select
-                            value={form.medicineName}
-                            onValueChange={(value) => {
-                              const medicine = availableMedicines.find(m => m.value === value);
-                              setForm(f => ({ ...f, medicineName: medicine?.label || value }));
-                            }}
-                          >
-                            <SelectTrigger className="bg-slate-50 border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm">
-                              <SelectValue placeholder="Select diagnostic medication">
-                                {form.medicineName || "Select diagnostic medication"}
-                              </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent className="bg-white border-slate-100 text-slate-800 max-h-[400px] rounded-2xl shadow-2xl">
-                              {(() => {
-                                const diseaseToCategory: Record<string, string[]> = {
-                                  'diabetes': ['Diabetes'],
-                                  'hypertension': ['Hypertension'],
-                                  'asthma': ['Respiratory'],
-                                  'hiv_aids': ['HIV/AIDS'],
-                                  'tuberculosis': ['Tuberculosis'],
-                                  'ckd': ['Kidney Disease'],
-                                  'respiratory': ['Respiratory'],
-                                  'cancer': ['Cancer'],
-                                  'sickle_cell': ['Cardiovascular'],
-                                  'liver': ['Liver Disease'],
-                                  'epilepsy': ['Epilepsy'],
-                                  'cardiovascular': ['Cardiovascular'],
-                                };
-
-                                const supportCategories = ['Pain Management', 'Vitamins', 'Gastrointestinal'];
-                                const patientDisease = (approving?.disease || '').toLowerCase();
-                                const recommendedCategories = diseaseToCategory[patientDisease] || [];
-                                
-                                const filtered = availableMedicines.filter(m => {
-                                  const matchesSearch = !searchQuery || 
-                                    m.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                    m.category.toLowerCase().includes(searchQuery.toLowerCase());
-                                  
-                                  if (!matchesSearch) return false;
-                                  if (showAll || searchQuery) return true;
-                                  
-                                  return recommendedCategories.includes(m.category) || supportCategories.includes(m.category);
-                                });
-
-                                if (filtered.length === 0) {
-                                  return <div className="p-4 text-center text-gray-400 text-sm">No medicines found matching your search.</div>;
-                                }
-
-                                // Group by category
-                                const grouped: Record<string, typeof availableMedicines> = {};
-                                filtered.forEach(m => {
-                                  if (!grouped[m.category]) grouped[m.category] = [];
-                                  grouped[m.category].push(m);
-                                });
-
-                                return Object.entries(grouped).sort((a,b) => {
-                                  const aRec = recommendedCategories.includes(a[0]);
-                                  const bRec = recommendedCategories.includes(b[0]);
-                                  if (aRec && !bRec) return -1;
-                                  if (!aRec && bRec) return 1;
-                                  return a[0].localeCompare(b[0]);
-                                }).map(([cat, meds]) => (
-                                    <div key={cat} className="mb-3 last:mb-0">
-                                      <div className="px-3 py-2 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 bg-slate-50/80 flex justify-between items-center border-y border-slate-100/50 mb-2">
-                                        <span>{cat}</span>
-                                        {recommendedCategories.includes(cat) && <span className="bg-primary/10 text-primary px-2.5 py-1 rounded-full lowercase text-[8px] font-black tracking-widest border border-primary/10">clinical match</span>}
-                                      </div>
-                                    {meds.map((med) => (
-                                      <SelectItem
-                                        key={med.value}
-                                        value={med.value}
-                                        className="text-slate-700 hover:bg-slate-50 focus:bg-slate-50 pl-8 cursor-pointer rounded-xl font-bold py-3 transition-colors"
-                                      >
-                                        <div className="flex flex-col">
-                                          <span className="text-sm tracking-tight">{med.label}</span>
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                  </div>
-                                ));
-                              })()}
-                            </SelectContent>
-                          </Select>
-                          {!showAll && !searchQuery && (
-                            <p className="text-[10px] text-primary/80 mt-1.5 flex items-center gap-1">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                              Showing clinical matches for {approving?.disease?.replace(/_/g,' ')}. Toggle "Show all" for full list.
-                            </p>
-                          )}
-                        </div>
-                        {(() => {
-                          const info = getMedType(form.medicineName);
-                          return (
-                            <div className="space-y-6 bg-slate-50/50 p-6 rounded-[28px] border border-slate-100 shadow-inner">
-                              <div>
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Clinical Quantity *</Label>
-                                <Input
-                                  type="number"
-                                  min="1"
-                                  placeholder={info.placeholder}
-                                  className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm"
-                                  value={form.prescriptionQuantity}
-                                  onChange={e => setForm(f => ({ ...f, prescriptionQuantity: e.target.value }))}
-                                />
-                                <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-wide">Volume to be dispensed in {info.unit}</p>
-                              </div>
-                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
-                                  <div>
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Dose Amount</Label>
-                                    <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm font-black text-sm" value={form.dose_amount} onChange={e=> setForm(f=>({...f, dose_amount: e.target.value}))} />
-                                  </div>
-                                  <div>
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
-                                    <Input className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm font-black text-sm" value={form.dose_unit} onChange={e=> setForm(f=>({...f, dose_unit: e.target.value}))} />
-                                  </div>
-                                  <div>
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Day Frequency</Label>
-                                    <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm font-black text-sm" value={form.times_per_day} onChange={e=> setForm(f=>({...f, times_per_day: Number(e.target.value)||1}))} />
-                                  </div>
+                          {(() => {
+                            const info = getMedType(form.medicineName);
+                            return (
+                              <div className="space-y-6 bg-slate-50/50 p-6 rounded-[28px] border border-slate-100 shadow-inner">
+                                <div>
+                                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Clinical Quantity *</Label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    placeholder={info.placeholder}
+                                    className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm"
+                                    value={form.prescriptionQuantity}
+                                    onChange={e => setForm(f => ({ ...f, prescriptionQuantity: e.target.value }))}
+                                  />
+                                  <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-wide">Volume to be dispensed in {info.unit}</p>
                                 </div>
-                              <div>
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Regimen Instructions *</Label>
-                                <textarea className="w-full bg-white border border-slate-100 text-slate-800 rounded-2xl p-4 text-sm font-bold italic shadow-sm focus:ring-primary/10 transition-all placeholder:text-slate-300" rows={3} value={form.instructions} onChange={e=> setForm(f=> ({...f, instructions: e.target.value}))} placeholder="e.g. Sync-take after 20:00 clinical cycles" />
-                                {Number(form.times_per_day) > 0 && Number(form.prescriptionQuantity) > 0 && (
-                                  <p className="text-[10px] text-emerald-600 mt-2 font-black uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full inline-flex items-center gap-2">
-                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    Dynamic Duration: {Math.ceil(Number(form.prescriptionQuantity) / (Number(form.dose_amount) * Number(form.times_per_day)))} days
-                                  </p>
-                                )}
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+                                    <div>
+                                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Dose Amount</Label>
+                                      <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm font-black text-sm" value={form.dose_amount} onChange={e=> setForm(f=>({...f, dose_amount: e.target.value}))} />
+                                    </div>
+                                    <div>
+                                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
+                                      <Input className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm font-black text-sm" value={form.dose_unit} onChange={e=> setForm(f=>({...f, dose_unit: e.target.value}))} />
+                                    </div>
+                                    <div>
+                                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Day Frequency</Label>
+                                      <Input type="number" min="1" className="bg-white border-slate-100 text-slate-800 h-12 rounded-2xl shadow-sm font-black text-sm" value={form.times_per_day} onChange={e=> setForm(f=>({...f, times_per_day: Number(e.target.value)||1}))} />
+                                    </div>
+                                  </div>
+                                <div>
+                                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Regimen Instructions *</Label>
+                                  <textarea className="w-full bg-white border border-slate-100 text-slate-800 rounded-2xl p-4 text-sm font-bold italic shadow-sm focus:ring-primary/10 transition-all placeholder:text-slate-300" rows={3} value={form.instructions} onChange={e=> setForm(f=> ({...f, instructions: e.target.value}))} placeholder="e.g. Sync-take after 20:00 clinical cycles" />
+                                  {Number(form.times_per_day) > 0 && Number(form.prescriptionQuantity) > 0 && (
+                                    <p className="text-[10px] text-emerald-600 mt-2 font-black uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full inline-flex items-center gap-2">
+                                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                      Dynamic Duration: {Math.ceil(Number(form.prescriptionQuantity) / (Number(form.dose_amount) * Number(form.times_per_day)))} days
+                                    </p>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })()}
-                        <div>
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Physician Guidance Advisory</Label>
-                          <textarea className="w-full bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl p-4 shadow-sm focus:ring-primary/10 transition-all font-medium" rows={3} value={form.advice} onChange={e=> setForm(f=> ({...f, advice: e.target.value}))} placeholder="Precision medical advice for patient telemetry..." />
-                        </div>
-                        <div>
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Adherence Strategy (Optional)</Label>
-                          <textarea className="w-full bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl p-4 shadow-sm focus:ring-primary/10 transition-all font-medium" rows={2} value={form.adherencePlan} onChange={e=> setForm(f=> ({...f, adherencePlan: e.target.value}))} placeholder="Monitoring plan and follow-up clinical cycles..." />
+                            );
+                          })()}
+                          <div>
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Physician Guidance Advisory</Label>
+                            <textarea className="w-full bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl p-4 shadow-sm focus:ring-primary/10 transition-all font-medium" rows={3} value={form.advice} onChange={e=> setForm(f=> ({...f, advice: e.target.value}))} placeholder="Precision medical advice for patient telemetry..." />
+                          </div>
+                          <div>
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Adherence Strategy (Optional)</Label>
+                            <textarea className="w-full bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl p-4 shadow-sm focus:ring-primary/10 transition-all font-medium" rows={2} value={form.adherencePlan} onChange={e=> setForm(f=> ({...f, adherencePlan: e.target.value}))} placeholder="Monitoring plan and follow-up clinical cycles..." />
+                          </div>
                         </div>
                       </div>
 
-                      <div className="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-50">
+                      <div className="p-8 border-t border-slate-50 flex justify-end gap-3 bg-slate-50/30">
                         <DialogClose asChild>
                           <Button variant="ghost" onClick={()=> setApproving(null)} className="rounded-xl font-bold text-slate-400">Cancel</Button>
                         </DialogClose>
@@ -655,18 +657,18 @@ export default function DoctorContent({ activeSection, setActiveSection }: { act
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="text-red-300 border-red-400 hover:bg-red-600/10" onClick={()=> { setRejecting(o); setRejectReason(''); }}>Reject</Button>
                     </DialogTrigger>
-           <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-md rounded-3xl shadow-2xl">
-                      <DialogHeader>
+                    <DialogContent className="bg-white border-slate-100 text-slate-800 max-w-md max-h-[90vh] rounded-3xl shadow-2xl flex flex-col p-0 overflow-hidden">
+                      <DialogHeader className="p-8 pb-4 border-b border-slate-50">
                         <DialogTitle className="font-black uppercase tracking-tight text-red-500">Clinical Rejection</DialogTitle>
                         <DialogDescription className="text-slate-400 italic">Provide clinical justification for rejecting this fulfillment request.</DialogDescription>
                       </DialogHeader>
-                      <div className="mt-4 space-y-4">
+                      <div className="flex-1 overflow-y-auto p-8 space-y-4">
                         <div>
                           <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Rejection Justification *</Label>
-                          <textarea className="w-full bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl p-4 text-sm font-medium focus:ring-red-500/10 focus:border-red-500 transition-all" rows={4} value={rejectReason} onChange={e=> setRejectReason(e.target.value)} placeholder="Explain the clinical basis for rejection..." />
+                          <textarea className="w-full bg-slate-50 border border-slate-100 text-slate-800 rounded-2xl p-4 text-sm font-medium focus:ring-red-500/10 focus:border-red-500 transition-all" rows={6} value={rejectReason} onChange={e=> setRejectReason(e.target.value)} placeholder="Explain the clinical basis for rejection..." />
                         </div>
                       </div>
-                      <div className="mt-6 flex justify-end gap-2">
+                      <div className="p-8 border-t border-slate-50 flex justify-end gap-2 bg-slate-50/30">
                         <DialogClose asChild>
                           <Button variant="ghost" onClick={()=> setRejecting(null)} className="rounded-xl font-bold text-slate-400">Cancel</Button>
                         </DialogClose>
